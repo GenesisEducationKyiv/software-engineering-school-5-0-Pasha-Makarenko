@@ -1,0 +1,6 @@
+/.idea
+/data
+/node_modules
+.env.test
+.env.dev
+.env

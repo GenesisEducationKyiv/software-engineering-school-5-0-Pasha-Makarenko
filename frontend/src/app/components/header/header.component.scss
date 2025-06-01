@@ -1,0 +1,41 @@
+@use "../../../styles/mixins" as mixins;
+
+.header {
+  border-bottom: var(--border) solid mixins.rem(1);
+
+  &__container {
+    @include mixins.adaptiveValue("padding-top", 20, 10);
+    @include mixins.adaptiveValue("padding-bottom", 20, 10);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: mixins.rem(20);
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: mixins.rem(10);
+    color: var(--select-text);
+
+    fa-icon {
+      @include mixins.adaptiveValue("font-size", 40, 30);
+    }
+
+    span {
+      font-weight: 700;
+      @include mixins.adaptiveValue("font-size", 20, 15);
+    }
+  }
+}
+
+.nav-header {
+  display: flex;
+  align-items: center;
+
+  &__link {
+    @include mixins.adaptiveValue("font-size", 20, 16);
+  }
+}
+

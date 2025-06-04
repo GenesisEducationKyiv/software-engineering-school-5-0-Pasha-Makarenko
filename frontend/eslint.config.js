@@ -3,34 +3,25 @@ const eslint = require("@eslint/js")
 const tseslint = require("typescript-eslint")
 const angular = require("angular-eslint")
 const unusedImports = require("eslint-plugin-unused-imports")
+const prettier = require("eslint-config-prettier")
+const prettierPlugin = require("eslint-plugin-prettier")
 
 module.exports = tseslint.config(
   {
     files: ["**/*.ts"],
     plugins: {
-      "unused-imports": unusedImports
+      "unused-imports": unusedImports,
+      prettier: prettierPlugin
     },
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
-      ...angular.configs.tsRecommended
+      ...angular.configs.tsRecommended,
+      prettier
     ],
     processor: angular.processInlineTemplates,
-    rules: {
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "unused-imports/no-unused-imports": "error",
-      "unused-imports/no-unused-vars": [
-        "warn",
-        {
-          vars: "all",
-          varsIgnorePattern: "^_",
-          args: "after-used",
-          argsIgnorePattern: "^_"
-        }
-      ]
-    }
+    rules: {}
   },
   {
     files: ["**/*.html"],

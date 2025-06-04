@@ -17,7 +17,9 @@
   --error: #f2545b;
   --scroll-bar: #e7e7e7;
   --scroll-bar-hover: #eeeeee;
-  --shadow-overlay: 0px 8px 32px 0px rgba(31, 46, 61, 0.53), 0px 1px 2px 0px rgba(25, 41, 56, 0.52);
+  --shadow-overlay:
+    0px 8px 32px 0px rgba(31, 46, 61, 0.53),
+    0px 1px 2px 0px rgba(25, 41, 56, 0.52);
 }
 
 ::-webkit-scrollbar {
@@ -73,7 +75,9 @@ body {
   background-color: var(--block-bg);
   border: mixins.rem(1) solid var(--border);
   border-radius: mixins.rem(15);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background-color: var(--select-bg);
@@ -114,7 +118,9 @@ body {
       width: 100%;
       height: 100%;
       padding: mixins.rem(10) mixins.rem(15);
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
       border: var(--border) solid mixins.rem(1);
       background-color: var(--block-bg);
       border-radius: mixins.rem(15);
@@ -174,7 +180,8 @@ body {
         transition: all 0.2s ease;
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         background-color: var(--second-text);
       }
 
@@ -195,7 +202,9 @@ body {
     @include mixins.adaptiveValue("font-size", 18, 14);
     @include mixins.adaptiveValue("margin-top", 25, 20);
     @include mixins.adaptiveValue("margin-bottom", 10, 7);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
     background-color: var(--second-bg);
     border: var(--light) solid mixins.rem(1);
     border-radius: mixins.rem(15);
@@ -221,11 +230,11 @@ body {
 }
 
 .loader:before {
-  content: "Loading..."
+  content: "Loading...";
 }
 
 @keyframes l4 {
   to {
-    clip-path: inset(0 -0.5ch 0 0)
+    clip-path: inset(0 -0.5ch 0 0);
   }
 }

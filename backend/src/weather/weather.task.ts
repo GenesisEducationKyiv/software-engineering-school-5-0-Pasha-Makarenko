@@ -54,7 +54,10 @@ export class WeatherTask {
           }
         })
       } catch (error) {
-        throw new InternalServerErrorException(error.message)
+        console.error(
+          `Failed to process subscription for ${sub.email}:`,
+          error.message
+        )
       }
     }
   }

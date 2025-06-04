@@ -13,7 +13,7 @@ export default tseslint.config(
       "./migrations/**",
       "./models/**",
       "./config/**",
-      "./jest.config.js",
+      "./jest.config.js"
     ]
   },
   eslint.configs.recommended,

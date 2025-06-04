@@ -2,8 +2,9 @@ import { Test, TestingModule } from "@nestjs/testing"
 import { INestApplication } from "@nestjs/common"
 import { App } from "supertest/types"
 import { AppModule } from "../src/app.module"
+import { config } from "dotenv"
 
-require("dotenv").config({ path: "../.env.test" })
+config({ path: "../.env.test" })
 
 describe("AppController (e2e)", () => {
   let app: INestApplication<App>

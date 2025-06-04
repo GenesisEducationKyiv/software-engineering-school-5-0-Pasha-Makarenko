@@ -45,11 +45,7 @@ export class SubscriptionsService {
       throw new InternalServerErrorException("Subscription not created")
     }
 
-    const url = this.configService.get<string>(
-      this.configService.get<string>("NODE_ENV") === "production"
-        ? "API_URL"
-        : "CLIENT_URL"
-    )
+    const url = this.configService.get<string>("CLIENT_URL")
 
     try {
       await this.mailService.sendMail({

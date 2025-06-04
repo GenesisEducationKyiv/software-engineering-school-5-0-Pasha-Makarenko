@@ -6,7 +6,15 @@ import tseslint from "typescript-eslint"
 
 export default tseslint.config(
   {
-    ignores: ["eslint.config.mjs"]
+    ignores: [
+      "eslint.config.mjs",
+      "./dist/**",
+      "./node_modules/**",
+      "./migrations/**",
+      "./models/**",
+      "./config/**",
+      "./jest.config.js",
+    ]
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
@@ -27,13 +35,7 @@ export default tseslint.config(
   },
   {
     rules: {
-      "prettier/prettier": "off",
-      "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-floating-promises": "off",
-      "@typescript-eslint/no-unsafe-call": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-      "@typescript-eslint/no-unsafe-argument": "warn"
+      "prettier/prettier": "warn"
     }
   }
 )

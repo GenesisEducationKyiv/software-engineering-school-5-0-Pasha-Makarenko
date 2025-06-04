@@ -13,7 +13,7 @@
     "db:reset": "npx sequelize-cli db:seed:undo:all && npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
     "seed": "npx sequelize-cli db:seed:all",
     "migrate": "npx sequelize-cli db:migrate:all",
-    "lint": "npx eslint .",
+    "lint": "npx eslint . --fix",
     "format": "npx prettier . --write",
     "test": "jest",
     "test:watch": "jest --watch",

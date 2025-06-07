@@ -4,22 +4,18 @@
       id="modal-target-{{ modalId() }}}"
       type="text"
       autocomplete="off"
-      [formControl]="searchControl()!"
-    >
+      [formControl]="searchControl()!" />
     <app-modal
       [modalId]="modalId()"
       [options]="{
-      closeOutside: true
-    }"
-    >
+        closeOutside: true
+      }">
       @if (data()) {
         <ul class="search__list">
           @for (item of data(); track item.id) {
             <li class="search__item">
-              <button
-                type="button"
-                (click)="select($index)"
-              >{{ item | city:"$n ($c)" }}
+              <button type="button" (click)="select($index)">
+                {{ item | city: "$n ($c)" }}
               </button>
             </li>
           }

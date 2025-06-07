@@ -4,7 +4,7 @@
   position: relative;
 
   .modal {
-    transform: translate(-50%, 0%) scale(0);;
+    transform: translate(-50%, 0%) scale(0);
     position: absolute;
     width: 100%;
     top: 100%;
@@ -23,7 +23,9 @@
 
   &__item {
     padding: mixins.rem(5) mixins.rem(15);
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition:
+      color 0.2s ease,
+      transform 0.2s ease;
     letter-spacing: normal;
 
     button {

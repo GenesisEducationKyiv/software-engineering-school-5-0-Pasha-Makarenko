@@ -95,13 +95,15 @@
     @include mixins.adaptiveValue("margin-bottom", 40, 30);
   }
 
-  td:first-child, th:first-child {
+  td:first-child,
+  th:first-child {
     text-align: left;
     vertical-align: bottom;
     font-weight: 400;
   }
 
-  td, th {
+  td,
+  th {
     &:nth-child(2n) {
       background-color: var(--second-bg);
     }

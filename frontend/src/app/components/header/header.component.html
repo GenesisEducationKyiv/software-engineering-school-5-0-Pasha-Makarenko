@@ -9,62 +9,75 @@
         id="modal-target-{{ modalId }}"
         type="button"
         class="nav-header__subscription button"
-        (click)="this.modalAdapter.open(modalId)"
-      >Subscription
+        (click)="this.modalAdapter.open(modalId)">
+        Subscription
       </button>
       <app-modal
         class="nav-header__modal subscriptions"
         [modalId]="modalId"
         [options]="{
           closeOutside: true
-        }"
-      >
+        }">
         <form
           class="subscriptions__form form"
           [formGroup]="subscriptionsFormGroup"
-          (ngSubmit)="subscribe()"
-        >
+          (ngSubmit)="subscribe()">
           <h2 class="form__label">Email</h2>
           <div
-            class="form__input-container {{ invalid(subscriptionsFormGroup, 'email') ? 'form__input-container_error' : '' }}">
+            class="form__input-container {{
+              invalid(subscriptionsFormGroup, 'email')
+                ? 'form__input-container_error'
+                : ''
+            }}">
             <input
               type="email"
               class="form__input"
               formControlName="email"
-              required
-            >
+              required />
           </div>
-          @if (invalid(subscriptionsFormGroup, 'email')) {
-            <app-form-error [message]="message(subscriptionsErrors, subscriptionsFormGroup, 'email')" />
+          @if (invalid(subscriptionsFormGroup, "email")) {
+            <app-form-error
+              [message]="
+                message(subscriptionsErrors, subscriptionsFormGroup, 'email')
+              " />
           }
 
           <h2 class="form__label">City</h2>
           <div
-            class="form__input-container {{ invalid(subscriptionsFormGroup, 'city') ? 'form__input-container_error' : '' }}">
+            class="form__input-container {{
+              invalid(subscriptionsFormGroup, 'city')
+                ? 'form__input-container_error'
+                : ''
+            }}">
             <app-search
               [searchId]="searchId"
               [searchControl]="this.subscriptionsFormGroup.controls.city"
               [options]="{
                 delay: 300,
                 save: false
-              }"
-            />
+              }" />
           </div>
-          @if (invalid(subscriptionsFormGroup, 'city')) {
-            <app-form-error [message]="message(subscriptionsErrors, subscriptionsFormGroup, 'city')" />
+          @if (invalid(subscriptionsFormGroup, "city")) {
+            <app-form-error
+              [message]="
+                message(subscriptionsErrors, subscriptionsFormGroup, 'city')
+              " />
           }
 
           <h2 class="form__label">Frequency</h2>
           <div
-            class="form__input-container form__input-container_radio {{ invalid(subscriptionsFormGroup, 'frequency') ? 'form__input-container_error' : '' }}">
+            class="form__input-container form__input-container_radio {{
+              invalid(subscriptionsFormGroup, 'frequency')
+                ? 'form__input-container_error'
+                : ''
+            }}">
             <div class="form__radio">
               <input
                 id="radio-1"
                 type="radio"
                 class="form__input"
                 formControlName="frequency"
-                [value]="Frequency.DAILY"
-              >
+                [value]="Frequency.DAILY" />
               <label for="radio-1">Daily</label>
             </div>
             <div class="form__radio">
@@ -73,13 +86,19 @@
                 type="radio"
                 class="form__input"
                 formControlName="frequency"
-                [value]="Frequency.HOURLY"
-              >
+                [value]="Frequency.HOURLY" />
               <label for="radio-2">Hourly</label>
             </div>
           </div>
-          @if (invalid(subscriptionsFormGroup, 'frequency')) {
-            <app-form-error [message]="message(subscriptionsErrors, subscriptionsFormGroup, 'frequency')" />
+          @if (invalid(subscriptionsFormGroup, "frequency")) {
+            <app-form-error
+              [message]="
+                message(
+                  subscriptionsErrors,
+                  subscriptionsFormGroup,
+                  'frequency'
+                )
+              " />
           }
 
           @if (subscriptionsSubmitError()) {
@@ -87,16 +106,14 @@
           }
 
           <div class="form__buttons">
-            <button
-              type="submit"
-              class="button form__button_submit"
-            >Subscribe
+            <button type="submit" class="button form__button_submit">
+              Subscribe
             </button>
             <button
               type="button"
               class="button form__button_cancel"
-              (click)="modalAdapter.close(modalId)"
-            >Cancel
+              (click)="modalAdapter.close(modalId)">
+              Cancel
             </button>
           </div>
         </form>

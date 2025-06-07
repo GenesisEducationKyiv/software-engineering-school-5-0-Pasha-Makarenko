@@ -27,7 +27,7 @@ jobs:
 
       - name: Run ESLint (frontend)
         working-directory: frontend
-        run: ng lint
+        run: npm run lint
 
       - name: Run Prettier (frontend)
         working-directory: frontend

@@ -10,6 +10,7 @@ import { HttpService } from "@nestjs/axios"
 import { WeatherData } from "./weather.interface"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
+import { lastValueFrom } from "rxjs"
 
 @Injectable()
 export class WeatherService {
@@ -35,8 +36,8 @@ export class WeatherService {
         return cachedData
       }
 
-      const response = await this.httpService
-        .get<WeatherData>(url + "/v1/forecast.json", {
+      const response = await lastValueFrom(
+        this.httpService.get<WeatherData>(url + "/v1/forecast.json", {
           params: {
             key,
             q: dto.city,
@@ -45,7 +46,7 @@ export class WeatherService {
             alerts: "no"
           }
         })
-        .toPromise()
+      )
 
       const weatherData = response?.data
       const ttl = Number(this.configService.get<number>("WEATHER_CACHE_TTL"))

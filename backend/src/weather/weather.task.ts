@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException
-} from "@nestjs/common"
+import { BadRequestException, Injectable } from "@nestjs/common"
 import { Cron, CronExpression } from "@nestjs/schedule"
 import { Frequency } from "../subscriptions/subscription.model"
 import { MailService } from "../mail/mail.service"
@@ -46,11 +42,7 @@ export class WeatherTask {
           throw new BadRequestException("Unable to get data")
         }
 
-        const url = this.configService.get<string>(
-          this.configService.get<string>("NODE_ENV") === "production"
-            ? "API_URL"
-            : "CLIENT_URL"
-        )
+        const url = this.configService.get<string>("CLIENT_URL")
 
         await this.mailService.sendMail({
           emails: [sub.email],
@@ -62,7 +54,10 @@ export class WeatherTask {
           }
         })
       } catch (error) {
-        throw new InternalServerErrorException(error.message)
+        console.error(
+          `Failed to process subscription for ${sub.email}:`,
+          error.message
+        )
       }
     }
   }

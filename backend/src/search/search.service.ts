@@ -1,58 +1,35 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException
-} from "@nestjs/common"
+import { BadRequestException, Inject, Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { HttpService } from "@nestjs/axios"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
-import { City } from "./search.interface"
+import { QueryBus } from "@nestjs/cqrs"
+import { GetCitiesQuery } from "./queries/get-cities.query"
 
 @Injectable()
 export class SearchService {
   constructor(
     private configService: ConfigService,
-    private httpService: HttpService,
+    private queryBus: QueryBus,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async search(city: string) {
-    const url = this.configService.get<string>("WEATHER_API_URL")
-    const key = this.configService.get<string>("WEATHER_API_KEY")
-
-    if (!url || !key) {
-      throw new InternalServerErrorException("Unable to get data")
-    }
-
     const cacheKey = `search_${city}`
+    const cachedData = await this.cacheManager.get<string[]>(cacheKey)
 
-    try {
-      const cachedData = await this.cacheManager.get<City[]>(cacheKey)
-      if (cachedData) {
-        return cachedData
-      }
-
-      const response = await this.httpService
-        .get<City[]>(url + "/v1/search.json", {
-          params: {
-            key,
-            q: city
-          }
-        })
-        .toPromise()
-
-      const searchData = response?.data
-      const ttl = Number(this.configService.get<number>("SEARCH_CACHE_TTL"))
-
-      if (searchData) {
-        await this.cacheManager.set(cacheKey, searchData, ttl)
-      }
-
-      return searchData
-    } catch (error) {
-      throw new BadRequestException(error.message)
+    if (cachedData) {
+      return cachedData
     }
+
+    const searchData = await this.queryBus.execute(new GetCitiesQuery(city))
+
+    if (!searchData || searchData.length === 0) {
+      throw new BadRequestException(`No results found for query: ${city}`)
+    }
+
+    const ttl = Number(this.configService.get<number>("SEARCH_CACHE_TTL"))
+    await this.cacheManager.set(cacheKey, searchData, ttl)
+
+    return searchData
   }
 }

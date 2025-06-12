@@ -1,15 +1,33 @@
 import { Test, TestingModule } from "@nestjs/testing"
-import { WeatherTask } from "./weather.task"
+import { SchedulerService } from "./scheduler.service"
 import { SubscriptionsService } from "../subscriptions/subscriptions.service"
 import { MailService } from "../mail/mail.service"
-import { WeatherService } from "./weather.service"
 import { Frequency, Subscription } from "../subscriptions/subscription.model"
 import { InternalServerErrorException } from "@nestjs/common"
-import { WeatherData } from "./weather.interface"
 import { ConfigModule } from "@nestjs/config"
+import { WeatherService } from "../weather/weather.service"
+import { WeatherData } from "../weather/weather.interface"
 
-describe("WeatherTask", () => {
-  let task: WeatherTask
+describe("SchedulerService", () => {
+  let service: SchedulerService
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [SchedulerService]
+    }).compile()
+
+    service = module.get<SchedulerService>(SchedulerService)
+  })
+
+  it("should be defined", () => {
+    expect(service).toBeDefined()
+  })
+})
+
+class WeatherTask {}
+
+describe("SchedulerService", () => {
+  let service: SchedulerService
   let subscriptionsService: SubscriptionsService
   let mailService: MailService
   let weatherService: WeatherService
@@ -36,7 +54,7 @@ describe("WeatherTask", () => {
         })
       ],
       providers: [
-        WeatherTask,
+        SchedulerService,
         {
           provide: SubscriptionsService,
           useValue: {
@@ -58,7 +76,7 @@ describe("WeatherTask", () => {
       ]
     }).compile()
 
-    task = module.get<WeatherTask>(WeatherTask)
+    service = module.get<SchedulerService>(WeatherTask)
     subscriptionsService =
       module.get<SubscriptionsService>(SubscriptionsService)
     mailService = module.get<MailService>(MailService)
@@ -73,7 +91,7 @@ describe("WeatherTask", () => {
       jest.spyOn(weatherService, "weather").mockResolvedValue(mockWeatherData)
       jest.spyOn(mailService, "sendMail").mockResolvedValue(true)
 
-      await task.sendWeatherHourly()
+      await service.sendWeatherHourly()
 
       expect(subscriptionsService.getActive).toHaveBeenCalledWith({
         frequency: Frequency.HOURLY
@@ -94,7 +112,7 @@ describe("WeatherTask", () => {
       jest.spyOn(weatherService, "weather").mockResolvedValue(mockWeatherData)
       jest.spyOn(mailService, "sendMail").mockResolvedValue(true)
 
-      await task.sendWeatherDaily()
+      await service.sendWeatherDaily()
 
       expect(subscriptionsService.getActive).toHaveBeenCalledWith({
         frequency: Frequency.DAILY
@@ -111,7 +129,7 @@ describe("WeatherTask", () => {
         .spyOn(weatherService, "weather")
         .mockRejectedValue(new Error("API Error"))
 
-      await expect(task.sendWeather(Frequency.DAILY)).rejects.toThrow(
+      await expect(service.sendWeatherDaily()).rejects.toThrow(
         InternalServerErrorException
       )
     })
@@ -122,7 +140,7 @@ describe("WeatherTask", () => {
         .mockResolvedValue([mockSubscription])
       jest.spyOn(weatherService, "weather").mockResolvedValue(undefined)
 
-      await expect(task.sendWeather(Frequency.DAILY)).rejects.toThrow(
+      await expect(service.sendWeatherDaily()).rejects.toThrow(
         InternalServerErrorException
       )
     })

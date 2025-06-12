@@ -1,26 +1,21 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common"
-import { MailerService } from "@nestjs-modules/mailer"
+import { Injectable } from "@nestjs/common"
 import { SendMailDto } from "./dto/send-mail.dto"
 import { ConfigService } from "@nestjs/config"
+import { CommandBus } from "@nestjs/cqrs"
+import { SendMailCommand } from "./commands/send-mail.command"
 
 @Injectable()
 export class MailService {
+  private readonly from: string
+
   constructor(
-    private mailerService: MailerService,
+    private commandBus: CommandBus,
     private configService: ConfigService
-  ) {}
+  ) {
+    this.from = this.configService.get<string>("SMTP_USER")!
+  }
 
   async sendMail(dto: SendMailDto) {
-    try {
-      return await this.mailerService.sendMail({
-        to: dto.emails,
-        from: this.configService.get<string>("SMTP_USER"),
-        subject: dto.subject,
-        template: dto.template,
-        context: dto.context
-      })
-    } catch (error) {
-      throw new InternalServerErrorException(error?.message)
-    }
+    return this.commandBus.execute(new SendMailCommand(dto, this.from))
   }
 }

@@ -1,63 +1,39 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException
-} from "@nestjs/common"
+import { BadRequestException, Inject, Injectable } from "@nestjs/common"
 import { WeatherQueryDto } from "./dto/weather-query.dto"
 import { ConfigService } from "@nestjs/config"
-import { HttpService } from "@nestjs/axios"
 import { WeatherData } from "./weather.interface"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
-import { lastValueFrom } from "rxjs"
+import { QueryBus } from "@nestjs/cqrs"
+import { GetWeatherQuery } from "./queries/get-weather.query"
 
 @Injectable()
 export class WeatherService {
   constructor(
     private configService: ConfigService,
-    private httpService: HttpService,
+    private queryBus: QueryBus,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async weather(dto: WeatherQueryDto) {
-    const url = this.configService.get<string>("WEATHER_API_URL")
-    const key = this.configService.get<string>("WEATHER_API_KEY")
-
-    if (!url || !key) {
-      throw new InternalServerErrorException("Unable to get data")
-    }
-
     const cacheKey = `weather_${dto.city}_${dto.days}`
+    const cachedData = await this.cacheManager.get<WeatherData>(cacheKey)
 
-    try {
-      const cachedData = await this.cacheManager.get<WeatherData>(cacheKey)
-      if (cachedData) {
-        return cachedData
-      }
-
-      const response = await lastValueFrom(
-        this.httpService.get<WeatherData>(url + "/v1/forecast.json", {
-          params: {
-            key,
-            q: dto.city,
-            days: dto.days,
-            aqi: "no",
-            alerts: "no"
-          }
-        })
-      )
-
-      const weatherData = response?.data
-      const ttl = Number(this.configService.get<number>("WEATHER_CACHE_TTL"))
-
-      if (weatherData) {
-        await this.cacheManager.set(cacheKey, weatherData, ttl)
-      }
-
-      return weatherData
-    } catch (error) {
-      throw new BadRequestException(error.message)
+    if (cachedData) {
+      return cachedData
     }
+
+    const weatherData = await this.queryBus.execute(new GetWeatherQuery(dto))
+
+    if (!weatherData) {
+      throw new BadRequestException(
+        `No weather data found for city: ${dto.city}`
+      )
+    }
+
+    const ttl = Number(this.configService.get<number>("WEATHER_CACHE_TTL"))
+    await this.cacheManager.set(cacheKey, weatherData, ttl)
+
+    return weatherData
   }
 }

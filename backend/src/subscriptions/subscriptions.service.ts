@@ -1,97 +1,36 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException
-} from "@nestjs/common"
-import { InjectModel } from "@nestjs/sequelize"
+import { Injectable } from "@nestjs/common"
 import { CreateSubscriptionDto } from "./dto/create-subscription.dto"
 import { Subscription } from "./subscription.model"
-import { generateToken } from "../shared/utils/token.util"
-import { MailService } from "../mail/mail.service"
-import { MailTemplate } from "../mail/dto/send-mail.dto"
-import { ConfigService } from "@nestjs/config"
+import { CommandBus, QueryBus } from "@nestjs/cqrs"
+import { CreateSubscriptionCommand } from "./commands/create-subscription.command"
+import { ConfirmSubscriptionCommand } from "./commands/confirm-subscription.command"
+import { UnsubscribeCommand } from "./commands/unsubscribe.command"
+import { GetActiveSubscriptionsQuery } from "./queries/get-active-subscriptions.query"
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
-    @InjectModel(Subscription)
-    private subscriptionsRepository: typeof Subscription,
-    private configService: ConfigService,
-    private mailService: MailService
+    private commandBus: CommandBus,
+    private queryBus: QueryBus
   ) {}
 
   async createSubscription(dto: CreateSubscriptionDto) {
-    const candidate = await this.subscriptionsRepository.findOne({
-      where: {
-        email: dto.email
-      }
-    })
-
-    if (candidate) {
-      throw new ConflictException("Subscription for this email exists")
-    }
-
-    const confirmationToken = generateToken()
-    const unsubscribeToken = generateToken()
-
-    const subscription = await this.subscriptionsRepository.create({
-      ...dto,
-      confirmationToken,
-      unsubscribeToken
-    })
-
-    if (!subscription) {
-      throw new InternalServerErrorException("Subscription not created")
-    }
-
-    const url = this.configService.get<string>("CLIENT_URL")
-
-    try {
-      await this.mailService.sendMail({
-        emails: [dto.email],
-        subject: "Confirmation",
-        template: MailTemplate.CONFIRM,
-        context: {
-          confirmUrl: url + "/confirm/" + confirmationToken
-        }
-      })
-    } catch (error) {
-      await subscription.destroy()
-      throw new InternalServerErrorException(error.message)
-    }
+    return await this.commandBus.execute(new CreateSubscriptionCommand(dto))
   }
 
   async confirm(confirmationToken: string) {
-    const subscription = await this.subscriptionsRepository.findOne({
-      where: { confirmationToken }
-    })
-
-    if (!subscription) {
-      throw new NotFoundException("Subscription for this email not found")
-    }
-
-    await subscription.update({ isConfirmed: true })
+    return await this.commandBus.execute(
+      new ConfirmSubscriptionCommand(confirmationToken)
+    )
   }
 
   async unsubscribe(unsubscribeToken: string) {
-    const subscription = await this.subscriptionsRepository.findOne({
-      where: { unsubscribeToken }
-    })
-
-    if (!subscription) {
-      throw new NotFoundException("Subscription for this email not found")
-    }
-
-    await subscription.destroy()
+    return await this.commandBus.execute(
+      new UnsubscribeCommand(unsubscribeToken)
+    )
   }
 
   async getActive(where: Partial<Subscription>) {
-    return await this.subscriptionsRepository.findAll({
-      where: {
-        ...where,
-        isConfirmed: true
-      }
-    })
+    return await this.queryBus.execute(new GetActiveSubscriptionsQuery(where))
   }
 }

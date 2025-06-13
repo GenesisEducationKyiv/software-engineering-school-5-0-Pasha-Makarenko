@@ -1,5 +1,5 @@
 import { Component, inject, signal } from "@angular/core"
-import { ModalAdapter } from "../modal/state/modal.adapter"
+import { ModalAdapter } from "../../store/modal/modal.adapter"
 import { ModalComponent } from "../modal/modal.component"
 import { faCloudBolt } from "@fortawesome/free-solid-svg-icons"
 import { FaIconComponent } from "@fortawesome/angular-fontawesome"

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core"
-import { AppState } from "../../../app.state"
+import { AppState } from "../state.interfaces"
 import { Store } from "@ngrx/store"
 import * as ModalActions from "./modal.actions"
 import { selectModals } from "./modal.selectors"

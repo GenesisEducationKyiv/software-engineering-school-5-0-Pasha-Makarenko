@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsEmail, IsEnum, IsString } from "class-validator"
-import { Frequency } from "../subscription.model"
+import { Frequency } from "../models/subscription.model"
 
 export class CreateSubscriptionDto {
   @ApiProperty({ example: "example@gmail.com", description: "User email" })

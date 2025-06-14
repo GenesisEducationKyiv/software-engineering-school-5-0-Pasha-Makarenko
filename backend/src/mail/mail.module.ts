@@ -1,12 +1,16 @@
 import { Module } from "@nestjs/common"
-import { MailService } from "./mail.service"
 import { MailerModule } from "@nestjs-modules/mailer"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { getMailConfig } from "../config/mail.config"
+import { SendMailHandler } from "./commands/handlers/send.mail.handler"
+import { CqrsModule } from "@nestjs/cqrs"
+
+const commandHandlers = [SendMailHandler]
 
 @Module({
-  providers: [MailService],
+  providers: commandHandlers,
   imports: [
+    CqrsModule,
     ConfigModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -14,6 +18,6 @@ import { getMailConfig } from "../config/mail.config"
       inject: [ConfigService]
     })
   ],
-  exports: [MailService]
+  exports: commandHandlers
 })
 export class MailModule {}

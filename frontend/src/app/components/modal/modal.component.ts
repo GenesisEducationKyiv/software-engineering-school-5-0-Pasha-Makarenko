@@ -1,9 +1,9 @@
-import { Component, HostListener, Input, signal } from "@angular/core"
+import { Component, HostListener, input, signal } from "@angular/core"
 import { findParentById } from "../../utils/dom/find"
-import { ModalAdapter } from "./state/modal.adapter"
+import { ModalAdapter } from "../../store/modal/modal.adapter"
 
 interface ModalOptions {
-  closeOutside?: boolean
+  closeOutside: boolean
 }
 
 @Component({
@@ -14,24 +14,24 @@ interface ModalOptions {
   styleUrl: "./modal.component.scss"
 })
 export class ModalComponent {
-  @Input({ required: true }) modalId!: string
-  @Input() options: ModalOptions = {}
+  modalId = input<string>()
+  options = input<Partial<ModalOptions> | null>(null)
   isOpen = signal(false)
 
   constructor(private modalAdapter: ModalAdapter) {
     this.modalAdapter.select().subscribe(res => {
-      this.isOpen.set(res[this.modalId]?.isOpen)
+      this.isOpen.set(res[this.modalId()!]?.isOpen)
     })
   }
 
   @HostListener("document:click", ["$event.target"])
   onClickOutside(target: HTMLElement) {
     if (
-      this.options?.closeOutside &&
+      this.options()?.closeOutside &&
       this.isOpen() &&
-      !findParentById(target, ["modal", `modal-target-${this.modalId}`])
+      !findParentById(target, ["modal", `modal-target-${this.modalId()!}`])
     ) {
-      this.modalAdapter.close(this.modalId)
+      this.modalAdapter.close(this.modalId()!)
     }
   }
 }

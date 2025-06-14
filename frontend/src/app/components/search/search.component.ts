@@ -13,9 +13,9 @@ import { debounceTime, distinctUntilChanged } from "rxjs"
 import { ModalComponent } from "../modal/modal.component"
 import { City } from "../../api/search/search.interface"
 import { SearchService } from "../../api/search/search.service"
-import { ModalAdapter } from "../modal/state/modal.adapter"
-import { WeatherService } from "../../api/weather/weather.service"
+import { ModalAdapter } from "../../store/modal/modal.adapter"
 import { CityPipe } from "../../pipes/city.pipe"
+import { CityAdapter } from "../../store/city/city.adapter"
 
 export interface SearchOptions {
   delay: number
@@ -30,7 +30,6 @@ export interface SearchOptions {
 })
 export class SearchComponent implements OnInit {
   searchService = inject(SearchService)
-  weatherService = inject(WeatherService)
 
   searchId = input<string>()
   modalId = computed(() => this.searchId() + "-modal")
@@ -39,7 +38,10 @@ export class SearchComponent implements OnInit {
   data = signal<City[]>([])
   selectOutput = output<City | null>()
 
-  constructor(protected modalAdapter: ModalAdapter) {
+  constructor(
+    protected modalAdapter: ModalAdapter,
+    protected cityAdapter: CityAdapter
+  ) {
     effect(() => {
       if (this.data().length) {
         this.modalAdapter.open(this.modalId())
@@ -68,7 +70,7 @@ export class SearchComponent implements OnInit {
     this.data.set([])
 
     if (this.options()?.save) {
-      this.weatherService.setCity(city, true)
+      this.cityAdapter.setCity(city)
     }
 
     if (this.selectOutput) {

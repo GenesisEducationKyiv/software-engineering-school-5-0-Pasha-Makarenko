@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing"
 import { ModalComponent } from "./modal.component"
-import { ModalAdapter } from "./state/modal.adapter"
+import { ModalAdapter } from "../../store/modal/modal.adapter"
 import { Store } from "@ngrx/store"
 import { of } from "rxjs"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { selectModals } from "./state/modal.selectors"
+import { selectModals } from "../../store/modal/modal.selectors"
 
 describe("ModalComponent", () => {
   let component: ModalComponent

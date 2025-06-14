@@ -4,8 +4,8 @@
       <div class="weather__heading heading-weather">
         <div class="heading-weather__title">
           {{
-            weatherService.city
-              ? (weatherService.city | city: "$n ($c)")
+            this.city()
+              ? (this.city() | city: "$n ($c)")
               : "Please, select city"
           }}
         </div>
@@ -17,20 +17,20 @@
               delay: 300,
               save: true
             }"
-            (selectOutput)="homeAdapter.weather()" />
+            (selectOutput)="cityAdapter.setCity($event!)" />
           <button
             type="button"
             class="heading-weather__button"
-            (click)="homeAdapter.weather()">
+            (click)="weatherAdapter.weather(city()?.url!)">
             <fa-icon [icon]="searchIcon" />
           </button>
         </div>
       </div>
 
-      @if (data().isLoading || !data().result) {
+      @if (weatherData().isLoading || !weatherData().data) {
         <div class="loader"></div>
-      } @else if (data().error) {
-        <app-form-error [message]="data().error!" />
+      } @else if (weatherData().error) {
+        <app-form-error [message]="weatherData().error!" />
       } @else {
         @if (currentDay()) {
           <div class="weather-summary">
@@ -146,7 +146,10 @@
           </div>
         }
         <ul class="weather__select select-weather">
-          @for (day of data().result!.forecast!.forecastday!; track day.date) {
+          @for (
+            day of weatherData().data!.forecast!.forecastday!;
+            track day.date
+          ) {
             <li class="select-weather__item">
               <button type="button" (click)="dayIndex.set($index)">
                 <div

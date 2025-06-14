@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing"
 import { HomeComponent } from "./home.component"
-import { HomeAdapter } from "./state/home.adapter"
+import { WeatherAdapter } from "../../store/weather/weather.adapter"
 import { WeatherService } from "../../api/weather/weather.service"
 import { Store } from "@ngrx/store"
 import { MockStore, provideMockStore } from "@ngrx/store/testing"
-import { selectHome } from "./state/home.selectors"
+import { selectWeather } from "../../store/weather/home.selectors"
 import { of } from "rxjs"
 import { City } from "../../api/search/search.interface"
 import { WeatherData } from "../../api/weather/weather.interface"
@@ -14,9 +14,9 @@ import {
   getWeatherAction,
   getWeatherFailureAction,
   getWeatherSuccessAction
-} from "./state/home.actions"
-import { initialHomeState } from "./state/home.state"
-import { homeReducer } from "./state/home.reducer"
+} from "../../store/weather/home.actions"
+import { initialWeatherState } from "../../store/weather/weatherState"
+import { weatherReducer } from "../../store/weather/weather.reducer"
 import { ReactiveFormsModule } from "@angular/forms"
 import { HttpClientTestingModule } from "@angular/common/http/testing"
 import { SearchComponent } from "../../components/search/search.component"
@@ -25,7 +25,7 @@ import { ErrorComponent } from "../../components/error/error.component"
 describe("HomeComponent", () => {
   let component: HomeComponent
   let fixture: ComponentFixture<HomeComponent>
-  let homeAdapter: HomeAdapter
+  let homeAdapter: WeatherAdapter
 
   const mockCity: City = {
     id: 1,
@@ -66,7 +66,7 @@ describe("HomeComponent", () => {
       ],
       providers: [
         {
-          provide: HomeAdapter,
+          provide: WeatherAdapter,
           useValue: {
             select: jest.fn(() =>
               of({ result: null, isLoading: false, error: null })
@@ -90,7 +90,7 @@ describe("HomeComponent", () => {
 
     fixture = TestBed.createComponent(HomeComponent)
     component = fixture.componentInstance
-    homeAdapter = TestBed.inject(HomeAdapter)
+    homeAdapter = TestBed.inject(WeatherAdapter)
 
     jest.spyOn(homeAdapter, "select").mockReturnValue(
       of({
@@ -139,14 +139,14 @@ describe("HomeComponent", () => {
 })
 
 describe("HomeAdapter", () => {
-  let adapter: HomeAdapter
+  let adapter: WeatherAdapter
   let store: MockStore
   let weatherService: WeatherService
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        HomeAdapter,
+        WeatherAdapter,
         {
           provide: WeatherService,
           useValue: {
@@ -160,7 +160,7 @@ describe("HomeAdapter", () => {
       ]
     })
 
-    adapter = TestBed.inject(HomeAdapter)
+    adapter = TestBed.inject(WeatherAdapter)
     store = TestBed.inject(Store) as MockStore
     weatherService = TestBed.inject(WeatherService)
     jest.spyOn(store, "dispatch")
@@ -181,7 +181,7 @@ describe("HomeAdapter", () => {
 
   it("should select home state", () => {
     const mockState = { result: null, isLoading: false, error: null }
-    store.overrideSelector(selectHome, mockState)
+    store.overrideSelector(selectWeather, mockState)
 
     adapter.select().subscribe(state => {
       expect(state).toEqual(mockState)
@@ -197,7 +197,7 @@ describe("Home Actions", () => {
 
   it("should create getWeatherSuccessAction with payload", () => {
     const payload = { location: { name: "London" } }
-    const action = getWeatherSuccessAction({ result: payload as never })
+    const action = getWeatherSuccessAction({ data: payload as never })
     expect(action.type).toBe("[Home] Get Weather Success")
     expect(action.result).toEqual(payload)
   })
@@ -211,43 +211,49 @@ describe("Home Actions", () => {
 })
 
 describe("Home Reducer", () => {
-  const initialState = initialHomeState
+  const initialState = initialWeatherState
 
   it("should return initial state", () => {
     const action = {} as never
-    const state = homeReducer(undefined, action)
+    const state = weatherReducer(undefined, action)
     expect(state).toEqual(initialState)
   })
 
   it("should handle getWeatherAction", () => {
     const action = getWeatherAction()
-    const state = homeReducer(initialState, action)
-    expect(state.home.isLoading).toBe(true)
-    expect(state.home.error).toBeNull()
+    const state = weatherReducer(initialState, action)
+    expect(state.weather.isLoading).toBe(true)
+    expect(state.weather.error).toBeNull()
   })
 
   it("should handle getWeatherSuccessAction", () => {
     const payload = { location: { name: "London" } }
-    const action = getWeatherSuccessAction({ result: payload as never })
-    const state = homeReducer(
-      { ...initialState, home: { ...initialState.home, isLoading: true } },
+    const action = getWeatherSuccessAction({ data: payload as never })
+    const state = weatherReducer(
+      {
+        ...initialState,
+        weather: { ...initialState.weather, isLoading: true }
+      },
       action
     )
-    expect(state.home.result).toEqual(payload)
-    expect(state.home.isLoading).toBe(false)
-    expect(state.home.error).toBeNull()
+    expect(state.weather.result).toEqual(payload)
+    expect(state.weather.isLoading).toBe(false)
+    expect(state.weather.error).toBeNull()
   })
 
   it("should handle getWeatherFailureAction", () => {
     const error = "Error message"
     const action = getWeatherFailureAction({ error })
-    const state = homeReducer(
-      { ...initialState, home: { ...initialState.home, isLoading: true } },
+    const state = weatherReducer(
+      {
+        ...initialState,
+        weather: { ...initialState.weather, isLoading: true }
+      },
       action
     )
-    expect(state.home.error).toBe(error)
-    expect(state.home.isLoading).toBe(false)
-    expect(state.home.result).toBeNull()
+    expect(state.weather.error).toBe(error)
+    expect(state.weather.isLoading).toBe(false)
+    expect(state.weather.result).toBeNull()
   })
 })
 
@@ -260,7 +266,7 @@ describe("Home Selectors", () => {
         error: null
       }
     }
-    const result = selectHome.projector(mockState)
+    const result = selectWeather.projector(mockState)
     expect(result).toEqual(mockState.home)
   })
 })

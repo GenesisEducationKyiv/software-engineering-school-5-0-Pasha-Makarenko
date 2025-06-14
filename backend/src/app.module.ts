@@ -11,6 +11,8 @@ import { getCacheConfig } from "./config/cache.config"
 import { ScheduleModule } from "@nestjs/schedule"
 import { SearchModule } from "./search/search.module"
 import { dynamicServeStatic } from "./config/serve-static.config"
+import { SchedulerModule } from "./scheduler/scheduler.module"
+import { UrlGeneratorModule } from "./url-generator/url-generator.module"
 
 @Module({
   imports: [
@@ -31,7 +33,9 @@ import { dynamicServeStatic } from "./config/serve-static.config"
     MailModule,
     SubscriptionsModule,
     WeatherModule,
-    SearchModule
+    SearchModule,
+    SchedulerModule,
+    UrlGeneratorModule
   ]
 })
 export class AppModule {}

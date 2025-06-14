@@ -1,10 +1,10 @@
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs"
-import { CreateSubscriptionCommand } from "../create-subscription.command"
+import { CreateSubscriptionCommand } from "../impl/create-subscription.command"
 import { InjectModel } from "@nestjs/sequelize"
-import { Subscription } from "../../subscription.model"
+import { Subscription } from "../../models/subscription.model"
 import { ConflictException } from "@nestjs/common"
 import { generateToken } from "../../../shared/utils/token.util"
-import { SubscriptionCreatedEvent } from "../../events/subscription-created.event"
+import { SubscriptionCreatedEvent } from "../../events/impl/subscription-created.event"
 
 @CommandHandler(CreateSubscriptionCommand)
 export class CreateSubscriptionHandler

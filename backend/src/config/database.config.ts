@@ -1,6 +1,6 @@
 import { SequelizeModuleOptions } from "@nestjs/sequelize"
 import { ConfigService } from "@nestjs/config"
-import { Subscription } from "../subscriptions/subscription.model"
+import { Subscription } from "../subscriptions/models/subscription.model"
 
 export const getSequelizeConfig = (
   configService: ConfigService

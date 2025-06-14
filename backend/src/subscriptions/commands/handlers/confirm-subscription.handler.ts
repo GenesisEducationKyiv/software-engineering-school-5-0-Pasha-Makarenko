@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
-import { ConfirmSubscriptionCommand } from "../confirm-subscription.command"
+import { ConfirmSubscriptionCommand } from "../impl/confirm-subscription.command"
 import { InjectModel } from "@nestjs/sequelize"
-import { Subscription } from "../../subscription.model"
+import { Subscription } from "../../models/subscription.model"
 import { NotFoundException } from "@nestjs/common"
 
 @CommandHandler(ConfirmSubscriptionCommand)

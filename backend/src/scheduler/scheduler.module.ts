@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common"
-import { SchedulerService } from "./scheduler.service"
+import { SchedulerService } from "./services/scheduler.service"
 import { MailModule } from "../mail/mail.module"
 import { SubscriptionsModule } from "../subscriptions/subscriptions.module"
 import { CqrsModule } from "@nestjs/cqrs"

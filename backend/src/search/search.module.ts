@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common"
-import { SearchController } from "./search.controller"
-import { SearchService } from "./search.service"
+import { SearchController } from "./controllers/search.controller"
 import { HttpModule } from "@nestjs/axios"
 import { GetCitiesHandler } from "./queries/handlers/get-cities.handler"
 import { CqrsModule } from "@nestjs/cqrs"
@@ -11,7 +10,7 @@ const queryHandlers = [GetCitiesHandler]
 @Module({
   controllers: [SearchController],
   imports: [CqrsModule, HttpModule, UrlGeneratorModule],
-  providers: [SearchService, ...queryHandlers],
-  exports: [SearchService, ...queryHandlers]
+  providers: queryHandlers,
+  exports: queryHandlers
 })
 export class SearchModule {}

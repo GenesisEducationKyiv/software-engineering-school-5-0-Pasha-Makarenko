@@ -1,7 +1,7 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs"
-import { GetActiveSubscriptionsQuery } from "../get-active-subscriptions.query"
+import { GetActiveSubscriptionsQuery } from "../impl/get-active-subscriptions.query"
 import { InjectModel } from "@nestjs/sequelize"
-import { Subscription } from "../../subscription.model"
+import { Subscription } from "../../models/subscription.model"
 
 @QueryHandler(GetActiveSubscriptionsQuery)
 export class GetActiveSubscriptionsHandler

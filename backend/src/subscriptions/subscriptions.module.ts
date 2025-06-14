@@ -1,8 +1,7 @@
 import { Module } from "@nestjs/common"
 import { SequelizeModule } from "@nestjs/sequelize"
-import { SubscriptionsService } from "./subscriptions.service"
-import { Subscription } from "./subscription.model"
-import { SubscriptionsController } from "./subscriptions.controller"
+import { Subscription } from "./models/subscription.model"
+import { SubscriptionsController } from "./controllers/subscriptions.controller"
 import { MailModule } from "../mail/mail.module"
 import { ConfigModule } from "@nestjs/config"
 import { CqrsModule } from "@nestjs/cqrs"
@@ -25,12 +24,7 @@ const eventHandlers = [SubscriptionCreatedHandler]
 
 @Module({
   controllers: [SubscriptionsController],
-  providers: [
-    SubscriptionsService,
-    ...commandHandlers,
-    ...queryHandlers,
-    ...eventHandlers
-  ],
+  providers: [...commandHandlers, ...queryHandlers, ...eventHandlers],
   imports: [
     CqrsModule,
     ConfigModule,
@@ -38,11 +32,6 @@ const eventHandlers = [SubscriptionCreatedHandler]
     MailModule,
     UrlGeneratorModule
   ],
-  exports: [
-    SubscriptionsService,
-    ...commandHandlers,
-    ...queryHandlers,
-    ...eventHandlers
-  ]
+  exports: [...commandHandlers, ...queryHandlers, ...eventHandlers]
 })
 export class SubscriptionsModule {}

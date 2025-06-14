@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
-import { UnsubscribeCommand } from "../unsubscribe.command"
+import { UnsubscribeCommand } from "../impl/unsubscribe.command"
 import { InjectModel } from "@nestjs/sequelize"
-import { Subscription } from "../../subscription.model"
+import { Subscription } from "../../models/subscription.model"
 import { NotFoundException } from "@nestjs/common"
 
 @CommandHandler(UnsubscribeCommand)

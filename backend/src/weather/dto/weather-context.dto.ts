@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsString } from "class-validator"
-import { WeatherData } from "../weather.interface"
+import { WeatherData } from "../interfaces/weather.interface"
 
 export class WeatherContextDto {
   @ApiProperty({ example: "123", description: "Unsubscription url" })

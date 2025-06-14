@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common"
-import { MailService } from "./mail.service"
 import { MailerModule } from "@nestjs-modules/mailer"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { getMailConfig } from "../config/mail.config"
@@ -9,7 +8,7 @@ import { CqrsModule } from "@nestjs/cqrs"
 const commandHandlers = [SendMailHandler]
 
 @Module({
-  providers: [MailService, ...commandHandlers],
+  providers: commandHandlers,
   imports: [
     CqrsModule,
     ConfigModule,
@@ -19,6 +18,6 @@ const commandHandlers = [SendMailHandler]
       inject: [ConfigService]
     })
   ],
-  exports: [MailService, ...commandHandlers]
+  exports: commandHandlers
 })
 export class MailModule {}

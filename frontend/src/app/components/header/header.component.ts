@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core"
+import { Component, signal } from "@angular/core"
 import { ModalAdapter } from "../../store/modal/modal.adapter"
 import { ModalComponent } from "../modal/modal.component"
 import { faCloudBolt } from "@fortawesome/free-solid-svg-icons"
@@ -6,8 +6,8 @@ import { FaIconComponent } from "@fortawesome/angular-fontawesome"
 import { subscriptionsFormValidators } from "./subscriptions-form.validators"
 import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms"
 import { Frequency } from "../../api/subscriptions/subscriptions.interface"
-import { invalid } from "../../utils/error/invalid"
-import { message } from "../../utils/error/message"
+import { invalid } from "../../utils/error/invalid.util"
+import { message } from "../../utils/error/message.util"
 import { subscriptionsErrors } from "../../consts/errors/subscriptions-errors"
 import { ErrorComponent } from "../error/error.component"
 import { SubscribeDto } from "../../api/subscriptions/dto/subscribe.dto"
@@ -27,8 +27,6 @@ import { SearchComponent } from "../search/search.component"
   styleUrl: "./header.component.scss"
 })
 export class HeaderComponent {
-  subscriptionsService = inject(SubscriptionsService)
-
   icon = faCloudBolt
   modalId = "subscriptions"
   searchId = "subscriptions"
@@ -43,7 +41,10 @@ export class HeaderComponent {
     )
   })
 
-  constructor(protected modalAdapter: ModalAdapter) {
+  constructor(
+    protected modalAdapter: ModalAdapter,
+    private subscriptionsService: SubscriptionsService
+  ) {
     this.modalAdapter.select().subscribe(state => {
       if (state[this.modalId] && !state[this.modalId].isOpen) {
         this.subscriptionsFormGroup.reset()

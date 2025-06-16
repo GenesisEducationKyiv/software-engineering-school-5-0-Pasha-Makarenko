@@ -7,17 +7,17 @@ import {
 import { SendWeatherCommand } from "../impl/send-weather.command"
 import { BadRequestException, Logger } from "@nestjs/common"
 import { SchedulerService } from "../../services/scheduler.service"
-import { UrlGeneratorService } from "../../../url-generator/services/url-generator.service"
 import { GetActiveSubscriptionsQuery } from "../../../subscriptions/queries/impl/get-active-subscriptions.query"
 import { GetWeatherQuery } from "../../../weather/queries/impl/get-weather.query"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
+import { ClientUrlGeneratorService } from "../../../url-generator/services/client-url-generator.service"
 
 @CommandHandler(SendWeatherCommand)
 export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
   private logger = new Logger(SchedulerService.name)
 
   constructor(
-    private urlGeneratorService: UrlGeneratorService,
+    private clientUrlGeneratorService: ClientUrlGeneratorService,
     private queryBus: QueryBus,
     private commandBus: CommandBus
   ) {}
@@ -44,9 +44,8 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
           throw new BadRequestException("Unable to get data")
         }
 
-        const { url: unsubscribeUrl } = this.urlGeneratorService.unsubscribeUrl(
-          sub.unsubscribeToken
-        )
+        const { url: unsubscribeUrl } =
+          this.clientUrlGeneratorService.unsubscribeUrl(sub.unsubscribeToken)
 
         await this.commandBus.execute(
           new SendMailCommand({

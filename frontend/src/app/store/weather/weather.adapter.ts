@@ -1,4 +1,4 @@
-import { inject, Injectable } from "@angular/core"
+import { Injectable } from "@angular/core"
 import { AppState } from "../state.interfaces"
 import { Store } from "@ngrx/store"
 import { commonErrors } from "../../consts/errors/common.errors"
@@ -8,9 +8,10 @@ import { selectWeather } from "./weather.selectors"
 
 @Injectable({ providedIn: "root" })
 export class WeatherAdapter {
-  weatherService = inject(WeatherService)
-
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private store: Store<AppState>,
+    private weatherService: WeatherService
+  ) {}
 
   select() {
     return this.store.select(selectWeather)
@@ -24,7 +25,7 @@ export class WeatherAdapter {
     this.store.dispatch(WeatherActions.getWeatherAction())
 
     this.weatherService
-      .weather({
+      .getWeather({
         city,
         days: 14
       })

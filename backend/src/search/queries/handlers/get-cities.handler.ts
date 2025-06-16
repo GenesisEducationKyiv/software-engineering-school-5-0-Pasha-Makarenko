@@ -4,7 +4,7 @@ import { HttpService } from "@nestjs/axios"
 import { BadRequestException, Inject } from "@nestjs/common"
 import { lastValueFrom } from "rxjs"
 import { City } from "../../interfaces/search.interface"
-import { UrlGeneratorService } from "../../../url-generator/services/url-generator.service"
+import { WeatherUrlGeneratorService } from "../../../url-generator/services/weather-url-generator.service"
 import { Cacheable } from "../../../shared/decorators/cacheable.decorator"
 import { ConfigService } from "@nestjs/config"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
@@ -13,7 +13,7 @@ import { Cache } from "cache-manager"
 @QueryHandler(GetCitiesQuery)
 export class GetCitiesHandler implements IQueryHandler<GetCitiesQuery> {
   constructor(
-    private urlGeneratorService: UrlGeneratorService,
+    private clientUrlGeneratorService: WeatherUrlGeneratorService,
     private httpService: HttpService,
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
@@ -27,7 +27,7 @@ export class GetCitiesHandler implements IQueryHandler<GetCitiesQuery> {
   })
   async execute(query: GetCitiesQuery) {
     const { city } = query
-    const { url, params } = this.urlGeneratorService.searchUrl(city)
+    const { url, params } = this.clientUrlGeneratorService.searchUrl(city)
 
     try {
       const response = await lastValueFrom(

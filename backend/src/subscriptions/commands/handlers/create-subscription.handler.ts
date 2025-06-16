@@ -21,7 +21,8 @@ export class CreateSubscriptionHandler
 
     const candidate = await this.subscriptionsRepository.findOne({
       where: {
-        email: dto.email
+        email: dto.email,
+        city: dto.city
       }
     })
 

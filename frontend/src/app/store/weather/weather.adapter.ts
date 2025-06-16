@@ -24,7 +24,7 @@ export class WeatherAdapter {
     this.store.dispatch(WeatherActions.getWeatherAction())
 
     this.weatherService
-      .weather({
+      .getWeather({
         city,
         days: 14
       })

@@ -2,7 +2,7 @@
   "name": "weather",
   "version": "1.0.0",
   "scripts": {
-    "dev:start": "docker-compose up -d",
+    "dev:start": "docker-compose -f docker-compose.dev.yaml up -d",
     "dev:stop": "docker-compose down",
     "install:all": "npm install && npm run install:backend && npm run install:frontend",
     "install:backend": "cd backend && npm install -g @nestjs/cli && npm install",
@@ -12,7 +12,12 @@
     "build:frontend": "cd frontend && npm run build",
     "start:all": "npm run start:backend & npm run start:frontend",
     "start:backend": "cd backend && npm run start:prod",
-    "start:frontend": "cd frontend && npm run start"
+    "start:frontend": "cd frontend && npm run start",
+    "test:unit:all": "npm run test:unit:backend && npm run test:unit:frontend",
+    "test:unit:backend": "docker-compose -f docker-compose.test.yaml up --build test-unit-backend",
+    "test:unit:frontend": "docker-compose -f docker-compose.test.yaml up --build test-unit-frontend",
+    "test:integration:backend": "docker-compose -f docker-compose.test.yaml up --build test-integration-backend",
+    "test:e2e:backend": "docker-compose -f docker-compose.test.yaml up --build test-e2e-backend"
   },
   "keywords": [
     "weather"

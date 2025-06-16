@@ -46,7 +46,7 @@ export const Cacheable = (options: CacheableOptions) => {
 
         const cachedValue = await cache.get(cacheKey)
 
-        if (cachedValue) {
+        if (cachedValue !== null && cachedValue !== undefined) {
           return cachedValue
         }
 

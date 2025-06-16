@@ -10,7 +10,7 @@ import { ENDPOINTS } from "../../consts/endpoints"
 export class WeatherService {
   http = inject(HttpClient)
 
-  weather(dto: GetWeatherDto) {
+  getWeather(dto: GetWeatherDto) {
     return this.http.get<WeatherData>(ENDPOINTS.weather(dto.city, dto.days))
   }
 }

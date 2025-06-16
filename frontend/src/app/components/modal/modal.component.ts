@@ -1,5 +1,5 @@
 import { Component, HostListener, input, signal } from "@angular/core"
-import { findParentById } from "../../utils/dom/find"
+import { findParentById } from "../../utils/dom/find.util"
 import { ModalAdapter } from "../../store/modal/modal.adapter"
 
 interface ModalOptions {

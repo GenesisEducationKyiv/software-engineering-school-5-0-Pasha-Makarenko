@@ -6,7 +6,7 @@ import { weatherDataMock } from "../data/weather.mock"
 
 export const queryBusMockFactory = () =>
   ({
-    execute: jest.fn((query: any) => {
+    execute: jest.fn((query: unknown) => {
       if (query instanceof GetActiveSubscriptionsQuery) {
         return Promise.resolve(subscriptionModelsMock)
       } else if (query instanceof GetWeatherQuery) {

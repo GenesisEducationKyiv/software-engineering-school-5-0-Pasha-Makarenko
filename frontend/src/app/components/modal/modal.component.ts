@@ -1,9 +1,10 @@
-import { Component, HostListener, Input, signal } from "@angular/core"
-import { findParentById } from "../../utils/dom/find"
-import { ModalAdapter } from "./state/modal.adapter"
+import { Component, effect, HostListener, input, signal } from '@angular/core'
+import { findParentById } from "../../utils/dom/find.util"
+import { ModalAdapter } from "../../store/modal/modal.adapter"
+import { Subscription } from 'rxjs'
 
 interface ModalOptions {
-  closeOutside?: boolean
+  closeOutside: boolean
 }
 
 @Component({
@@ -14,24 +15,37 @@ interface ModalOptions {
   styleUrl: "./modal.component.scss"
 })
 export class ModalComponent {
-  @Input({ required: true }) modalId!: string
-  @Input() options: ModalOptions = {}
+  modalId = input<string>()
+  options = input<Partial<ModalOptions> | null>(null)
   isOpen = signal(false)
+  selectSubscription = signal<Subscription | null>(null)
 
   constructor(private modalAdapter: ModalAdapter) {
-    this.modalAdapter.select().subscribe(res => {
-      this.isOpen.set(res[this.modalId]?.isOpen)
+    effect(() => {
+      const modalId = this.modalId()
+      if (modalId) {
+        this.selectSubscription()?.unsubscribe()
+
+        const sub = this.modalAdapter.select().subscribe(res => {
+          this.isOpen.set(res[modalId]?.isOpen)
+        })
+
+        this.selectSubscription.set(sub)
+      }
     })
   }
 
   @HostListener("document:click", ["$event.target"])
   onClickOutside(target: HTMLElement) {
+    const modalId = this.modalId()
+
     if (
-      this.options?.closeOutside &&
+      modalId &&
+      this.options()?.closeOutside &&
       this.isOpen() &&
-      !findParentById(target, ["modal", `modal-target-${this.modalId}`])
+      !findParentById(target, ["modal", `modal-target-${modalId}`])
     ) {
-      this.modalAdapter.close(this.modalId)
+      this.modalAdapter.close(modalId)
     }
   }
 }

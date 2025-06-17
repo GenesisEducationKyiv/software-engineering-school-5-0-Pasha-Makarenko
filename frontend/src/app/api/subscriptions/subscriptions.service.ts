@@ -1,4 +1,4 @@
-import { inject, Injectable } from "@angular/core"
+import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
 import { ENDPOINTS } from "../../consts/endpoints"
 import { SubscribeDto } from "./dto/subscribe.dto"
@@ -7,7 +7,7 @@ import { SubscribeDto } from "./dto/subscribe.dto"
   providedIn: "root"
 })
 export class SubscriptionsService {
-  http = inject(HttpClient)
+  constructor(private http: HttpClient) {}
 
   subscribe(dto: SubscribeDto) {
     return this.http.post(ENDPOINTS.subscribe, dto)

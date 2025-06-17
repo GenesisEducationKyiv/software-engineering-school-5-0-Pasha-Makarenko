@@ -1,15 +1,16 @@
 import { Module } from "@nestjs/common"
-import { WeatherController } from "./weather.controller"
-import { WeatherService } from "./weather.service"
+import { CqrsModule } from "@nestjs/cqrs"
 import { HttpModule } from "@nestjs/axios"
-import { WeatherTask } from "./weather.task"
-import { MailModule } from "../mail/mail.module"
-import { SubscriptionsModule } from "../subscriptions/subscriptions.module"
+import { WeatherController } from "./controllers/weather.controller"
+import { GetWeatherHandler } from "./queries/handlers/get-weather.handler"
+import { UrlGeneratorModule } from "../url-generator/url-generator.module"
+
+const queryHandlers = [GetWeatherHandler]
 
 @Module({
   controllers: [WeatherController],
-  imports: [HttpModule, MailModule, SubscriptionsModule],
-  providers: [WeatherService, WeatherTask],
-  exports: [WeatherService, WeatherTask]
+  imports: [CqrsModule, HttpModule, UrlGeneratorModule],
+  providers: queryHandlers,
+  exports: queryHandlers
 })
 export class WeatherModule {}

@@ -1,18 +1,15 @@
 import { Test } from "@nestjs/testing"
 import { MailerService } from "@nestjs-modules/mailer"
-import { ConfigService } from "@nestjs/config"
 import { InternalServerErrorException } from "@nestjs/common"
 import { SendMailHandler } from "../../../../src/mail/commands/handlers/send.mail.handler"
 import { SendMailCommand } from "../../../../src/mail/commands/impl/send-mail.command"
-import { mailerServiceMockFactory } from "../../../mocks/services/mailer.service.mock"
 import {
-  configServiceMockFactory,
-  SMTP_USER
-} from "../../../mocks/services/config.service.mock"
-import {
-  sendMailDtoMock1,
-  sendMailDtoMock2
+  sendMailDtoWithManyRecipientsMock,
+  sendMailDtoWithOneRecipientMock
 } from "../../../mocks/dto/send-mail.dto.mock"
+import { mailerServiceMockFactory } from "../../../mocks/services/mailer.service.mock"
+import { ConfigService } from "@nestjs/config"
+import { configServiceMockFactory } from "../../../mocks/services/config.service.mock"
 
 describe("SendMailHandler", () => {
   let handler: SendMailHandler
@@ -23,12 +20,12 @@ describe("SendMailHandler", () => {
       providers: [
         SendMailHandler,
         {
-          provide: MailerService,
-          useValue: mailerServiceMockFactory()
-        },
-        {
           provide: ConfigService,
           useValue: configServiceMockFactory()
+        },
+        {
+          provide: MailerService,
+          useValue: mailerServiceMockFactory()
         }
       ]
     }).compile()
@@ -37,50 +34,44 @@ describe("SendMailHandler", () => {
     mailerService = moduleRef.get<MailerService>(MailerService)
   })
 
-  describe("execute", () => {
-    it("should send email with correct parameters", async () => {
-      const dto = sendMailDtoMock1
-      const command = new SendMailCommand(dto)
+  it("should send email with correct parameters", async () => {
+    const dto = sendMailDtoWithOneRecipientMock
+    const command = new SendMailCommand(dto)
 
-      jest.spyOn(mailerService, "sendMail").mockResolvedValue(true)
+    await handler.execute(command)
 
-      await handler.execute(command)
+    expect(mailerService.sendMail).toHaveBeenCalledWith({
+      to: dto.emails,
+      from: process.env["SMTP_USER"],
+      subject: dto.subject,
+      template: dto.template,
+      context: dto.context
+    })
+  })
 
-      expect(mailerService.sendMail).toHaveBeenCalledWith({
-        to: dto.emails,
-        subject: dto.subject,
-        template: dto.template,
-        from: SMTP_USER,
-        context: dto.context
+  it("should throw when mail sending fails", async () => {
+    const command = new SendMailCommand(sendMailDtoWithOneRecipientMock)
+    const errorMessage = "SMTP error"
+
+    jest
+      .spyOn(mailerService, "sendMail")
+      .mockRejectedValue(new Error(errorMessage))
+
+    await expect(handler.execute(command)).rejects.toThrow(
+      InternalServerErrorException
+    )
+    await expect(handler.execute(command)).rejects.toThrow(errorMessage)
+  })
+
+  it("should handle multiple recipients", async () => {
+    const command = new SendMailCommand(sendMailDtoWithManyRecipientsMock)
+
+    await handler.execute(command)
+
+    expect(mailerService.sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: sendMailDtoWithManyRecipientsMock.emails
       })
-    })
-
-    it("should throw InternalServerErrorException when mail sending fails", async () => {
-      const command = new SendMailCommand(sendMailDtoMock1)
-
-      const errorMessage = "SMTP connection failed"
-      jest
-        .spyOn(mailerService, "sendMail")
-        .mockRejectedValue(new Error(errorMessage))
-
-      await expect(handler.execute(command)).rejects.toThrow(
-        InternalServerErrorException
-      )
-      await expect(handler.execute(command)).rejects.toThrow(errorMessage)
-    })
-
-    it("should handle multiple recipients", async () => {
-      const command = new SendMailCommand(sendMailDtoMock2)
-
-      jest.spyOn(mailerService, "sendMail").mockResolvedValue(true)
-
-      await handler.execute(command)
-
-      expect(mailerService.sendMail).toHaveBeenCalledWith(
-        expect.objectContaining({
-          to: sendMailDtoMock2.emails
-        })
-      )
-    })
+    )
   })
 })

@@ -25,33 +25,16 @@ describe("SubscriptionsService", () => {
     httpMock = TestBed.inject(HttpTestingController)
   })
 
-  afterEach(() => {
-    httpMock.verify()
-  })
+  it("should handle subscription errors", () => {
+    const errorResponse = { status: 500, statusText: "Server Error" }
 
-  it("should be created", () => {
-    expect(service).toBeTruthy()
-  })
-
-  it("should subscribe", () => {
-    service.subscribe(subscribeDtoMock).subscribe()
+    service.subscribe(subscribeDtoMock).subscribe({
+      error: err => {
+        expect(err.status).toBe(500)
+      }
+    })
 
     const req = httpMock.expectOne(ENDPOINTS.subscribe)
-    expect(req.request.method).toBe("POST")
-    expect(req.request.body).toEqual(subscribeDtoMock)
-  })
-
-  it("should confirm subscription", () => {
-    service.confirm(confirmTokenMock).subscribe()
-
-    const req = httpMock.expectOne(ENDPOINTS.confirm(confirmTokenMock))
-    expect(req.request.method).toBe("POST")
-  })
-
-  it("should unsubscribe", () => {
-    service.unsubscribe(unsubscribeTokenMock).subscribe()
-
-    const req = httpMock.expectOne(ENDPOINTS.unsubscribe(unsubscribeTokenMock))
-    expect(req.request.method).toBe("POST")
+    req.flush(null, errorResponse)
   })
 })

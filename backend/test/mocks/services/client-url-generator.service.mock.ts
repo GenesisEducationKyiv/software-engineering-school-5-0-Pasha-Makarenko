@@ -1,11 +1,10 @@
 import { ClientUrlGeneratorService } from "../../../src/url-generator/services/client-url-generator.service"
-import { CLIENT_URL } from "./config.service.mock"
 import { ClientRoutesConsts } from "../../../src/url-generator/consts/client-routes.consts"
 
 export const confirmUrlMock = (token: string) =>
-  CLIENT_URL + ClientRoutesConsts.confirm(token)
+  process.env["CLIENT_URL"] + ClientRoutesConsts.confirm(token)
 export const unsubscribeUrlMock = (token: string) =>
-  CLIENT_URL + ClientRoutesConsts.unsubscribe(token)
+  process.env["CLIENT_URL"] + ClientRoutesConsts.unsubscribe(token)
 
 export const clientUrlGeneratorServiceMockFactory = () =>
   ({

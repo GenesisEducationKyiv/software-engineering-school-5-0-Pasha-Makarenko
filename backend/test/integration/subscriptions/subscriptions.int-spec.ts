@@ -3,6 +3,7 @@ import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.d
 import { CreateSubscriptionDto } from "../../../src/subscriptions/dto/create-subscription.dto"
 import { GetActiveSubscriptionsQuery } from "../../../src/subscriptions/queries/impl/get-active-subscriptions.query"
 import {
+  beforeAllSetup,
   cleanupTestApp,
   closeTestApp,
   setupTestApp,
@@ -14,8 +15,19 @@ describe("Subscriptions", () => {
   let dto: CreateSubscriptionDto
 
   beforeAll(async () => {
+    await beforeAllSetup()
+  })
+
+  beforeEach(async () => {
     context = await setupTestApp()
-    await context.sequelize.sync({ force: true })
+
+    try {
+      await context.sequelize.sync({ force: true })
+    } catch (err) {
+      await new Promise(resolve => setTimeout(resolve, 5000))
+      await context.sequelize.sync({ force: true })
+    }
+
     dto = createSubscriptionDtoMock
   })
 

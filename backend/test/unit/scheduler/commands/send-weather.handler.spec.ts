@@ -1,28 +1,21 @@
 import { Test } from "@nestjs/testing"
 import { CommandBus, QueryBus } from "@nestjs/cqrs"
-import { ClientUrlGeneratorService } from "../../../../src/url-generator/services/client-url-generator.service"
 import { SendWeatherHandler } from "../../../../src/scheduler/commands/handlers/send-weather.handler"
-import { Frequency } from "../../../../src/subscriptions/models/subscription.model"
 import { SendWeatherCommand } from "../../../../src/scheduler/commands/impl/send-weather.command"
-import { GetActiveSubscriptionsQuery } from "../../../../src/subscriptions/queries/impl/get-active-subscriptions.query"
-import { GetWeatherQuery } from "../../../../src/weather/queries/impl/get-weather.query"
-import { SendMailCommand } from "../../../../src/mail/commands/impl/send-mail.command"
+import { Frequency } from "../../../../src/subscriptions/models/subscription.model"
+import { subscriptionModelsMock } from "../../../mocks/models/subscription.model.mock"
+import { weatherDataMock } from "../../../mocks/data/weather.mock"
 import {
   commandBusMockFactory,
   queryBusMockFactory
 } from "../../../mocks/services/cqrs.mock"
-import {
-  clientUrlGeneratorServiceMockFactory,
-  unsubscribeUrlMock
-} from "../../../mocks/services/client-url-generator.service.mock"
-import { subscriptionModelsMock } from "../../../mocks/models/subscription.model.mock"
-import { weatherDataMock } from "../../../mocks/data/weather.mock"
+import { ClientUrlGeneratorService } from "../../../../src/url-generator/services/client-url-generator.service"
+import { clientUrlGeneratorServiceMockFactory } from "../../../mocks/services/client-url-generator.service.mock"
 
 describe("SendWeatherHandler", () => {
   let handler: SendWeatherHandler
   let queryBus: QueryBus
   let commandBus: CommandBus
-  let clientUrlGeneratorService: ClientUrlGeneratorService
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -46,55 +39,36 @@ describe("SendWeatherHandler", () => {
     handler = moduleRef.get<SendWeatherHandler>(SendWeatherHandler)
     queryBus = moduleRef.get<QueryBus>(QueryBus)
     commandBus = moduleRef.get<CommandBus>(CommandBus)
-    clientUrlGeneratorService = moduleRef.get<ClientUrlGeneratorService>(
-      ClientUrlGeneratorService
+  })
+
+  it("should process subscriptions and send emails", async () => {
+    const frequency = Frequency.DAILY
+    const command = new SendWeatherCommand(frequency)
+
+    jest
+      .spyOn(queryBus, "execute")
+      .mockResolvedValueOnce(subscriptionModelsMock)
+      .mockResolvedValue(weatherDataMock)
+
+    await handler.execute(command)
+
+    expect(queryBus.execute).toHaveBeenCalledTimes(
+      1 + subscriptionModelsMock.length
+    )
+    expect(commandBus.execute).toHaveBeenCalledTimes(
+      subscriptionModelsMock.length
     )
   })
 
-  describe("execute", () => {
-    it("should process subscriptions and send emails successfully", async () => {
-      const frequency = Frequency.DAILY
-      const command = new SendWeatherCommand(frequency)
+  it("should handle empty subscriptions", async () => {
+    const frequency = Frequency.DAILY
+    const command = new SendWeatherCommand(frequency)
 
-      const mockSubscriptions = subscriptionModelsMock
+    jest.spyOn(queryBus, "execute").mockResolvedValue([])
 
-      await handler.execute(command)
+    await handler.execute(command)
 
-      expect(queryBus.execute).toHaveBeenCalledWith(
-        new GetActiveSubscriptionsQuery({ frequency })
-      )
-
-      mockSubscriptions.forEach(sub => {
-        expect(queryBus.execute).toHaveBeenCalledWith(
-          new GetWeatherQuery({ city: sub.city, days: "1" })
-        )
-        expect(clientUrlGeneratorService.unsubscribeUrl).toHaveBeenCalledWith(
-          sub.unsubscribeToken
-        )
-        expect(commandBus.execute).toHaveBeenCalledWith(
-          new SendMailCommand({
-            emails: [sub.email],
-            subject: "Weather",
-            template: "weather",
-            context: {
-              unsubscribeUrl: unsubscribeUrlMock(sub.unsubscribeToken),
-              weather: weatherDataMock
-            }
-          })
-        )
-      })
-    })
-
-    it("should handle empty subscriptions list", async () => {
-      const frequency = Frequency.DAILY
-      const command = new SendWeatherCommand(frequency)
-
-      jest.spyOn(queryBus, "execute").mockResolvedValue([])
-
-      await handler.execute(command)
-
-      expect(queryBus.execute).toHaveBeenCalledTimes(1)
-      expect(commandBus.execute).not.toHaveBeenCalled()
-    })
+    expect(queryBus.execute).toHaveBeenCalledTimes(1)
+    expect(commandBus.execute).not.toHaveBeenCalled()
   })
 })

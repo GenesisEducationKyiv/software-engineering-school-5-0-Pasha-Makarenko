@@ -1,6 +1,4 @@
-import { City } from "../../../src/app/api/search/search.interface"
-import { CityState } from "../../../src/app/store/city/city.state"
-import { Action } from "@ngrx/store"
+import { City } from "../../../src/search/interfaces/search.interface"
 
 export const citiesMock: City[] = [
   {
@@ -40,7 +38,3 @@ export const citiesMock: City[] = [
     url: "sydney-australia"
   }
 ]
-
-export const getCityStateMock: (index: number) => CityState = index => ({
-  city: citiesMock[index] || null
-})

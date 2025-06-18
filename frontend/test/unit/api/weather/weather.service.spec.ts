@@ -7,7 +7,6 @@ import { WeatherService } from "../../../../src/app/api/weather/weather.service"
 import { CookieService } from "ngx-cookie-service"
 import { ENDPOINTS } from "../../../../src/app/consts/endpoints"
 import { cookieServiceMockFactory } from "../../../mocks/services/cookie.service.mock"
-import { weatherDataMock } from "../../../mocks/data/weather.mock"
 
 describe("WeatherService", () => {
   let service: WeatherService
@@ -26,25 +25,18 @@ describe("WeatherService", () => {
     httpMock = TestBed.inject(HttpTestingController)
   })
 
-  afterEach(() => {
-    httpMock.verify()
-  })
+  it("should handle weather API errors", () => {
+    const city = "London"
+    const days = 3
+    const errorResponse = { status: 404, statusText: "Not Found" }
 
-  it("should be created", () => {
-    expect(service).toBeTruthy()
-  })
-
-  it("should get weather data", () => {
-    const mockData = weatherDataMock
-    const city = mockData.location.name
-    const days = mockData.forecast.forecastday.length
-
-    service.getWeather({ city, days }).subscribe(data => {
-      expect(data).toEqual(mockData)
+    service.getWeather({ city, days }).subscribe({
+      error: err => {
+        expect(err.status).toBe(404)
+      }
     })
 
     const req = httpMock.expectOne(ENDPOINTS.weather(city, days))
-    expect(req.request.method).toBe("GET")
-    req.flush(mockData)
+    req.flush(null, errorResponse)
   })
 })

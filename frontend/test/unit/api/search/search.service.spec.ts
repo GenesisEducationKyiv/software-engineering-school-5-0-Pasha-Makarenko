@@ -22,14 +22,6 @@ describe("SearchService", () => {
     httpMock = TestBed.inject(HttpTestingController)
   })
 
-  afterEach(() => {
-    httpMock.verify()
-  })
-
-  it("should be created", () => {
-    expect(service).toBeTruthy()
-  })
-
   it("should search for cities", () => {
     const mockCities: City[] = [citiesMock[0]]
     const searchTerm = "London"

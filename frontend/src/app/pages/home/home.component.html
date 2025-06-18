@@ -27,7 +27,9 @@
         </div>
       </div>
 
-      @if (weatherData().isLoading || !weatherData().data) {
+      @if (
+        weatherData().isLoading || (!weatherData().data && !weatherData().error)
+      ) {
         <div class="loader"></div>
       } @else if (weatherData().error) {
         <app-form-error [message]="weatherData().error!" />

@@ -1,11 +1,20 @@
 import * as request from "supertest"
-import { cleanupTestApp, setupTestApp, TestContext } from "../setup"
+import {
+  beforeAllSetup,
+  cleanupTestApp,
+  setupTestApp,
+  TestContext
+} from "../setup"
 
 describe("Search", () => {
   let context: TestContext
   const cityQuery = "Paris"
 
   beforeAll(async () => {
+    await beforeAllSetup()
+  })
+
+  beforeEach(async () => {
     context = await setupTestApp()
   })
 
@@ -32,7 +41,7 @@ describe("Search", () => {
     it("should throw error for invalid query", async () => {
       await request(context.app.getHttpServer())
         .get("/api/search")
-        .query({ city: [] })
+        .query({ city: "" })
         .expect(400)
         .expect(res => {
           expect(res.body.message).toContain(

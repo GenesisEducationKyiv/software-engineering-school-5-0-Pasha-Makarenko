@@ -1,10 +1,11 @@
 import { WeatherUrlGeneratorService } from "../../../src/url-generator/services/weather-url-generator.service"
-import { WEATHER_API_KEY, WEATHER_API_URL } from "./config.service.mock"
 import { WeatherQueryDto } from "../../../src/weather/dto/weather-query.dto"
 import { WeatherApiConst } from "../../../src/url-generator/consts/weather-api.const"
 
-export const searchUrlMock = WEATHER_API_URL + WeatherApiConst.search
-export const weatherUrlMock = WEATHER_API_URL + WeatherApiConst.weather
+export const searchUrlMock =
+  process.env["WEATHER_API_URL"] + WeatherApiConst.search
+export const weatherUrlMock =
+  process.env["WEATHER_API_URL"] + WeatherApiConst.weather
 
 export const weatherUrlGeneratorServiceMockFactory = () =>
   ({
@@ -17,7 +18,7 @@ export const weatherUrlGeneratorServiceMockFactory = () =>
     weatherUrl: jest.fn((dto: WeatherQueryDto) => ({
       url: weatherUrlMock,
       params: {
-        key: WEATHER_API_KEY,
+        key: process.env["WEATHER_API_KEY"],
         q: dto.city,
         days: dto.days,
         aqi: "no",

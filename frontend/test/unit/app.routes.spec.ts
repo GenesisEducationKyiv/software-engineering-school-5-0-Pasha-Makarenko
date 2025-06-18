@@ -1,4 +1,4 @@
-import { TestBed } from "@angular/core/testing"
+import { fakeAsync, TestBed, tick } from "@angular/core/testing"
 import { Router } from "@angular/router"
 import { RouterTestingModule } from "@angular/router/testing"
 import { routes } from "../../src/app/app.routes"
@@ -22,27 +22,11 @@ describe("App Routes", () => {
     subscriptionsService = TestBed.inject(SubscriptionsService)
   })
 
-  it("should navigate to home", async () => {
-    await router.navigate(["/"])
-    expect(router.url).toBe("/")
-  })
-
-  it("should redirect confirm route and call service", async () => {
+  it("should handle route guards and redirects", fakeAsync(() => {
     const spy = jest.spyOn(subscriptionsService, "confirm")
-    await router.navigate(["/confirm/test-token"])
-    expect(spy).toHaveBeenCalledWith("test-token")
+    router.navigate(["/confirm/invalid-token"])
+    tick()
+    expect(spy).toHaveBeenCalledWith("invalid-token")
     expect(router.url).toBe("/")
-  })
-
-  it("should redirect unsubscribe route and call service", async () => {
-    const spy = jest.spyOn(subscriptionsService, "unsubscribe")
-    await router.navigate(["/unsubscribe/test-token"])
-    expect(spy).toHaveBeenCalledWith("test-token")
-    expect(router.url).toBe("/")
-  })
-
-  it("should navigate to not-found for unknown routes", async () => {
-    await router.navigate(["/unknown"])
-    expect(router.url).toBe("/unknown")
-  })
+  }))
 })

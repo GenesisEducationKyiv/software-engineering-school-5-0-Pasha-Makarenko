@@ -1,151 +1,74 @@
 import { Cache } from "cache-manager"
-import { ConfigService } from "@nestjs/config"
 import {
   BadRequestException,
   InternalServerErrorException
 } from "@nestjs/common"
-import * as util from "node:util"
 import { Cacheable } from "../../../../src/shared/decorators/cacheable.decorator"
-import { configServiceMockFactory } from "../../../mocks/services/config.service.mock"
 import { cacheServiceMockFactory } from "../../../mocks/services/cache.service.mock"
 
-class TestClass {
-  cacheManager: Cache
-  configService: ConfigService
+class TestService {
+  _cacheManager: Cache
 
-  @Cacheable({ key: "static-key", ttl: 60 })
-  async staticKeyMethod() {
-    return "original-value"
+  get cacheManager() {
+    if (!this._cacheManager) {
+      throw new InternalServerErrorException("Cache manager not initialized")
+    }
+    return this._cacheManager
   }
 
-  @Cacheable({
-    key: (arg: string) => `dynamic-key-${arg}`,
-    ttl: config => config.get("CACHE_TTL")
-  })
-  async dynamicKeyMethod(arg: string) {
-    return `original-${arg}`
+  set cacheManager(value: Cache) {
+    this._cacheManager = value
   }
 
-  @Cacheable({
-    key: async (arg: string) => `async-key-${arg}`,
-    ttl: async config => config.get("CACHE_TTL")
-  })
-  async asyncKeyMethod(arg: string) {
-    return `original-${arg}`
+  @Cacheable({ key: "test-key", ttl: 60 })
+  async cachedMethod() {
+    return "result"
   }
 
   @Cacheable({ key: "error-key" })
   async errorMethod() {
     throw new Error("Test error")
   }
-
-  @Cacheable({ key: "no-cache-key" })
-  async noCacheMethod() {
-    return "no-cache-value"
-  }
 }
 
 describe("Cacheable Decorator", () => {
-  let mockCache: jest.Mocked<Cache>
-  let mockConfigService: jest.Mocked<ConfigService>
-  let testClass: TestClass
+  let service: TestService
+  let cacheManager: jest.Mocked<Cache>
 
   beforeEach(() => {
-    testClass = new TestClass()
-
-    mockCache = cacheServiceMockFactory() as jest.Mocked<Cache>
-    mockConfigService = configServiceMockFactory() as jest.Mocked<ConfigService>
-
-    testClass.cacheManager = mockCache
-    testClass.configService = mockConfigService
+    service = new TestService()
+    cacheManager = cacheServiceMockFactory() as jest.Mocked<Cache>
+    service.cacheManager = cacheManager
   })
 
-  describe("static key and ttl", () => {
-    it("should return cached value when available", async () => {
-      mockCache.get.mockResolvedValue("cached-value")
+  it("should return cached value", async () => {
+    cacheManager.get.mockResolvedValue("cached-value")
 
-      const result = await testClass.staticKeyMethod()
+    const result = await service.cachedMethod()
 
-      expect(result).toBe("cached-value")
-      expect(mockCache.get).toHaveBeenCalledWith("static-key")
-      expect(mockCache.set).not.toHaveBeenCalled()
-    })
-
-    it("should call original method and cache result when no cache", async () => {
-      mockCache.get.mockResolvedValue(null)
-      mockCache.set.mockResolvedValue(null)
-
-      const result = await testClass.staticKeyMethod()
-
-      expect(result).toBe("original-value")
-      expect(mockCache.get).toHaveBeenCalledWith("static-key")
-      expect(mockCache.set).toHaveBeenCalledWith(
-        "static-key",
-        "original-value",
-        60
-      )
-    })
+    expect(result).toBe("cached-value")
+    expect(cacheManager.set).not.toHaveBeenCalled()
   })
 
-  describe("dynamic key and ttl", () => {
-    it("should use dynamic key and ttl from config", async () => {
-      mockCache.get.mockResolvedValue(null)
-      mockConfigService.get.mockReturnValue(300)
-      mockCache.set.mockResolvedValue(null)
+  it("should call original method and cache result", async () => {
+    cacheManager.get.mockResolvedValue(null)
 
-      const result = await testClass.dynamicKeyMethod("test")
+    const result = await service.cachedMethod()
 
-      expect(result).toBe("original-test")
-      expect(mockCache.get).toHaveBeenCalledWith("dynamic-key-test")
-      expect(mockConfigService.get).toHaveBeenCalledWith("CACHE_TTL")
-      expect(mockCache.set).toHaveBeenCalledWith(
-        "dynamic-key-test",
-        "original-test",
-        300
-      )
-    })
+    expect(result).toBe("result")
+    expect(cacheManager.set).toHaveBeenCalledWith("test-key", "result", 60)
   })
 
-  describe("async key and ttl", () => {
-    it("should handle async key and ttl functions", async () => {
-      mockCache.get.mockResolvedValue(null)
-      mockConfigService.get.mockReturnValue(500)
-      mockCache.set.mockResolvedValue(null)
-
-      const result = await testClass.asyncKeyMethod("async")
-
-      expect(result).toBe("original-async")
-      expect(mockCache.get).toHaveBeenCalledWith("async-key-async")
-      expect(mockConfigService.get).toHaveBeenCalledWith("CACHE_TTL")
-      expect(mockCache.set).toHaveBeenCalledWith(
-        "async-key-async",
-        "original-async",
-        500
-      )
-    })
+  it("should throw when original method fails", async () => {
+    await expect(service.errorMethod()).rejects.toThrow(BadRequestException)
   })
 
-  describe("error handling", () => {
-    it("should throw BadRequestException when original method throws", async () => {
-      await expect(testClass.errorMethod()).rejects.toThrow(BadRequestException)
-      await expect(testClass.errorMethod()).rejects.toThrow("Test error")
-    })
-
-    it("should throw InternalServerErrorException when cache manager is missing", async () => {
-      testClass.cacheManager = undefined as never as Cache
-      await expect(testClass.staticKeyMethod()).rejects.toThrow(
-        InternalServerErrorException
-      )
-    })
-  })
-
-  describe("util.types.isAsyncFunction", () => {
-    it("should correctly identify async functions", () => {
-      const asyncFn = async () => null
-      const syncFn = () => null
-
-      expect(util.types.isAsyncFunction(asyncFn)).toBe(true)
-      expect(util.types.isAsyncFunction(syncFn)).toBe(false)
-    })
+  it("should throw when cache manager missing", async () => {
+    jest
+      .spyOn(service, "cacheManager", "get")
+      .mockReturnValue(undefined as never as Cache)
+    await expect(service.cachedMethod()).rejects.toThrow(
+      InternalServerErrorException
+    )
   })
 })

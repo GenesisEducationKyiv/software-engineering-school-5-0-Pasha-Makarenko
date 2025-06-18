@@ -7,6 +7,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { QueryBus } from "@nestjs/cqrs"
 import { AppModule } from "../../src/app.module"
 import { Subscription } from "../../src/subscriptions/models/subscription.model"
+import { server } from "../mocks/server.mock"
 
 export interface ClearOptions {
   clearCache?: boolean
@@ -23,6 +24,12 @@ export interface TestContext {
   subscriptionModel: typeof Subscription
   cacheManager: Cache
   queryBus: QueryBus
+}
+
+export async function beforeAllSetup() {
+  server.listen({
+    onUnhandledRequest: "bypass"
+  })
 }
 
 export async function setupTestApp(): Promise<TestContext> {
@@ -53,6 +60,7 @@ export async function cleanupTestApp(
   context: TestContext,
   options: ClearOptions = {}
 ) {
+  server.resetHandlers()
   if (options?.clearCache) {
     await context.cacheManager.clear()
   }
@@ -65,6 +73,7 @@ export async function closeTestApp(
   context: TestContext,
   options: CloseOptions = {}
 ) {
+  server.close()
   await context.app.close()
   if (options?.closeDB) {
     await context.sequelize.close()

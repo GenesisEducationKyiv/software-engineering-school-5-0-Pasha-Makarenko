@@ -1,11 +1,20 @@
 import * as request from "supertest"
 import { weatherQueryDtoMock } from "../../mocks/dto/weather-query.dto.mock"
-import { cleanupTestApp, setupTestApp, TestContext } from "../setup"
+import {
+  beforeAllSetup,
+  cleanupTestApp,
+  setupTestApp,
+  TestContext
+} from "../setup"
 
 describe("Weather", () => {
   let context: TestContext
 
   beforeAll(async () => {
+    await beforeAllSetup()
+  })
+
+  beforeEach(async () => {
     context = await setupTestApp()
   })
 

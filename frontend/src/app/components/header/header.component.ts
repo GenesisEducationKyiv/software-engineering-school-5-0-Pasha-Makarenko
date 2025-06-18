@@ -27,7 +27,8 @@ import { SearchComponent } from "../search/search.component"
   styleUrl: "./header.component.scss"
 })
 export class HeaderComponent {
-  subscriptionsService = inject(SubscriptionsService)
+  protected modalAdapter = inject(ModalAdapter)
+  private subscriptionsService = inject(SubscriptionsService)
 
   icon = faCloudBolt
   modalId = "subscriptions"
@@ -43,7 +44,7 @@ export class HeaderComponent {
     )
   })
 
-  constructor(protected modalAdapter: ModalAdapter) {
+  constructor() {
     this.modalAdapter.select().subscribe(state => {
       if (state[this.modalId] && !state[this.modalId].isOpen) {
         this.subscriptionsFormGroup.reset()

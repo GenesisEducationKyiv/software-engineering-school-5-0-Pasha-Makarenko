@@ -11,8 +11,9 @@ export class CityEffects {
   private readonly CITY_COOKIE_KEY = "selected_city"
   private actions$ = inject(Actions)
   private cookieService = inject(CookieService)
+  private store = inject(Store<AppState>)
 
-  constructor(private store: Store<AppState>) {
+  constructor() {
     this.loadInitialCity()
   }
 

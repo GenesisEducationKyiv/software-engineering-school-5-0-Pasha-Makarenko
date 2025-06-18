@@ -1,6 +1,6 @@
 import { Test } from "@nestjs/testing"
 import { CommandBus, QueryBus } from "@nestjs/cqrs"
-import { UrlGeneratorService } from "../../../../src/url-generator/services/url-generator.service"
+import { ClientUrlGeneratorService } from "../../../../src/url-generator/services/client-url-generator.service"
 import { SendWeatherHandler } from "../../../../src/scheduler/commands/handlers/send-weather.handler"
 import { Frequency } from "../../../../src/subscriptions/models/subscription.model"
 import { SendWeatherCommand } from "../../../../src/scheduler/commands/impl/send-weather.command"
@@ -12,9 +12,9 @@ import {
   queryBusMockFactory
 } from "../../../mocks/services/cqrs.mock"
 import {
-  unsubscribeUrlMock,
-  urlGeneratorServiceMockFactory
-} from "../../../mocks/services/url-generator.service.mock"
+  clientUrlGeneratorServiceMockFactory,
+  unsubscribeUrlMock
+} from "../../../mocks/services/client-url-generator.service.mock"
 import { subscriptionModelsMock } from "../../../mocks/models/subscription.model.mock"
 import { weatherDataMock } from "../../../mocks/data/weather.mock"
 
@@ -22,7 +22,7 @@ describe("SendWeatherHandler", () => {
   let handler: SendWeatherHandler
   let queryBus: QueryBus
   let commandBus: CommandBus
-  let urlGeneratorService: UrlGeneratorService
+  let clientUrlGeneratorService: ClientUrlGeneratorService
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -37,8 +37,8 @@ describe("SendWeatherHandler", () => {
           useValue: commandBusMockFactory()
         },
         {
-          provide: UrlGeneratorService,
-          useValue: urlGeneratorServiceMockFactory()
+          provide: ClientUrlGeneratorService,
+          useValue: clientUrlGeneratorServiceMockFactory()
         }
       ]
     }).compile()
@@ -46,8 +46,9 @@ describe("SendWeatherHandler", () => {
     handler = moduleRef.get<SendWeatherHandler>(SendWeatherHandler)
     queryBus = moduleRef.get<QueryBus>(QueryBus)
     commandBus = moduleRef.get<CommandBus>(CommandBus)
-    urlGeneratorService =
-      moduleRef.get<UrlGeneratorService>(UrlGeneratorService)
+    clientUrlGeneratorService = moduleRef.get<ClientUrlGeneratorService>(
+      ClientUrlGeneratorService
+    )
   })
 
   describe("execute", () => {
@@ -67,7 +68,7 @@ describe("SendWeatherHandler", () => {
         expect(queryBus.execute).toHaveBeenCalledWith(
           new GetWeatherQuery({ city: sub.city, days: "1" })
         )
-        expect(urlGeneratorService.unsubscribeUrl).toHaveBeenCalledWith(
+        expect(clientUrlGeneratorService.unsubscribeUrl).toHaveBeenCalledWith(
           sub.unsubscribeToken
         )
         expect(commandBus.execute).toHaveBeenCalledWith(
@@ -76,7 +77,7 @@ describe("SendWeatherHandler", () => {
             subject: "Weather",
             template: "weather",
             context: {
-              unsubscribeUrl: `${unsubscribeUrlMock}${sub.unsubscribeToken}`,
+              unsubscribeUrl: unsubscribeUrlMock(sub.unsubscribeToken),
               weather: weatherDataMock
             }
           })

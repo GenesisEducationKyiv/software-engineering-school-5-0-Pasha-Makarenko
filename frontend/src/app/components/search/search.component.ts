@@ -29,7 +29,9 @@ export interface SearchOptions {
   styleUrl: "./search.component.scss"
 })
 export class SearchComponent implements OnInit {
-  searchService = inject(SearchService)
+  private modalAdapter = inject(ModalAdapter)
+  private cityAdapter = inject(CityAdapter)
+  private searchService = inject(SearchService)
 
   searchId = input<string>()
   modalId = computed(() => this.searchId() + "-modal")
@@ -38,10 +40,7 @@ export class SearchComponent implements OnInit {
   data = signal<City[]>([])
   selectOutput = output<City | null>()
 
-  constructor(
-    protected modalAdapter: ModalAdapter,
-    protected cityAdapter: CityAdapter
-  ) {
+  constructor() {
     effect(() => {
       if (this.data().length) {
         this.modalAdapter.open(this.modalId())

@@ -20,7 +20,7 @@ export class ConfirmSubscriptionHandler
       where: { confirmationToken }
     })
 
-    if (!subscription) {
+    if (!subscription || subscription.isConfirmed) {
       throw new NotFoundException("Subscription not found or already confirmed")
     }
 

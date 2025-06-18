@@ -1,63 +1,40 @@
-import { Test } from "@nestjs/testing"
-import {
-  ConflictException,
-  INestApplication,
-  NotFoundException
-} from "@nestjs/common"
-import { Sequelize } from "sequelize-typescript"
-import { getModelToken } from "@nestjs/sequelize"
-import { AppModule } from "../../../src/app.module"
-import { Subscription } from "../../../src/subscriptions/models/subscription.model"
+import * as request from "supertest"
 import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.dto.mock"
 import { CreateSubscriptionDto } from "../../../src/subscriptions/dto/create-subscription.dto"
-import { CommandBus, QueryBus } from "@nestjs/cqrs"
-import { CreateSubscriptionCommand } from "../../../src/subscriptions/commands/impl/create-subscription.command"
-import { ConfirmSubscriptionCommand } from "../../../src/subscriptions/commands/impl/confirm-subscription.command"
-import { UnsubscribeCommand } from "../../../src/subscriptions/commands/impl/unsubscribe.command"
 import { GetActiveSubscriptionsQuery } from "../../../src/subscriptions/queries/impl/get-active-subscriptions.query"
+import {
+  cleanupTestApp,
+  closeTestApp,
+  setupTestApp,
+  TestContext
+} from "../setup"
 
 describe("Subscriptions", () => {
-  let app: INestApplication
-  let sequelize: Sequelize
-  let subscriptionModel: typeof Subscription
+  let context: TestContext
   let dto: CreateSubscriptionDto
-  let commandBus: CommandBus
-  let queryBus: QueryBus
 
   beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [AppModule]
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
-
-    sequelize = moduleFixture.get<Sequelize>(Sequelize)
-    subscriptionModel = moduleFixture.get<typeof Subscription>(
-      getModelToken(Subscription)
-    )
-    commandBus = moduleFixture.get<CommandBus>(CommandBus)
-    queryBus = moduleFixture.get<QueryBus>(QueryBus)
-
-    await sequelize.sync({ force: true })
-
+    context = await setupTestApp()
+    await context.sequelize.sync({ force: true })
     dto = createSubscriptionDtoMock
   })
 
   afterEach(async () => {
-    await subscriptionModel.destroy({ where: {} })
+    await cleanupTestApp(context, { clearDB: true })
   })
 
   afterAll(async () => {
-    await app.close()
-    await sequelize.close()
+    await closeTestApp(context, { closeDB: true })
   })
 
   describe("subscribe", () => {
     it("should create a new subscription", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      const subscription = await subscriptionModel.findOne({
+      const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
@@ -66,28 +43,38 @@ describe("Subscriptions", () => {
       expect(subscription!.isConfirmed).toBe(false)
     })
 
-    it("should throw error for duplicate email", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+    it("should throw error for duplicate email and city", async () => {
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      await expect(
-        commandBus.execute(new CreateSubscriptionCommand(dto))
-      ).rejects.toThrowError(ConflictException)
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(409)
+        .expect(res => {
+          expect(res.body.message).toBe("Subscription already exists")
+        })
     })
   })
 
   describe("confirmation", () => {
     it("should confirm a subscription", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      const subscription = await subscriptionModel.findOne({
+      const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
-      await commandBus.execute(
-        new ConfirmSubscriptionCommand(subscription!.confirmationToken)
-      )
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}`)
+        .expect(204)
 
-      const updatedSubscription = await subscriptionModel.findOne({
+      const updatedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
@@ -95,31 +82,70 @@ describe("Subscriptions", () => {
     })
 
     it("should throw error for invalid token", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      await expect(
-        commandBus.execute(new ConfirmSubscriptionCommand("invalid-token"))
-      ).rejects.toThrowError(NotFoundException)
+      const subscription = await context.subscriptionModel.findOne({
+        where: { email: dto.email }
+      })
+
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}_invalid-token`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.message).toBe(
+            "Subscription not found or already confirmed"
+          )
+        })
+    })
+
+    it("should throw error for already confirmed subscription", async () => {
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
+
+      const subscription = await context.subscriptionModel.findOne({
+        where: { email: dto.email }
+      })
+
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}`)
+        .expect(204)
+
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.message).toBe(
+            "Subscription not found or already confirmed"
+          )
+        })
     })
   })
 
   describe("unsubscribe", () => {
     it("should unsubscribe a confirmed user", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      const subscription = await subscriptionModel.findOne({
+      const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
-      await commandBus.execute(
-        new ConfirmSubscriptionCommand(subscription!.confirmationToken)
-      )
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}`)
+        .expect(204)
 
-      await commandBus.execute(
-        new UnsubscribeCommand(subscription!.unsubscribeToken)
-      )
+      await request(context.app.getHttpServer())
+        .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
+        .expect(204)
 
-      const deletedSubscription = await subscriptionModel.findOne({
+      const deletedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
@@ -127,17 +153,20 @@ describe("Subscriptions", () => {
     })
 
     it("should unsubscribe a unconfirmed user", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      const subscription = await subscriptionModel.findOne({
+      const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
-      await commandBus.execute(
-        new UnsubscribeCommand(subscription!.unsubscribeToken)
-      )
+      await request(context.app.getHttpServer())
+        .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
+        .expect(204)
 
-      const deletedSubscription = await subscriptionModel.findOne({
+      const deletedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
@@ -145,31 +174,74 @@ describe("Subscriptions", () => {
     })
 
     it("should throw error for invalid token", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      await expect(
-        commandBus.execute(new UnsubscribeCommand("invalid-token"))
-      ).rejects.toThrowError(NotFoundException)
+      const subscription = await context.subscriptionModel.findOne({
+        where: { email: dto.email }
+      })
+
+      await request(context.app.getHttpServer())
+        .post(
+          `/api/unsubscribe/${subscription!.unsubscribeToken}_invalid-token`
+        )
+        .expect(404)
+        .expect(res => {
+          expect(res.body.message).toBe(
+            "Subscription not found or already unsubscribed"
+          )
+        })
+    })
+
+    it("should throw error for already unsubscribed user", async () => {
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
+
+      const subscription = await context.subscriptionModel.findOne({
+        where: { email: dto.email }
+      })
+
+      await request(context.app.getHttpServer())
+        .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
+        .expect(204)
+
+      await request(context.app.getHttpServer())
+        .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.message).toBe(
+            "Subscription not found or already unsubscribed"
+          )
+        })
     })
   })
 
   describe("get active subscriptions", () => {
     it("should return active subscriptions", async () => {
-      await commandBus.execute(new CreateSubscriptionCommand(dto))
+      await request(context.app.getHttpServer())
+        .post("/api/subscribe")
+        .send(dto)
+        .expect(204)
 
-      const subscription = await subscriptionModel.findOne({
+      const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
       })
 
-      await commandBus.execute(
-        new ConfirmSubscriptionCommand(subscription!.confirmationToken)
+      await request(context.app.getHttpServer())
+        .post(`/api/confirm/${subscription!.confirmationToken}`)
+        .expect(204)
+
+      const activeSubscriptionsFromDB = await context.subscriptionModel.findAll(
+        {
+          where: { isConfirmed: true }
+        }
       )
 
-      const activeSubscriptionsFromDB = await subscriptionModel.findAll({
-        where: { isConfirmed: true }
-      })
-
-      const activeSubscriptions = await queryBus.execute(
+      const activeSubscriptions = await context.queryBus.execute(
         new GetActiveSubscriptionsQuery({})
       )
 

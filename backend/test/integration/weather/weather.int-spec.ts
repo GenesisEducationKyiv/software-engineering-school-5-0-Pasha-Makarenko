@@ -1,67 +1,66 @@
-import { Test } from "@nestjs/testing"
-import { BadRequestException, INestApplication } from "@nestjs/common"
-import { AppModule } from "../../../src/app.module"
-import { QueryBus } from "@nestjs/cqrs"
-import { GetWeatherQuery } from "../../../src/weather/queries/impl/get-weather.query"
+import * as request from "supertest"
 import { weatherQueryDtoMock } from "../../mocks/dto/weather-query.dto.mock"
-import { Cache } from "cache-manager"
-import { CACHE_MANAGER } from "@nestjs/cache-manager"
+import { cleanupTestApp, setupTestApp, TestContext } from "../setup"
 
 describe("Weather", () => {
-  let app: INestApplication
-  let queryBus: QueryBus
-  let cacheManager: Cache
+  let context: TestContext
 
   beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [AppModule]
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
-
-    queryBus = moduleFixture.get<QueryBus>(QueryBus)
-    cacheManager = moduleFixture.get<Cache>(CACHE_MANAGER)
+    context = await setupTestApp()
   })
 
   afterEach(async () => {
-    await cacheManager.clear()
+    await cleanupTestApp(context, { clearCache: true })
   })
 
   afterAll(async () => {
-    await app.close()
+    await cleanupTestApp(context)
   })
 
   describe("weather", () => {
     it("should return weather data for a city", async () => {
-      const weatherData = await queryBus.execute(
-        new GetWeatherQuery(weatherQueryDtoMock)
-      )
-
-      expect(weatherData.location.name).toBe(weatherQueryDtoMock.city)
+      await request(context.app.getHttpServer())
+        .get("/api/weather")
+        .query({
+          city: weatherQueryDtoMock.city,
+          days: weatherQueryDtoMock.days
+        })
+        .expect(200)
+        .expect(res => {
+          expect(res.body?.location?.name).toBe(weatherQueryDtoMock.city)
+        })
     })
 
     it("should throw error for invalid city", async () => {
-      await expect(
-        queryBus.execute(
-          new GetWeatherQuery({
-            city: "",
-            days: ""
-          })
-        )
-      ).rejects.toThrowError(BadRequestException)
+      await request(context.app.getHttpServer())
+        .get("/api/weather")
+        .query({
+          city: "invalid_city_query",
+          days: weatherQueryDtoMock.days
+        })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.message).toContain(
+            "Request failed with status code 400"
+          )
+          expect(res.body.statusCode).toBe(400)
+        })
     })
 
     it("should return cached response for same query", async () => {
       const key = `weather_${weatherQueryDtoMock.city}_${weatherQueryDtoMock.days}`
 
-      await expect(cacheManager.get(key)).resolves.toBeNull()
+      await expect(context.cacheManager.get(key)).resolves.toBeNull()
 
-      const weatherData = await queryBus.execute(
-        new GetWeatherQuery(weatherQueryDtoMock)
-      )
+      const { body: weatherData } = await request(context.app.getHttpServer())
+        .get("/api/weather")
+        .query({
+          city: weatherQueryDtoMock.city,
+          days: weatherQueryDtoMock.days
+        })
+        .expect(200)
 
-      await expect(cacheManager.get(key)).resolves.toEqual(weatherData)
+      await expect(context.cacheManager.get(key)).resolves.toEqual(weatherData)
     })
   })
 })

@@ -152,19 +152,19 @@
           ) {
             <li class="select-weather__item">
               <button type="button" (click)="dayIndex.set($index)">
-                <div
+                <span
                   class="weather-item {{
                     day.date === currentDate() ? 'weather-item_active' : ''
                   }}">
-                  <div class="weather-item__day">
+                  <span class="weather-item__day">
                     {{ day.date | date: "E" }}
-                  </div>
+                  </span>
                   <img
                     [src]="day.day.condition.icon"
                     [srcset]="day.day.condition.icon"
                     alt="day-icon"
                     class="weather-item__icon" />
-                  <div class="weather-temp">
+                  <span class="weather-temp">
                     {{
                       day.day[
                         tempUnit() === TemperatureUnit.CELSIUS
@@ -172,8 +172,8 @@
                           : "avgtemp_f"
                       ] | temperature: tempUnit()
                     }}
-                  </div>
-                </div>
+                  </span>
+                </span>
               </button>
             </li>
           }

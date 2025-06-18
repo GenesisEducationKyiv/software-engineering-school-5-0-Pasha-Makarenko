@@ -14,5 +14,5 @@ export const getSequelizeConfig = (
   autoLoadModels: true,
   synchronize: process.env.NODE_ENV !== "production",
   models: [Subscription],
-  logging: false
+  logging: process.env.NODE_ENV === "production"
 })

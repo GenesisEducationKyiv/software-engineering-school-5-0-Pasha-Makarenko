@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common"
 import { CqrsModule } from "@nestjs/cqrs"
-import { UrlGeneratorService } from "./services/url-generator.service"
+import { WeatherUrlGeneratorService } from "./services/weather-url-generator.service"
+import { ClientUrlGeneratorService } from "./services/client-url-generator.service"
 
 @Module({
   imports: [CqrsModule],
-  providers: [UrlGeneratorService],
-  exports: [UrlGeneratorService]
+  providers: [WeatherUrlGeneratorService, ClientUrlGeneratorService],
+  exports: [WeatherUrlGeneratorService, ClientUrlGeneratorService]
 })
 export class UrlGeneratorModule {}

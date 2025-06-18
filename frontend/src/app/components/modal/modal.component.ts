@@ -1,4 +1,4 @@
-import { Component, HostListener, input, signal } from "@angular/core"
+import { Component, HostListener, inject, input, signal } from "@angular/core"
 import { findParentById } from "../../utils/dom/find.util"
 import { ModalAdapter } from "../../store/modal/modal.adapter"
 
@@ -14,11 +14,13 @@ interface ModalOptions {
   styleUrl: "./modal.component.scss"
 })
 export class ModalComponent {
+  private modalAdapter = inject(ModalAdapter)
+
   modalId = input<string>()
   options = input<Partial<ModalOptions> | null>(null)
   isOpen = signal(false)
 
-  constructor(private modalAdapter: ModalAdapter) {
+  constructor() {
     this.modalAdapter.select().subscribe(res => {
       this.isOpen.set(res[this.modalId()!]?.isOpen)
     })
@@ -26,12 +28,15 @@ export class ModalComponent {
 
   @HostListener("document:click", ["$event.target"])
   onClickOutside(target: HTMLElement) {
+    const modalId = this.modalId()
+
     if (
+      modalId &&
       this.options()?.closeOutside &&
       this.isOpen() &&
-      !findParentById(target, ["modal", `modal-target-${this.modalId()!}`])
+      !findParentById(target, ["modal", `modal-target-${modalId}`])
     ) {
-      this.modalAdapter.close(this.modalId()!)
+      this.modalAdapter.close(modalId)
     }
   }
 }

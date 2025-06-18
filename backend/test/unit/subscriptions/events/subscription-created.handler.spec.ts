@@ -1,19 +1,19 @@
 import { Test } from "@nestjs/testing"
 import { CommandBus } from "@nestjs/cqrs"
 import { SubscriptionCreatedHandler } from "../../../../src/subscriptions/events/handlers/subscription-created.handler"
-import { UrlGeneratorService } from "../../../../src/url-generator/services/url-generator.service"
+import { ClientUrlGeneratorService } from "../../../../src/url-generator/services/client-url-generator.service"
 import { SubscriptionCreatedEvent } from "../../../../src/subscriptions/events/impl/subscription-created.event"
 import { SendMailCommand } from "../../../../src/mail/commands/impl/send-mail.command"
 import {
-  confirmUrlMock,
-  urlGeneratorServiceMockFactory
-} from "../../../mocks/services/url-generator.service.mock"
+  clientUrlGeneratorServiceMockFactory,
+  confirmUrlMock
+} from "../../../mocks/services/client-url-generator.service.mock"
 import { commandBusMockFactory } from "../../../mocks/services/cqrs.mock"
 import { subscriptionModelsMock } from "../../../mocks/models/subscription.model.mock"
 
 describe("SubscriptionCreatedHandler", () => {
   let handler: SubscriptionCreatedHandler
-  let urlGeneratorService: UrlGeneratorService
+  let urlGeneratorService: ClientUrlGeneratorService
   let commandBus: CommandBus
 
   beforeEach(async () => {
@@ -21,8 +21,8 @@ describe("SubscriptionCreatedHandler", () => {
       providers: [
         SubscriptionCreatedHandler,
         {
-          provide: UrlGeneratorService,
-          useValue: urlGeneratorServiceMockFactory()
+          provide: ClientUrlGeneratorService,
+          useValue: clientUrlGeneratorServiceMockFactory()
         },
         {
           provide: CommandBus,
@@ -34,8 +34,9 @@ describe("SubscriptionCreatedHandler", () => {
     handler = moduleRef.get<SubscriptionCreatedHandler>(
       SubscriptionCreatedHandler
     )
-    urlGeneratorService =
-      moduleRef.get<UrlGeneratorService>(UrlGeneratorService)
+    urlGeneratorService = moduleRef.get<ClientUrlGeneratorService>(
+      ClientUrlGeneratorService
+    )
     commandBus = moduleRef.get<CommandBus>(CommandBus)
   })
 
@@ -57,7 +58,7 @@ describe("SubscriptionCreatedHandler", () => {
           subject: "Confirmation",
           template: "confirm",
           context: {
-            confirmUrl: `${confirmUrlMock}${mockSubscription.confirmationToken}`
+            confirmUrl: confirmUrlMock(mockSubscription.confirmationToken)
           }
         })
       )

@@ -1,4 +1,4 @@
-import { Component, computed, effect, signal } from "@angular/core"
+import { Component, computed, effect, inject, signal } from "@angular/core"
 import { WeatherAdapter } from "../../store/weather/weather.adapter"
 import {
   initialWeatherState,
@@ -32,6 +32,9 @@ import { City } from "../../api/search/search.interface"
   styleUrl: "./home.component.scss"
 })
 export class HomeComponent {
+  protected weatherAdapter = inject(WeatherAdapter)
+  protected cityAdapter = inject(CityAdapter)
+
   searchControl = new FormControl<string | null>(null)
   searchIcon = faSearch
   hourStep = 3
@@ -60,10 +63,7 @@ export class HomeComponent {
       : SpeedUnit.MIlES
   )
 
-  constructor(
-    protected weatherAdapter: WeatherAdapter,
-    protected cityAdapter: CityAdapter
-  ) {
+  constructor() {
     this.weatherAdapter.select().subscribe(this.weatherData.set)
     this.cityAdapter.select().subscribe(city => {
       this.city.set(city)

@@ -73,23 +73,6 @@ services:
       - test-network
     command: npm run test:integration
 
-  test-e2e-backend:
-    container_name: weather.backend.test-e2e
-    build:
-      context: backend
-      dockerfile: Dockerfile.test
-    env_file:
-      - .env.test
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - test-database
-      - test-redis
-    networks:
-      - test-network
-    command: npm run test:e2e
-
 networks:
   test-network:
     driver: bridge

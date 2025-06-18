@@ -58,7 +58,7 @@ describe("CreateSubscriptionHandler", () => {
       const result = await handler.execute(command)
 
       expect(subscriptionsRepository.findOne).toHaveBeenCalledWith({
-        where: { email: dto.email }
+        where: { email: dto.email, city: dto.city }
       })
       expect(subscriptionsRepository.create).toHaveBeenCalledWith({
         ...dto,

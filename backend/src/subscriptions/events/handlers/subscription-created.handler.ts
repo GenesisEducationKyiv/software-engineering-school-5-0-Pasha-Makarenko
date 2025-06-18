@@ -1,7 +1,7 @@
 import { CommandBus, EventsHandler, IEventHandler } from "@nestjs/cqrs"
 import { SubscriptionCreatedEvent } from "../impl/subscription-created.event"
 import { Logger } from "@nestjs/common"
-import { UrlGeneratorService } from "../../../url-generator/services/url-generator.service"
+import { ClientUrlGeneratorService } from "../../../url-generator/services/client-url-generator.service"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
 
 @EventsHandler(SubscriptionCreatedEvent)
@@ -11,7 +11,7 @@ export class SubscriptionCreatedHandler
   private logger = new Logger(SubscriptionCreatedHandler.name)
 
   constructor(
-    private urlGeneratorService: UrlGeneratorService,
+    private clientUrlGeneratorService: ClientUrlGeneratorService,
     private commandBus: CommandBus
   ) {}
 
@@ -19,7 +19,7 @@ export class SubscriptionCreatedHandler
     const { subscription } = event
 
     try {
-      const { url: confirmUrl } = this.urlGeneratorService.confirmUrl(
+      const { url: confirmUrl } = this.clientUrlGeneratorService.confirmUrl(
         subscription.confirmationToken
       )
 

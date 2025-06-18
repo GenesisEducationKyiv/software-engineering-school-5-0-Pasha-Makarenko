@@ -1,59 +1,67 @@
-import { Test } from "@nestjs/testing"
-import { BadRequestException, INestApplication } from "@nestjs/common"
-import { AppModule } from "../../../src/app.module"
-import { QueryBus } from "@nestjs/cqrs"
-import { Cache } from "cache-manager"
-import { CACHE_MANAGER } from "@nestjs/cache-manager"
-import { GetCitiesQuery } from "../../../src/search/queries/impl/get-cities.query"
+import * as request from "supertest"
+import { cleanupTestApp, setupTestApp, TestContext } from "../setup"
 
 describe("Search", () => {
-  let app: INestApplication
-  let queryBus: QueryBus
-  let cacheManager: Cache
+  let context: TestContext
   const cityQuery = "Paris"
 
   beforeAll(async () => {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [AppModule]
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
-
-    queryBus = moduleFixture.get<QueryBus>(QueryBus)
-    cacheManager = moduleFixture.get<Cache>(CACHE_MANAGER)
+    context = await setupTestApp()
   })
 
   afterEach(async () => {
-    await cacheManager.clear()
+    await cleanupTestApp(context, { clearCache: true })
   })
 
   afterAll(async () => {
-    await app.close()
+    await cleanupTestApp(context)
   })
 
   describe("search", () => {
     it("should return cities for search query", async () => {
-      const searchData = await queryBus.execute(new GetCitiesQuery(cityQuery))
-
-      expect(Array.isArray(searchData)).toBe(true)
-      expect(searchData.length).toBeGreaterThan(0)
+      await request(context.app.getHttpServer())
+        .get("/api/search")
+        .query({ city: cityQuery })
+        .expect(200)
+        .expect(res => {
+          expect(Array.isArray(res.body)).toBe(true)
+          expect(res.body.length).toBeGreaterThan(0)
+        })
     })
 
     it("should throw error for invalid query", async () => {
-      await expect(
-        queryBus.execute(new GetCitiesQuery(""))
-      ).rejects.toThrowError(BadRequestException)
+      await request(context.app.getHttpServer())
+        .get("/api/search")
+        .query({ city: [] })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.message).toContain(
+            "Request failed with status code 400"
+          )
+          expect(res.body.statusCode).toBe(400)
+        })
+
+      await request(context.app.getHttpServer())
+        .get("/api/search")
+        .query({ city: "invalid_city_query" })
+        .expect(200)
+        .expect(res => {
+          expect(Array.isArray(res.body)).toBe(true)
+          expect(res.body.length).toBe(0)
+        })
     })
 
     it("should return cached response for same query", async () => {
       const key = `search_${cityQuery}`
 
-      await expect(cacheManager.get(key)).resolves.toBeNull()
+      await expect(context.cacheManager.get(key)).resolves.toBeNull()
 
-      const searchData = await queryBus.execute(new GetCitiesQuery(cityQuery))
+      const { body: searchData } = await request(context.app.getHttpServer())
+        .get("/api/search")
+        .query({ city: cityQuery })
+        .expect(200)
 
-      await expect(cacheManager.get(key)).resolves.toEqual(searchData)
+      await expect(context.cacheManager.get(key)).resolves.toEqual(searchData)
     })
   })
 })

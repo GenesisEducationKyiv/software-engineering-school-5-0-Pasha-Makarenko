@@ -5,7 +5,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { Cache } from "cache-manager"
 import { of } from "rxjs"
 import { BadRequestException } from "@nestjs/common"
-import { UrlGeneratorService } from "../../../../src/url-generator/services/url-generator.service"
+import { WeatherUrlGeneratorService } from "../../../../src/url-generator/services/weather-url-generator.service"
 import { GetCitiesHandler } from "../../../../src/search/queries/handlers/get-cities.handler"
 import { GetCitiesQuery } from "../../../../src/search/queries/impl/get-cities.query"
 import { City } from "../../../../src/search/interfaces/search.interface"
@@ -13,15 +13,15 @@ import { AxiosResponse } from "axios"
 import { httpServiceMockFactory } from "../../../mocks/services/http.service.mock"
 import {
   searchUrlMock,
-  urlGeneratorServiceMockFactory
-} from "../../../mocks/services/url-generator.service.mock"
+  weatherUrlGeneratorServiceMockFactory
+} from "../../../mocks/services/weather-url-generator.service.mock"
 import { configServiceMockFactory } from "../../../mocks/services/config.service.mock"
 import { cacheServiceMockFactory } from "../../../mocks/services/cache.service.mock"
 
 describe("GetCitiesHandler", () => {
   let handler: GetCitiesHandler
   let httpService: HttpService
-  let urlGeneratorService: UrlGeneratorService
+  let urlGeneratorService: WeatherUrlGeneratorService
   let configService: ConfigService
   let cacheManager: Cache
 
@@ -34,8 +34,8 @@ describe("GetCitiesHandler", () => {
           useValue: httpServiceMockFactory()
         },
         {
-          provide: UrlGeneratorService,
-          useValue: urlGeneratorServiceMockFactory()
+          provide: WeatherUrlGeneratorService,
+          useValue: weatherUrlGeneratorServiceMockFactory()
         },
         {
           provide: ConfigService,
@@ -50,8 +50,9 @@ describe("GetCitiesHandler", () => {
 
     handler = moduleRef.get<GetCitiesHandler>(GetCitiesHandler)
     httpService = moduleRef.get<HttpService>(HttpService)
-    urlGeneratorService =
-      moduleRef.get<UrlGeneratorService>(UrlGeneratorService)
+    urlGeneratorService = moduleRef.get<WeatherUrlGeneratorService>(
+      WeatherUrlGeneratorService
+    )
     configService = moduleRef.get<ConfigService>(ConfigService)
     cacheManager = moduleRef.get<Cache>(CACHE_MANAGER)
   })

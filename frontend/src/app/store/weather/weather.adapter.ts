@@ -8,7 +8,7 @@ import { selectWeather } from "./weather.selectors"
 
 @Injectable({ providedIn: "root" })
 export class WeatherAdapter {
-  weatherService = inject(WeatherService)
+  private weatherService = inject(WeatherService)
 
   constructor(private store: Store<AppState>) {}
 

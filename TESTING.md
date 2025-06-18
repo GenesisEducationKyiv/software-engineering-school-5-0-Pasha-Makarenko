@@ -1,45 +1,27 @@
-# Testing
+# 🧪 Testing Guide
 
-Copy environment variables from `.env.test.example` to `.env.test`:
+## 🛠️ Initial Setup
+
+Copy environment variables for testing
 
 ```bash
 cp .env.test.example .env.test
 ```
 
-## Unit Tests
+## 🔬 Unit Tests
 
-Run the unit tests:
-
-* For backend:
-
+### Backend Tests
 ```bash
 npm run test:unit:backend
 ```
 
-* For frontend:
-
+### Frontend Tests
 ```bash
 npm run test:unit:frontend
 ```
 
-* For all unit tests (both backend and frontend):
-
-```bash
-npm run test:unit:all
-```
-
-## Integration Tests
-
-Run the integration tests:
+## 🔗 Integration Tests
 
 ```bash
 npm run test:integration:backend
-```
-
-## E2E Tests
-
-Run the end-to-end tests:
-
-```bash
-npm run test:e2e:backend
 ```

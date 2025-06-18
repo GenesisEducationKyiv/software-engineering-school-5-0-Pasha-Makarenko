@@ -7,11 +7,11 @@ import { Cache } from "cache-manager"
 import { AxiosResponse } from "axios"
 import { GetWeatherHandler } from "../../../../src/weather/queries/handlers/get-weather.handler"
 import { GetWeatherQuery } from "../../../../src/weather/queries/impl/get-weather.query"
-import { UrlGeneratorService } from "../../../../src/url-generator/services/url-generator.service"
+import { WeatherUrlGeneratorService } from "../../../../src/url-generator/services/weather-url-generator.service"
 import {
-  urlGeneratorServiceMockFactory,
+  weatherUrlGeneratorServiceMockFactory,
   weatherUrlMock
-} from "../../../mocks/services/url-generator.service.mock"
+} from "../../../mocks/services/weather-url-generator.service.mock"
 import {
   configServiceMockFactory,
   WEATHER_API_KEY
@@ -24,7 +24,7 @@ import { weatherQueryDtoMock } from "../../../mocks/dto/weather-query.dto.mock"
 describe("GetWeatherHandler", () => {
   let handler: GetWeatherHandler
   let httpService: HttpService
-  let urlGeneratorService: UrlGeneratorService
+  let urlGeneratorService: WeatherUrlGeneratorService
   let cacheManager: Cache
 
   beforeEach(async () => {
@@ -36,8 +36,8 @@ describe("GetWeatherHandler", () => {
           useValue: httpServiceMockFactory()
         },
         {
-          provide: UrlGeneratorService,
-          useValue: urlGeneratorServiceMockFactory()
+          provide: WeatherUrlGeneratorService,
+          useValue: weatherUrlGeneratorServiceMockFactory()
         },
         {
           provide: ConfigService,
@@ -52,8 +52,9 @@ describe("GetWeatherHandler", () => {
 
     handler = moduleRef.get<GetWeatherHandler>(GetWeatherHandler)
     httpService = moduleRef.get<HttpService>(HttpService)
-    urlGeneratorService =
-      moduleRef.get<UrlGeneratorService>(UrlGeneratorService)
+    urlGeneratorService = moduleRef.get<WeatherUrlGeneratorService>(
+      WeatherUrlGeneratorService
+    )
     cacheManager = moduleRef.get(CACHE_MANAGER)
   })
 

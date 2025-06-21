@@ -16,8 +16,8 @@ export class WeatherAdapter {
     return this.store.select(selectWeather)
   }
 
-  weather(city: string | null, finallyFn?: () => void) {
-    if (!city) {
+  weather(city: string | null, lat: string | null, lon: string | null, finallyFn?: () => void) {
+    if (!lat || !lon || !city) {
       return
     }
 
@@ -26,6 +26,8 @@ export class WeatherAdapter {
     this.weatherService
       .getWeather({
         city,
+        lat,
+        lon,
         days: 14
       })
       .subscribe(

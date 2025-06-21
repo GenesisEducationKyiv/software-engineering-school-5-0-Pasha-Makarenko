@@ -6,6 +6,7 @@ import {
   setupTestApp,
   TestContext
 } from "../setup"
+import { HttpStatus } from "@nestjs/common"
 
 describe("Weather", () => {
   let context: TestContext
@@ -34,7 +35,7 @@ describe("Weather", () => {
           city: weatherQueryDtoMock.city,
           days: weatherQueryDtoMock.days
         })
-        .expect(200)
+        .expect(HttpStatus.OK)
         .expect(res => {
           expect(res.body?.location?.name).toBe(weatherQueryDtoMock.city)
         })
@@ -47,12 +48,12 @@ describe("Weather", () => {
           city: "invalid_city_query",
           days: weatherQueryDtoMock.days
         })
-        .expect(400)
+        .expect(HttpStatus.BAD_REQUEST)
         .expect(res => {
           expect(res.body.message).toContain(
-            "Request failed with status code 400"
+            `Request failed with status code ${HttpStatus.BAD_REQUEST}`
           )
-          expect(res.body.statusCode).toBe(400)
+          expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST)
         })
     })
 
@@ -67,7 +68,7 @@ describe("Weather", () => {
           city: weatherQueryDtoMock.city,
           days: weatherQueryDtoMock.days
         })
-        .expect(200)
+        .expect(HttpStatus.OK)
 
       await expect(context.cacheManager.get(key)).resolves.toEqual(weatherData)
     })

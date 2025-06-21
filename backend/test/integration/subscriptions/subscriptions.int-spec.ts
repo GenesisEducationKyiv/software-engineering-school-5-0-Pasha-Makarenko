@@ -9,6 +9,8 @@ import {
   setupTestApp,
   TestContext
 } from "../setup"
+import { Frequency } from "../../../src/subscriptions/models/subscription.model"
+import { HttpStatus } from "@nestjs/common"
 
 describe("Subscriptions", () => {
   let context: TestContext
@@ -44,7 +46,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -59,12 +61,12 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(409)
+        .expect(HttpStatus.CONFLICT)
         .expect(res => {
           expect(res.body.message).toBe("Subscription already exists")
         })
@@ -76,7 +78,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -84,7 +86,7 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const updatedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -97,7 +99,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -105,7 +107,7 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}_invalid-token`)
-        .expect(404)
+        .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toBe(
             "Subscription not found or already confirmed"
@@ -117,7 +119,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -125,11 +127,11 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(404)
+        .expect(HttpStatus.NO_CONTENT)
         .expect(res => {
           expect(res.body.message).toBe(
             "Subscription not found or already confirmed"
@@ -143,7 +145,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -151,11 +153,11 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       await request(context.app.getHttpServer())
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const deletedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -168,7 +170,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -176,7 +178,7 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const deletedSubscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -189,7 +191,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -199,7 +201,7 @@ describe("Subscriptions", () => {
         .post(
           `/api/unsubscribe/${subscription!.unsubscribeToken}_invalid-token`
         )
-        .expect(404)
+        .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toBe(
             "Subscription not found or already unsubscribed"
@@ -211,7 +213,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -219,11 +221,11 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       await request(context.app.getHttpServer())
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
-        .expect(404)
+        .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toBe(
             "Subscription not found or already unsubscribed"
@@ -237,7 +239,7 @@ describe("Subscriptions", () => {
       await request(context.app.getHttpServer())
         .post("/api/subscribe")
         .send(dto)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const subscription = await context.subscriptionModel.findOne({
         where: { email: dto.email }
@@ -245,16 +247,16 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(204)
+        .expect(HttpStatus.NO_CONTENT)
 
       const activeSubscriptionsFromDB = await context.subscriptionModel.findAll(
         {
-          where: { isConfirmed: true }
+          where: { isConfirmed: true, frequency: Frequency.DAILY }
         }
       )
 
       const activeSubscriptions = await context.queryBus.execute(
-        new GetActiveSubscriptionsQuery({})
+        new GetActiveSubscriptionsQuery(Frequency.DAILY)
       )
 
       expect(activeSubscriptions.length).toBe(activeSubscriptionsFromDB.length)

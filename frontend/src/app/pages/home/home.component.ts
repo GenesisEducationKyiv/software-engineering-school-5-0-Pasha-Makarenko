@@ -42,19 +42,16 @@ export class HomeComponent {
   city = signal<City | null>(null)
   dayIndex = signal<number>(0)
   currentDay = computed(
-    () =>
-      this.weatherData().data?.forecast.forecastday[this.dayIndex()].day || null
+    () => this.weatherData().data?.forecast[this.dayIndex()] || null
   )
   currentDate = computed(
-    () =>
-      this.weatherData().data?.forecast.forecastday[this.dayIndex()].date ||
-      null
+    () => this.weatherData().data?.forecast[this.dayIndex()].date || null
   )
   hours = computed<WeatherHour[]>(
     () =>
-      this.weatherData().data?.forecast.forecastday[
-        this.dayIndex()
-      ].hour.filter((_, i) => i % this.hourStep === 0) || []
+      this.weatherData().data?.forecast[this.dayIndex()].hours.filter(
+        (_, i) => i % this.hourStep === 0
+      ) || []
   )
   tempUnit = signal<TemperatureUnit>(TemperatureUnit.CELSIUS)
   speedUnit = computed(() =>
@@ -74,7 +71,11 @@ export class HomeComponent {
       const city = this.city()
 
       if (city) {
-        this.weatherAdapter.weather(city.url)
+        this.weatherAdapter.weather(
+          city.name,
+          city.lat.toString(),
+          city.lon.toString()
+        )
       }
     })
   }

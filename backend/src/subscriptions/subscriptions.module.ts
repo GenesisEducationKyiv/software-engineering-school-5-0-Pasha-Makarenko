@@ -11,6 +11,14 @@ import { ConfirmSubscriptionHandler } from "./commands/handlers/confirm-subscrip
 import { GetActiveSubscriptionsHandler } from "./queries/handlers/get-active-subscriptions.handler"
 import { SubscriptionCreatedHandler } from "./events/handlers/subscription-created.handler"
 import { UrlGeneratorModule } from "../url-generator/url-generator.module"
+import {
+  SUBSCRIPTIONS_QUERY_REPOSITORY,
+  SubscriptionsQueryRepository
+} from "./repositories/subscriptions-query.repository"
+import {
+  SUBSCRIPTIONS_COMMAND_REPOSITORY,
+  SubscriptionsCommandRepository
+} from "./repositories/subscriptions-command.repository"
 
 const commandHandlers = [
   CreateSubscriptionHandler,
@@ -22,9 +30,25 @@ const queryHandlers = [GetActiveSubscriptionsHandler]
 
 const eventHandlers = [SubscriptionCreatedHandler]
 
+const repositories = [
+  {
+    provide: SUBSCRIPTIONS_QUERY_REPOSITORY,
+    useClass: SubscriptionsQueryRepository
+  },
+  {
+    provide: SUBSCRIPTIONS_COMMAND_REPOSITORY,
+    useClass: SubscriptionsCommandRepository
+  }
+]
+
 @Module({
   controllers: [SubscriptionsController],
-  providers: [...commandHandlers, ...queryHandlers, ...eventHandlers],
+  providers: [
+    ...commandHandlers,
+    ...queryHandlers,
+    ...eventHandlers,
+    ...repositories
+  ],
   imports: [
     CqrsModule,
     ConfigModule,
@@ -32,6 +56,11 @@ const eventHandlers = [SubscriptionCreatedHandler]
     MailModule,
     UrlGeneratorModule
   ],
-  exports: [...commandHandlers, ...queryHandlers, ...eventHandlers]
+  exports: [
+    ...commandHandlers,
+    ...queryHandlers,
+    ...eventHandlers,
+    ...repositories
+  ]
 })
 export class SubscriptionsModule {}

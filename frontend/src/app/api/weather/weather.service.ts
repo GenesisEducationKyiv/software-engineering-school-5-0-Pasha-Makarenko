@@ -11,6 +11,6 @@ export class WeatherService {
   http = inject(HttpClient)
 
   getWeather(dto: GetWeatherDto) {
-    return this.http.get<WeatherData>(ENDPOINTS.weather(dto.city, dto.days))
+    return this.http.get<WeatherData>(ENDPOINTS.weather(dto))
   }
 }

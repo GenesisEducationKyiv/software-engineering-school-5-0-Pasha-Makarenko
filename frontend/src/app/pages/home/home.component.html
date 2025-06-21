@@ -21,15 +21,13 @@
           <button
             type="button"
             class="heading-weather__button"
-            (click)="weatherAdapter.weather(city()?.url!)">
+            (click)="weatherAdapter.weather(city()?.name!, city()?.lat!.toString(), city()?.lon!.toString())">
             <fa-icon [icon]="searchIcon" />
           </button>
         </div>
       </div>
 
-      @if (
-        weatherData().isLoading || (!weatherData().data && !weatherData().error)
-      ) {
+      @if (weatherData().isLoading || (!weatherData().data && !weatherData().error)) {
         <div class="loader"></div>
       } @else if (weatherData().error) {
         <app-form-error [message]="weatherData().error!" />
@@ -39,19 +37,13 @@
             <div class="weather-summary__average avg-summary">
               <div class="avg-summary__header">
                 <img
-                  [src]="currentDay()!.condition.icon"
-                  [srcset]="currentDay()!.condition.icon"
+                  [src]="currentDay()!.icon"
+                  [srcset]="currentDay()!.icon"
                   alt="day-icon"
                   class="avg-summary__icon" />
                 <div class="avg-summary__text">
                   <div class="avg-summary__temp">
-                    {{
-                      currentDay()![
-                        tempUnit() === TemperatureUnit.CELSIUS
-                          ? "avgtemp_c"
-                          : "avgtemp_f"
-                      ]
-                    }}
+                    {{ currentDay()!.avgtemp }}
                   </div>
                   <div class="avg-summary__switch">
                     <button
@@ -83,75 +75,60 @@
                 {{ currentDate() | date: "EEEE" }}
               </div>
               <div class="type-summary__type">
-                {{ currentDay()!.condition.text }}
+                {{ currentDay()!.text }}
               </div>
             </div>
           </div>
           <div class="weather-hours__wrapper">
             <table class="weather-hours">
               <thead>
-                <tr>
-                  <th>Time</th>
-                  @for (hour of hours(); track hour.time) {
-                    <th>
-                      <div class="weather-hours__header">
-                        <img
-                          [src]="hour.condition.icon"
-                          [srcset]="hour.condition.icon"
-                          alt="hour-icon"
-                          class="weather-hours__icon" />
-                        <div class="weather-hours__time">
-                          {{ hour.time.split(" ")[1] }}
-                        </div>
+              <tr>
+                <th>Time</th>
+                @for (hour of hours(); track hour.time) {
+                  <th>
+                    <div class="weather-hours__header">
+                      <img
+                        [src]="hour.icon"
+                        [srcset]="hour.icon"
+                        alt="hour-icon"
+                        class="weather-hours__icon" />
+                      <div class="weather-hours__time">
+                        {{ hour.time }}
                       </div>
-                    </th>
-                  }
-                </tr>
+                    </div>
+                  </th>
+                }
+              </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Temperature</td>
-                  @for (hour of hours(); track hour.time) {
-                    <td>
-                      {{
-                        hour[
-                          tempUnit() === TemperatureUnit.CELSIUS
-                            ? "temp_c"
-                            : "temp_f"
-                        ] | temperature: tempUnit()
-                      }}
-                    </td>
-                  }
-                </tr>
-                <tr>
-                  <td>Humidity</td>
-                  @for (hour of hours(); track hour.time) {
-                    <td>{{ hour.humidity }}%</td>
-                  }
-                </tr>
-                <tr>
-                  <td>Wind</td>
-                  @for (hour of hours(); track hour.time) {
-                    <td>
-                      {{
-                        hour[
-                          speedUnit() === SpeedUnit.KILOMETRES
-                            ? "wind_kph"
-                            : "wind_mph"
-                        ] | speed: speedUnit()
-                      }}
-                    </td>
-                  }
-                </tr>
+              <tr>
+                <td>Temperature</td>
+                @for (hour of hours(); track hour.time) {
+                  <td>
+                    {{ hour.temp | temperature: tempUnit() }}
+                  </td>
+                }
+              </tr>
+              <tr>
+                <td>Humidity</td>
+                @for (hour of hours(); track hour.time) {
+                  <td>{{ hour.humidity }}%</td>
+                }
+              </tr>
+              <tr>
+                <td>Wind</td>
+                @for (hour of hours(); track hour.time) {
+                  <td>
+                    {{ hour.wind | speed: speedUnit() }}
+                  </td>
+                }
+              </tr>
               </tbody>
             </table>
           </div>
         }
         <ul class="weather__select select-weather">
-          @for (
-            day of weatherData().data!.forecast!.forecastday!;
-            track day.date
-          ) {
+          @for (day of weatherData().data!.forecast!; track day.date) {
             <li class="select-weather__item">
               <button type="button" (click)="dayIndex.set($index)">
                 <span
@@ -162,18 +139,12 @@
                     {{ day.date | date: "E" }}
                   </span>
                   <img
-                    [src]="day.day.condition.icon"
-                    [srcset]="day.day.condition.icon"
+                    [src]="day.icon"
+                    [srcset]="day.icon"
                     alt="day-icon"
                     class="weather-item__icon" />
                   <span class="weather-temp">
-                    {{
-                      day.day[
-                        tempUnit() === TemperatureUnit.CELSIUS
-                          ? "avgtemp_c"
-                          : "avgtemp_f"
-                      ] | temperature: tempUnit()
-                    }}
+                    {{ day.avgtemp | temperature: tempUnit() }}
                   </span>
                 </span>
               </button>

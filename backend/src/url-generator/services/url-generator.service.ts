@@ -4,7 +4,7 @@ import { GeneratedUrl } from "../interfaces/url-generator.interfaces"
 import { ClientRoutesConsts } from "../consts/client-routes.consts"
 
 @Injectable()
-export class ClientUrlGeneratorService {
+export class UrlGeneratorService {
   private readonly clientUrl: string
 
   constructor(private configService: ConfigService) {

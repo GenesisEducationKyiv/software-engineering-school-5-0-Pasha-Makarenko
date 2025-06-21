@@ -5,6 +5,7 @@ import {
   setupTestApp,
   TestContext
 } from "../setup"
+import { HttpStatus } from "@nestjs/common"
 
 describe("Search", () => {
   let context: TestContext
@@ -31,7 +32,7 @@ describe("Search", () => {
       await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: cityQuery })
-        .expect(200)
+        .expect(HttpStatus.OK)
         .expect(res => {
           expect(Array.isArray(res.body)).toBe(true)
           expect(res.body.length).toBeGreaterThan(0)
@@ -42,18 +43,18 @@ describe("Search", () => {
       await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: "" })
-        .expect(400)
+        .expect(HttpStatus.BAD_REQUEST)
         .expect(res => {
           expect(res.body.message).toContain(
-            "Request failed with status code 400"
+            `Request failed with status code ${HttpStatus.BAD_REQUEST}`
           )
-          expect(res.body.statusCode).toBe(400)
+          expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST)
         })
 
       await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: "invalid_city_query" })
-        .expect(200)
+        .expect(HttpStatus.OK)
         .expect(res => {
           expect(Array.isArray(res.body)).toBe(true)
           expect(res.body.length).toBe(0)
@@ -68,7 +69,7 @@ describe("Search", () => {
       const { body: searchData } = await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: cityQuery })
-        .expect(200)
+        .expect(HttpStatus.OK)
 
       await expect(context.cacheManager.get(key)).resolves.toEqual(searchData)
     })

@@ -1,5 +1,6 @@
-export const openMeteoWeatherCodeConst: {
-  [code: string]: {
+export const openMeteoWeatherCodeConst: Record<
+  string,
+  {
     day: {
       description: string
       image: string
@@ -9,7 +10,7 @@ export const openMeteoWeatherCodeConst: {
       image: string
     }
   }
-} = {
+> = {
   "0": {
     day: {
       description: "Sunny",

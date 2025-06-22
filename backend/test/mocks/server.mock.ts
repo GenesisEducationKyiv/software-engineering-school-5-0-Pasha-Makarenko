@@ -1,20 +1,25 @@
 import { setupServer } from "msw/node"
 import { http, HttpResponse } from "msw"
-import { WeatherApiConst } from "../../src/url-generator/consts/weather-api.const"
 import { weatherDataMock } from "./data/weather.mock"
 import { citiesMock } from "./data/search.mock"
+import { HttpStatus } from "@nestjs/common"
 
 const weatherHandler = http.get(
-  process.env["WEATHER_API_URL"] + WeatherApiConst.weather,
+  process.env["WEATHER_API_WEATHER_URL"]!,
   async ({ request }) => {
     const url = new URL(request.url)
-    const city = url.searchParams.get("q")
-    const days = url.searchParams.get("days")
+    const city =
+      url.searchParams.get("q") ||
+      url.searchParams.get("latitude") + "," + url.searchParams.get("longitude")
+    const days =
+      url.searchParams.get("days") || url.searchParams.get("forecast_days")
 
-    if (!city || !days || city === "invalid_city_query") {
+    console.log(url.searchParams)
+
+    if (!city || !days || city === "invalid_lat,invalid_lon") {
       return new HttpResponse(
         { message: "No matching location found." },
-        { status: 400 }
+        { status: HttpStatus.BAD_REQUEST }
       )
     }
 
@@ -23,15 +28,15 @@ const weatherHandler = http.get(
 )
 
 const searchHandler = http.get(
-  process.env["WEATHER_API_URL"] + WeatherApiConst.search,
+  process.env["WEATHER_API_SEARCH_URL"]!,
   async ({ request }) => {
     const url = new URL(request.url)
-    const city = url.searchParams.get("q")
+    const city = url.searchParams.get("q") || url.searchParams.get("name")
 
     if (!city?.toString()) {
       return new HttpResponse(
         { message: "Parameter q is missing." },
-        { status: 400 }
+        { status: HttpStatus.BAD_REQUEST }
       )
     }
 

@@ -10,7 +10,7 @@ import { openMeteoWeatherMapper } from "../mappers/open-meteo-weather.mapper"
 import { CityNotFoundException } from "../../search/exceptions/city-not-found.exception"
 import { WeatherProviderException } from "../exceptions/weather-provider.exception"
 import { WeatherProviderHandler } from "./weather.provider.handler"
-import { findClosedCity } from "../../shared/utils/ind-closed-city.util"
+import { findClosedCity } from "../../shared/utils/find-closed-city.util"
 
 @Injectable()
 export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
@@ -29,8 +29,6 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
 
     const cities = await this.searchProvider.search(city)
     const currentCity = findClosedCity(cities, lat, lon)
-
-    console.log(currentCity, cities)
 
     if (!currentCity) {
       throw new CityNotFoundException(city)
@@ -54,7 +52,7 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
       const response = await lastValueFrom(
         this.httpService.get<OpenMeteoData>(url, { params })
       )
-      return openMeteoWeatherMapper(response.data, cities[0])
+      return openMeteoWeatherMapper(response.data, currentCity)
     } catch (error) {
       throw new WeatherProviderException(
         `Failed to fetch weather data from OpenMeteo: ${error.message}`,

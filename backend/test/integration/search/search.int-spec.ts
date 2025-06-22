@@ -62,7 +62,7 @@ describe("Search", () => {
     })
 
     it("should return cached response for same query", async () => {
-      const key = `search_${cityQuery}`
+      const key = `search:${cityQuery}`
 
       await expect(context.cacheManager.get(key)).resolves.toBeNull()
 

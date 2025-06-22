@@ -31,10 +31,7 @@ describe("Weather", () => {
     it("should return weather data for a city", async () => {
       await request(context.app.getHttpServer())
         .get("/api/weather")
-        .query({
-          city: weatherQueryDtoMock.city,
-          days: weatherQueryDtoMock.days
-        })
+        .query(weatherQueryDtoMock)
         .expect(HttpStatus.OK)
         .expect(res => {
           expect(res.body?.location?.name).toBe(weatherQueryDtoMock.city)
@@ -46,6 +43,8 @@ describe("Weather", () => {
         .get("/api/weather")
         .query({
           city: "invalid_city_query",
+          lat: "invalid_lat",
+          lon: "invalid_lon",
           days: weatherQueryDtoMock.days
         })
         .expect(HttpStatus.BAD_REQUEST)
@@ -58,16 +57,13 @@ describe("Weather", () => {
     })
 
     it("should return cached response for same query", async () => {
-      const key = `weather_${weatherQueryDtoMock.city}_${weatherQueryDtoMock.days}`
+      const key = `weather:${weatherQueryDtoMock.city}:${weatherQueryDtoMock.days}`
 
       await expect(context.cacheManager.get(key)).resolves.toBeNull()
 
       const { body: weatherData } = await request(context.app.getHttpServer())
         .get("/api/weather")
-        .query({
-          city: weatherQueryDtoMock.city,
-          days: weatherQueryDtoMock.days
-        })
+        .query(weatherQueryDtoMock)
         .expect(HttpStatus.OK)
 
       await expect(context.cacheManager.get(key)).resolves.toEqual(weatherData)

@@ -35,7 +35,7 @@ export const searchProviderFactory = (
 
   return new SearchLoggerDecorator(
     new SearchCacheProxy(
-      next,
+      current,
       cacheManager,
       configService.get<number>("SEARCH_CACHE_TTL")!
     )

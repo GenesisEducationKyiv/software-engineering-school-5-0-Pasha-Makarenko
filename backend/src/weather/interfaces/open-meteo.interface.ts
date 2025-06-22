@@ -12,7 +12,7 @@ export interface OpenMeteoData {
     relative_humidity_2m: number[]
     wind_speed_10m: number[]
     weather_code: number[]
-    iss_day: number[]
+    is_day: number[]
   }
   daily: {
     time: string[]

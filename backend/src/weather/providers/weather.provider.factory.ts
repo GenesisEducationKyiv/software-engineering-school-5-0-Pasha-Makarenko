@@ -38,7 +38,7 @@ export const weatherProviderFactory = (
 
   return new WeatherLoggerDecorator(
     new WeatherCacheProxy(
-      next,
+      current,
       cacheManager,
       configService.get<number>("WEATHER_CACHE_TTL")!
     )

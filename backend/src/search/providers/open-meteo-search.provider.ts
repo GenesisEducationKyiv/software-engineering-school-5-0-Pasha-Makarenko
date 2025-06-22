@@ -33,11 +33,11 @@ export class OpenMeteoSearchProvider extends SearchProviderHandler {
         this.httpService.get<OpenMeteoSearch>(url, { params })
       )
 
-      if (!response.data?.result) {
+      if (!response.data?.results) {
         return []
       }
 
-      return response.data.result.map(openMeteoSearchMapper)
+      return response.data.results.map(openMeteoSearchMapper)
     } catch (error) {
       throw new SearchProviderException(
         `Failed to search cities from OpenMeteo: ${error.message}`,

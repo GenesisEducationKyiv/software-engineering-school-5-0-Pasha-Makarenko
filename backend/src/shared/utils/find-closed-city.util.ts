@@ -11,12 +11,12 @@ export const findClosedCity = (
     const latDiff = parseFloat(city.lat.toString()) - parseFloat(lat)
     const lonDiff = parseFloat(city.lon.toString()) - parseFloat(lon)
     return {
-      ...city,
+      city,
       distance: Math.sqrt(latDiff * latDiff + lonDiff * lonDiff)
     }
   })
 
   vectors.sort((a, b) => a.distance - b.distance)
 
-  return vectors[0]
+  return vectors[0].city
 }

@@ -16,7 +16,12 @@ export class WeatherAdapter {
     return this.store.select(selectWeather)
   }
 
-  weather(city: string | null, lat: string | null, lon: string | null, finallyFn?: () => void) {
+  weather(
+    city: string | null,
+    lat: string | null,
+    lon: string | null,
+    finallyFn?: () => void
+  ) {
     if (!lat || !lon || !city) {
       return
     }

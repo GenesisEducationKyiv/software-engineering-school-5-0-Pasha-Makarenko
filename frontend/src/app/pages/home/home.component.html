@@ -21,13 +21,21 @@
           <button
             type="button"
             class="heading-weather__button"
-            (click)="weatherAdapter.weather(city()?.name!, city()?.lat!.toString(), city()?.lon!.toString())">
+            (click)="
+              weatherAdapter.weather(
+                city()?.name!,
+                city()?.lat!.toString(),
+                city()?.lon!.toString()
+              )
+            ">
             <fa-icon [icon]="searchIcon" />
           </button>
         </div>
       </div>
 
-      @if (weatherData().isLoading || (!weatherData().data && !weatherData().error)) {
+      @if (
+        weatherData().isLoading || (!weatherData().data && !weatherData().error)
+      ) {
         <div class="loader"></div>
       } @else if (weatherData().error) {
         <app-form-error [message]="weatherData().error!" />
@@ -43,7 +51,7 @@
                   class="avg-summary__icon" />
                 <div class="avg-summary__text">
                   <div class="avg-summary__temp">
-                    {{ currentDay()!.avgtemp }}
+                    {{ currentDay()!.avgtemp | temperature: tempUnit() }}
                   </div>
                   <div class="avg-summary__switch">
                     <button
@@ -82,47 +90,47 @@
           <div class="weather-hours__wrapper">
             <table class="weather-hours">
               <thead>
-              <tr>
-                <th>Time</th>
-                @for (hour of hours(); track hour.time) {
-                  <th>
-                    <div class="weather-hours__header">
-                      <img
-                        [src]="hour.icon"
-                        [srcset]="hour.icon"
-                        alt="hour-icon"
-                        class="weather-hours__icon" />
-                      <div class="weather-hours__time">
-                        {{ hour.time }}
+                <tr>
+                  <th>Time</th>
+                  @for (hour of hours(); track hour.time) {
+                    <th>
+                      <div class="weather-hours__header">
+                        <img
+                          [src]="hour.icon"
+                          [srcset]="hour.icon"
+                          alt="hour-icon"
+                          class="weather-hours__icon" />
+                        <div class="weather-hours__time">
+                          {{ hour.time }}
+                        </div>
                       </div>
-                    </div>
-                  </th>
-                }
-              </tr>
+                    </th>
+                  }
+                </tr>
               </thead>
               <tbody>
-              <tr>
-                <td>Temperature</td>
-                @for (hour of hours(); track hour.time) {
-                  <td>
-                    {{ hour.temp | temperature: tempUnit() }}
-                  </td>
-                }
-              </tr>
-              <tr>
-                <td>Humidity</td>
-                @for (hour of hours(); track hour.time) {
-                  <td>{{ hour.humidity }}%</td>
-                }
-              </tr>
-              <tr>
-                <td>Wind</td>
-                @for (hour of hours(); track hour.time) {
-                  <td>
-                    {{ hour.wind | speed: speedUnit() }}
-                  </td>
-                }
-              </tr>
+                <tr>
+                  <td>Temperature</td>
+                  @for (hour of hours(); track hour.time) {
+                    <td>
+                      {{ hour.temp | temperature: tempUnit() }}
+                    </td>
+                  }
+                </tr>
+                <tr>
+                  <td>Humidity</td>
+                  @for (hour of hours(); track hour.time) {
+                    <td>{{ hour.humidity }}%</td>
+                  }
+                </tr>
+                <tr>
+                  <td>Wind</td>
+                  @for (hour of hours(); track hour.time) {
+                    <td>
+                      {{ hour.wind | speed: speedUnit() }}
+                    </td>
+                  }
+                </tr>
               </tbody>
             </table>
           </div>

@@ -68,7 +68,9 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.CONFLICT)
         .expect(res => {
-          expect(res.body.message).toBe("Subscription already exists")
+          expect(res.body.message).toBe(
+            `Subscription already exists for email "${dto.email}" and city "${dto.city}"`
+          )
         })
     })
   })
@@ -109,9 +111,7 @@ describe("Subscriptions", () => {
         .post(`/api/confirm/${subscription!.confirmationToken}_invalid-token`)
         .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
-          expect(res.body.message).toBe(
-            "Subscription not found or already confirmed"
-          )
+          expect(res.body.message).toBe("Subscription not found")
         })
     })
 
@@ -131,11 +131,9 @@ describe("Subscriptions", () => {
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
-        .expect(HttpStatus.NO_CONTENT)
+        .expect(HttpStatus.BAD_REQUEST)
         .expect(res => {
-          expect(res.body.message).toBe(
-            "Subscription not found or already confirmed"
-          )
+          expect(res.body.message).toBe("Subscription is already confirmed")
         })
     })
   })

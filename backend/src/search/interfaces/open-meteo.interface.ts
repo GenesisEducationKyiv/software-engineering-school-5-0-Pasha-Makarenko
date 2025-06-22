@@ -1,5 +1,5 @@
 export interface OpenMeteoSearch {
-  result: OpenMeteoSearchItem[]
+  results: OpenMeteoSearchItem[]
 }
 
 export interface OpenMeteoSearchItem {

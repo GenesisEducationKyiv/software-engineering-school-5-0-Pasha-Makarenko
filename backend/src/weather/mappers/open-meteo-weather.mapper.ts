@@ -27,7 +27,7 @@ export const openMeteoWeatherMapper: (
       .slice(startIndex, endIndex)
       .map((time, index) => {
         const weatherCode = data.hourly.weather_code[startIndex + index]
-        const type = data.hourly.iss_day[startIndex + index] ? "day" : "night"
+        const type = data.hourly.is_day[startIndex + index] ? "day" : "night"
 
         return {
           time: time.split("T")[1],
@@ -41,7 +41,7 @@ export const openMeteoWeatherMapper: (
     const weatherCode = data.daily.weather_code[i]
 
     result.forecast.push({
-      date: data.daily[i].time,
+      date: data.daily.time[i],
       mintemp: Math.min(...dailyData.map(d => d.temp)),
       maxtemp: Math.max(...dailyData.map(d => d.temp)),
       avgtemp: dailyData.reduce((sum, d) => sum + d.temp, 0) / dailyData.length,

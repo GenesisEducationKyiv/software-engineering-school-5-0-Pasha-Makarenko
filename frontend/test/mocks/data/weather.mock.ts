@@ -18,6 +18,7 @@ export const weatherDataMock: WeatherData = {
       mintemp: 20,
       hours: Array(24)
         .fill(null)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .map(_ => ({
           wind: 0,
           humidity: 50,

@@ -1,15 +1,13 @@
 import { CommandBus, EventsHandler, IEventHandler } from "@nestjs/cqrs"
 import { SubscriptionCreatedEvent } from "../impl/subscription-created.event"
-import { Logger } from "@nestjs/common"
 import { UrlGeneratorService } from "../../../url-generator/services/url-generator.service"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
+import { SendConfirmationMailException } from "../../exceptions/send-confirmation-mail.exception"
 
 @EventsHandler(SubscriptionCreatedEvent)
 export class SubscriptionCreatedHandler
   implements IEventHandler<SubscriptionCreatedEvent>
 {
-  private logger = new Logger(SubscriptionCreatedHandler.name)
-
   constructor(
     private urlGeneratorService: UrlGeneratorService,
     private commandBus: CommandBus
@@ -32,7 +30,9 @@ export class SubscriptionCreatedHandler
         })
       )
     } catch (error) {
-      this.logger.error("Failed to send confirmation email:", error.message)
+      throw new SendConfirmationMailException(
+        `Failed to send confirmation email for ${subscription.email}`
+      )
     }
   }
 }

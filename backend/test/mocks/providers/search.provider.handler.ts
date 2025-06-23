@@ -1,33 +1,23 @@
 import { SearchProviderHandler } from "../../../src/search/providers/search.provider.handler"
 import { City } from "../../../src/search/interfaces/search.interface"
-import { SearchProviderException } from "../../../src/search/exceptions/search-provider.exception"
+import { citiesMock } from "../data/search.mock"
 
-export class MockSearchProvider extends SearchProviderHandler {
-  constructor(
-    private shouldReturnData: boolean,
-    private shouldThrow = false
-  ) {
+export class MockSuccessSearchProvider extends SearchProviderHandler {
+  constructor(private mockData: City[] = citiesMock) {
     super()
   }
 
-  protected async handle(city: string): Promise<City[]> {
-    if (this.shouldThrow) {
-      throw new SearchProviderException("Provider error")
-    }
+  async handle(): Promise<City[]> {
+    return this.mockData
+  }
+}
 
-    if (this.shouldReturnData) {
-      return [
-        {
-          id: 1,
-          name: "Test City",
-          country: "Test Country",
-          lat: 0,
-          lon: 0,
-          url: "test-city"
-        }
-      ]
-    }
+export class MockErrorSearchProviderProvider extends SearchProviderHandler {
+  constructor(private error: Error) {
+    super()
+  }
 
-    return []
+  async handle(): Promise<City[]> {
+    throw this.error
   }
 }

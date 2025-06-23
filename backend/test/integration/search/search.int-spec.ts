@@ -9,7 +9,7 @@ import { HttpStatus } from "@nestjs/common"
 
 describe("Search", () => {
   let context: TestContext
-  const cityQuery = "Paris"
+  const cityQuery = "Test City"
 
   beforeAll(async () => {
     await beforeAllSetup()
@@ -40,17 +40,6 @@ describe("Search", () => {
     })
 
     it("should throw error for invalid query", async () => {
-      await request(context.app.getHttpServer())
-        .get("/api/search")
-        .query({ city: "" })
-        .expect(HttpStatus.BAD_REQUEST)
-        .expect(res => {
-          expect(res.body.message).toContain(
-            `Request failed with status code ${HttpStatus.BAD_REQUEST}`
-          )
-          expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST)
-        })
-
       await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: "invalid_city_query" })

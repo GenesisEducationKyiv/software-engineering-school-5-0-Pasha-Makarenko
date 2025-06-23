@@ -9,7 +9,6 @@ import {
   setupTestApp,
   TestContext
 } from "../setup"
-import { Frequency } from "../../../src/subscriptions/models/subscription.model"
 import { HttpStatus } from "@nestjs/common"
 
 describe("Subscriptions", () => {
@@ -249,12 +248,12 @@ describe("Subscriptions", () => {
 
       const activeSubscriptionsFromDB = await context.subscriptionModel.findAll(
         {
-          where: { isConfirmed: true, frequency: Frequency.DAILY }
+          where: { isConfirmed: true, frequency: dto.frequency }
         }
       )
 
       const activeSubscriptions = await context.queryBus.execute(
-        new GetActiveSubscriptionsQuery(Frequency.DAILY)
+        new GetActiveSubscriptionsQuery(dto.frequency)
       )
 
       expect(activeSubscriptions.length).toBe(activeSubscriptionsFromDB.length)

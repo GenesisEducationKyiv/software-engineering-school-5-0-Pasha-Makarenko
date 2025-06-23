@@ -2,7 +2,7 @@ import { CreateSubscriptionDto } from "../../../src/subscriptions/dto/create-sub
 import { Frequency } from "../../../src/subscriptions/models/subscription.model"
 
 export const createSubscriptionDtoMock: CreateSubscriptionDto = {
-  email: "test@example.com",
-  city: "London",
+  email: "email3@example.com",
+  city: "City3",
   frequency: Frequency.DAILY
 }

@@ -47,12 +47,12 @@ describe("Weather", () => {
           lon: "invalid_lon",
           days: weatherQueryDtoMock.days
         })
-        .expect(HttpStatus.BAD_REQUEST)
+        .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toContain(
-            `Request failed with status code ${HttpStatus.BAD_REQUEST}`
+            `No cities found for "invalid_city_query"`
           )
-          expect(res.body.statusCode).toBe(HttpStatus.BAD_REQUEST)
+          expect(res.body.statusCode).toBe(HttpStatus.NOT_FOUND)
         })
     })
 

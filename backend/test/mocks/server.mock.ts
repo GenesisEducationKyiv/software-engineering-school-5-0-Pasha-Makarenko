@@ -14,8 +14,6 @@ const weatherHandler = http.get(
     const days =
       url.searchParams.get("days") || url.searchParams.get("forecast_days")
 
-    console.log(url.searchParams)
-
     if (!city || !days || city === "invalid_lat,invalid_lon") {
       return new HttpResponse(
         { message: "No matching location found." },
@@ -23,7 +21,15 @@ const weatherHandler = http.get(
       )
     }
 
-    return HttpResponse.json(weatherDataMock)
+    const dynamicWeatherData = {
+      ...weatherDataMock,
+      location: {
+        ...weatherDataMock.location,
+        name: url.searchParams.get("q") || weatherDataMock.location.name
+      }
+    }
+
+    return HttpResponse.json(dynamicWeatherData)
   }
 )
 
@@ -33,9 +39,9 @@ const searchHandler = http.get(
     const url = new URL(request.url)
     const city = url.searchParams.get("q") || url.searchParams.get("name")
 
-    if (!city?.toString()) {
+    if (!city) {
       return new HttpResponse(
-        { message: "Parameter q is missing." },
+        { message: "City query parameter is required." },
         { status: HttpStatus.BAD_REQUEST }
       )
     }

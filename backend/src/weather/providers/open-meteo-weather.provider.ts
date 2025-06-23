@@ -28,6 +28,11 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
     const { city, lat, lon, days } = dto
 
     const cities = await this.searchProvider.search(city)
+
+    if (!cities || cities.length === 0) {
+      throw new CityNotFoundException(city)
+    }
+
     const currentCity = findClosedCity(cities, lat, lon)
 
     if (!currentCity) {

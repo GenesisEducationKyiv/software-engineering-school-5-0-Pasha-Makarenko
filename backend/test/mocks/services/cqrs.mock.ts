@@ -3,6 +3,8 @@ import { GetActiveSubscriptionsQuery } from "../../../src/subscriptions/queries/
 import { GetWeatherQuery } from "../../../src/weather/queries/impl/get-weather.query"
 import { GetWeatherQueryHandler } from "../handlers/get-weather-handler.mock"
 import { GetActiveSubscriptionsHandler } from "../handlers/get-active-subscriptions-handler.mock"
+import { GetCitiesQuery } from "../../../src/search/queries/impl/get-cities.query"
+import { GetCitiesQueryHandler } from "../handlers/get-cities-handler.mock"
 
 export interface QueryHandler<TQuery, TResult> {
   handle(query: TQuery): Promise<TResult>
@@ -33,6 +35,7 @@ const queryBusMock = new QueryBusMock()
     GetActiveSubscriptionsQuery,
     new GetActiveSubscriptionsHandler()
   )
+  .registerHandler(GetCitiesQuery, new GetCitiesQueryHandler())
   .registerHandler(GetWeatherQuery, new GetWeatherQueryHandler())
 
 export const queryBusMockFactory = () =>

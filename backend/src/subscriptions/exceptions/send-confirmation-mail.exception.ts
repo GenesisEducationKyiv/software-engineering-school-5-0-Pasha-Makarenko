@@ -1,4 +1,4 @@
-import { BaseException } from "src/shared/exceptions/base.exception"
+import { BaseException } from "../../shared/exceptions/base.exception"
 import { HttpStatus } from "@nestjs/common"
 
 export class SendConfirmationMailException extends BaseException {

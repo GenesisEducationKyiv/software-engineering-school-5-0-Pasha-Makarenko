@@ -24,10 +24,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>()
     const request = ctx.getRequest<Request>()
 
-    let status: number
-    let message: string
-    let code: string
-    let details: unknown
+    let status = HttpStatus.INTERNAL_SERVER_ERROR
+    let message = "Internal server error"
+    let code = "INTERNAL_SERVER_ERROR"
+    let details: unknown = undefined
 
     if (exception instanceof BaseException) {
       status = exception.statusCode
@@ -44,7 +44,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       } else if (typeof exceptionResponse === "object") {
         const responseObj = exceptionResponse as ExceptionResponse
         message = Array.isArray(responseObj.message)
-          ? responseObj.message[0]
+          ? responseObj.message.join(", ")
           : responseObj.message || exception.message
         code = responseObj.error || "HTTP_EXCEPTION"
         details = responseObj.details
@@ -52,15 +52,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = exception.message
         code = "HTTP_EXCEPTION"
       }
-    } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR
-      message = "Internal server error"
-      code = "INTERNAL_SERVER_ERROR"
-
-      this.logger.error(
-        `Unhandled exception: ${exception}`,
-        exception instanceof Error ? exception.stack : undefined
-      )
     }
 
     this.logger.error(

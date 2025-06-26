@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common"
+import { HttpStatus, Inject, Injectable } from "@nestjs/common"
 import { WeatherProviderAttributesDto } from "../dto/weather-provider-attributes.dto"
 import { HttpService } from "@nestjs/axios"
 import { WeatherQueryDto } from "../dto/weather-query.dto"
@@ -11,6 +11,7 @@ import { CityNotFoundException } from "../../search/exceptions/city-not-found.ex
 import { WeatherProviderException } from "../exceptions/weather-provider.exception"
 import { WeatherProviderHandler } from "./weather.provider.handler"
 import { findClosedCity } from "../../shared/utils/find-closed-city.util"
+import { InvalidWeatherProviderKeyException } from "../exceptions/invalid-weather-provider-key.exception"
 
 @Injectable()
 export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
@@ -59,6 +60,15 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
       )
       return openMeteoWeatherMapper(response.data, currentCity)
     } catch (error) {
+      switch (error.response?.status) {
+        case HttpStatus.UNAUTHORIZED:
+          throw new InvalidWeatherProviderKeyException(
+            OpenMeteoWeatherProvider.name
+          )
+        case HttpStatus.NOT_FOUND:
+          throw new CityNotFoundException(city)
+      }
+
       throw new WeatherProviderException(
         `Failed to fetch weather data from OpenMeteo: ${error.message}`,
         error

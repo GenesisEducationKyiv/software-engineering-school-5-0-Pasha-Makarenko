@@ -14,7 +14,7 @@ const weatherHandler = http.get(
     const days =
       url.searchParams.get("days") || url.searchParams.get("forecast_days")
 
-    if (!city || !days || city === "invalid_lat,invalid_lon") {
+    if (!city || !days || city === "1,1") {
       return new HttpResponse(
         { message: "No matching location found." },
         { status: HttpStatus.BAD_REQUEST }

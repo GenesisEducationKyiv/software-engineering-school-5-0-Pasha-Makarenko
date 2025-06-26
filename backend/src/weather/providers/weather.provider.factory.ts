@@ -7,40 +7,50 @@ import { OpenMeteoWeatherProvider } from "./open-meteo-weather.provider"
 import { WeatherCacheProxy } from "./weather-cache.proxy"
 import { WeatherLoggerDecorator } from "./weather-logger.decorator"
 import { WeatherProviderHandler } from "./weather.provider.handler"
+import { setupChain } from "../../shared/utils/setup-chain.util"
 
 export const WEATHER_PROVIDER = "WEATHER_PROVIDER"
 
 export const weatherProviderFactory = (
   configService: ConfigService,
-  httpService: HttpService,
-  searchProvider: ISearchProvider,
-  cacheManager: Cache
+  cacheManager: Cache,
+  ...providers: WeatherProviderHandler[]
 ) => {
-  const weatherApiAttributes = {
-    url: configService.get<string>("WEATHER_API_WEATHER_URL")!,
-    key: configService.get<string>("WEATHER_API_WEATHER_KEY")!
-  }
-  const openMeteoAttributes = {
-    url: configService.get<string>("OPEN_METEO_WEATHER_URL")!,
-    key: configService.get<string>("OPEN_METEO_WEATHER_KEY") || undefined
-  }
-
-  const current: WeatherProviderHandler = new WeatherApiWeatherProvider(
-    weatherApiAttributes,
-    httpService
-  )
-  const next: WeatherProviderHandler = new OpenMeteoWeatherProvider(
-    openMeteoAttributes,
-    httpService,
-    searchProvider
-  )
-  current.setNext(next)
+  const chain = setupChain<WeatherProviderHandler>(providers)
 
   return new WeatherLoggerDecorator(
     new WeatherCacheProxy(
-      current,
+      chain,
       cacheManager,
       configService.get<number>("WEATHER_CACHE_TTL")!
     )
+  )
+}
+
+export const weatherApiWeatherProviderFactory = (
+  configService: ConfigService,
+  httpService: HttpService
+) => {
+  return new WeatherApiWeatherProvider(
+    {
+      url: configService.get<string>("WEATHER_API_WEATHER_URL")!,
+      key: configService.get<string>("WEATHER_API_WEATHER_KEY")!
+    },
+    httpService
+  )
+}
+
+export const openMeteoWeatherProviderFactory = (
+  configService: ConfigService,
+  httpService: HttpService,
+  searchProvider: ISearchProvider
+) => {
+  return new OpenMeteoWeatherProvider(
+    {
+      url: configService.get<string>("OPEN_METEO_WEATHER_URL")!,
+      key: configService.get<string>("OPEN_METEO_WEATHER_KEY") || undefined
+    },
+    httpService,
+    searchProvider
   )
 }

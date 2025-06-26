@@ -28,8 +28,8 @@ describe("WeatherService", () => {
   it("should handle weather API errors", () => {
     const dto = {
       city: "London",
-      lat: "51.5074",
-      lon: "-0.1278",
+      lat: 51.5074,
+      lon: -0.1278,
       days: 3
     }
     const errorResponse = { status: 404, statusText: "Not Found" }

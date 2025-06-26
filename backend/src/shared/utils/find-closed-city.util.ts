@@ -2,14 +2,14 @@ import { City } from "../../search/interfaces/search.interface"
 
 export const findClosedCity = (
   cities: City[],
-  lat: string,
-  lon: string
+  lat: number,
+  lon: number
 ): City => {
   const array = [...cities]
 
   const vectors = array.map(city => {
-    const latDiff = parseFloat(city.lat.toString()) - parseFloat(lat)
-    const lonDiff = parseFloat(city.lon.toString()) - parseFloat(lon)
+    const latDiff = parseFloat(city.lat.toString()) - lat
+    const lonDiff = parseFloat(city.lon.toString()) - lon
     return {
       city,
       distance: Math.sqrt(latDiff * latDiff + lonDiff * lonDiff)

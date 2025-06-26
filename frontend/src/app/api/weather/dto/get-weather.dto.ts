@@ -1,6 +1,6 @@
 export interface GetWeatherDto {
   readonly city: string
-  readonly lat: string
-  readonly lon: string
-  readonly days: string | number
+  readonly lat: number
+  readonly lon: number
+  readonly days: number
 }

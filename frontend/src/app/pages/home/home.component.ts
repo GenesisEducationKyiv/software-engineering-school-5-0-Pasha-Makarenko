@@ -71,11 +71,7 @@ export class HomeComponent {
       const city = this.city()
 
       if (city) {
-        this.weatherAdapter.weather(
-          city.name,
-          city.lat.toString(),
-          city.lon.toString()
-        )
+        this.weatherAdapter.weather(city.name, city.lat, city.lon)
       }
     })
   }

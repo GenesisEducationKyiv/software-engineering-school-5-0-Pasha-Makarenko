@@ -43,9 +43,9 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
         const weather = await this.queryBus.execute(
           new GetWeatherQuery({
             city: cities[0].name,
-            lat: cities[0].lat.toString(),
-            lon: cities[0].lon.toString(),
-            days: "1"
+            lat: cities[0].lat,
+            lon: cities[0].lon,
+            days: 1
           })
         )
 

@@ -2,8 +2,11 @@ import { IWeatherProvider } from "../interfaces/weather.provider.interface"
 import { WeatherQueryDto } from "../dto/weather-query.dto"
 import { WeatherData } from "../interfaces/weather.interface"
 import { WeatherProviderException } from "../exceptions/weather-provider.exception"
+import { IHandler } from "../../shared/interfaces/handler.interface"
 
-export abstract class WeatherProviderHandler implements IWeatherProvider {
+export abstract class WeatherProviderHandler
+  implements IWeatherProvider, IHandler
+{
   protected next?: WeatherProviderHandler
 
   setNext(handler: WeatherProviderHandler): WeatherProviderHandler {

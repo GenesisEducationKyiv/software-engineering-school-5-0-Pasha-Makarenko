@@ -22,11 +22,7 @@
             type="button"
             class="heading-weather__button"
             (click)="
-              weatherAdapter.weather(
-                city()?.name!,
-                city()?.lat!.toString(),
-                city()?.lon!.toString()
-              )
+              weatherAdapter.weather(city()?.name!, city()?.lat!, city()?.lon!)
             ">
             <fa-icon [icon]="searchIcon" />
           </button>

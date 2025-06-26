@@ -6,38 +6,44 @@ import { SearchCacheProxy } from "./search-cache.proxy"
 import { Cache } from "cache-manager"
 import { SearchLoggerDecorator } from "./search-logger.decorator"
 import { SearchProviderHandler } from "./search.provider.handler"
+import { setupChain } from "../../shared/utils/setup-chain.util"
 
 export const SEARCH_PROVIDER = "SEARCH_PROVIDER"
 
 export const searchProviderFactory = (
   configService: ConfigService,
-  httpService: HttpService,
-  cacheManager: Cache
+  cacheManager: Cache,
+  ...providers: SearchProviderHandler[]
 ) => {
-  const weatherApiAttributes = {
-    url: configService.get<string>("WEATHER_API_SEARCH_URL")!,
-    key: configService.get<string>("WEATHER_API_SEARCH_KEY")!
-  }
-  const openMeteoAttributes = {
-    url: configService.get<string>("OPEN_METEO_SEARCH_URL")!,
-    key: configService.get<string>("OPEN_METEO_SEARCH_KEY") || undefined
-  }
-
-  const current: SearchProviderHandler = new WeatherApiSearchProvider(
-    weatherApiAttributes,
-    httpService
-  )
-  const next: SearchProviderHandler = new OpenMeteoSearchProvider(
-    openMeteoAttributes,
-    httpService
-  )
-  current.setNext(next)
+  const chain = setupChain<SearchProviderHandler>(providers)
 
   return new SearchLoggerDecorator(
     new SearchCacheProxy(
-      current,
+      chain,
       cacheManager,
       configService.get<number>("SEARCH_CACHE_TTL")!
     )
   )
+}
+
+export const weatherApiSearchProviderFactory = (
+  configService: ConfigService,
+  httpService: HttpService
+) => {
+  const attributes = {
+    url: configService.get<string>("WEATHER_API_SEARCH_URL")!,
+    key: configService.get<string>("WEATHER_API_SEARCH_KEY")!
+  }
+  return new WeatherApiSearchProvider(attributes, httpService)
+}
+
+export const openMeteoSearchProviderFactory = (
+  configService: ConfigService,
+  httpService: HttpService
+) => {
+  const attributes = {
+    url: configService.get<string>("OPEN_METEO_SEARCH_URL")!,
+    key: configService.get<string>("OPEN_METEO_SEARCH_KEY") || undefined
+  }
+  return new OpenMeteoSearchProvider(attributes, httpService)
 }

@@ -18,8 +18,8 @@ export class WeatherAdapter {
 
   weather(
     city: string | null,
-    lat: string | null,
-    lon: string | null,
+    lat: number | null,
+    lon: number | null,
     finallyFn?: () => void
   ) {
     if (!lat || !lon || !city) {

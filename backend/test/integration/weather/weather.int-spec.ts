@@ -43,8 +43,8 @@ describe("Weather", () => {
         .get("/api/weather")
         .query({
           city: "invalid_city_query",
-          lat: "invalid_lat",
-          lon: "invalid_lon",
+          lat: 1,
+          lon: 1,
           days: weatherQueryDtoMock.days
         })
         .expect(HttpStatus.NOT_FOUND)

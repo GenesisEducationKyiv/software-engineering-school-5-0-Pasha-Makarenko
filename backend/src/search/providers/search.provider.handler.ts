@@ -1,8 +1,11 @@
 import { ISearchProvider } from "../interfaces/search.provider.interface"
 import { City } from "../interfaces/search.interface"
 import { SearchProviderException } from "../exceptions/search-provider.exception"
+import { IHandler } from "../../shared/interfaces/handler.interface"
 
-export abstract class SearchProviderHandler implements ISearchProvider {
+export abstract class SearchProviderHandler
+  implements ISearchProvider, IHandler
+{
   protected next?: SearchProviderHandler
 
   setNext(handler: SearchProviderHandler): SearchProviderHandler {

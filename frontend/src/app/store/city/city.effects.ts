@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core"
+import { inject, Injectable } from "@angular/core"
 import { Actions, createEffect, ofType } from "@ngrx/effects"
 import { tap } from "rxjs/operators"
 import * as CityActions from "./city.actions"
@@ -9,12 +9,11 @@ import { AppState } from "../state.interfaces"
 @Injectable()
 export class CityEffects {
   private readonly CITY_COOKIE_KEY = "selected_city"
+  private actions$ = inject(Actions)
+  private cookieService = inject(CookieService)
+  private store = inject(Store<AppState>)
 
-  constructor(
-    private store: Store<AppState>,
-    private actions$: Actions,
-    private cookieService: CookieService
-  ) {
+  constructor() {
     this.loadInitialCity()
   }
 

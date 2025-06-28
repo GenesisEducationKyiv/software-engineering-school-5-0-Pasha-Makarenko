@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core"
+import { inject, Injectable } from "@angular/core"
 import { AppState } from "../state.interfaces"
 import { Store } from "@ngrx/store"
 import { commonErrors } from "../../consts/errors/common.errors"
@@ -8,17 +8,21 @@ import { selectWeather } from "./weather.selectors"
 
 @Injectable({ providedIn: "root" })
 export class WeatherAdapter {
-  constructor(
-    private store: Store<AppState>,
-    private weatherService: WeatherService
-  ) {}
+  private weatherService = inject(WeatherService)
+
+  constructor(private store: Store<AppState>) {}
 
   select() {
     return this.store.select(selectWeather)
   }
 
-  weather(city: string | null, finallyFn?: () => void) {
-    if (!city) {
+  weather(
+    city: string | null,
+    lat: number | null,
+    lon: number | null,
+    finallyFn?: () => void
+  ) {
+    if (!lat || !lon || !city) {
       return
     }
 
@@ -27,6 +31,8 @@ export class WeatherAdapter {
     this.weatherService
       .getWeather({
         city,
+        lat,
+        lon,
         days: 14
       })
       .subscribe(

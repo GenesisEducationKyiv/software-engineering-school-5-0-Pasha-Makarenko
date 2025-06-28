@@ -1,7 +1,6 @@
-import { Component, effect, HostListener, input, signal } from '@angular/core'
+import { Component, HostListener, inject, input, signal } from "@angular/core"
 import { findParentById } from "../../utils/dom/find.util"
 import { ModalAdapter } from "../../store/modal/modal.adapter"
-import { Subscription } from 'rxjs'
 
 interface ModalOptions {
   closeOutside: boolean
@@ -15,23 +14,15 @@ interface ModalOptions {
   styleUrl: "./modal.component.scss"
 })
 export class ModalComponent {
+  private modalAdapter = inject(ModalAdapter)
+
   modalId = input<string>()
   options = input<Partial<ModalOptions> | null>(null)
   isOpen = signal(false)
-  selectSubscription = signal<Subscription | null>(null)
 
-  constructor(private modalAdapter: ModalAdapter) {
-    effect(() => {
-      const modalId = this.modalId()
-      if (modalId) {
-        this.selectSubscription()?.unsubscribe()
-
-        const sub = this.modalAdapter.select().subscribe(res => {
-          this.isOpen.set(res[modalId]?.isOpen)
-        })
-
-        this.selectSubscription.set(sub)
-      }
+  constructor() {
+    this.modalAdapter.select().subscribe(res => {
+      this.isOpen.set(res[this.modalId()!]?.isOpen)
     })
   }
 

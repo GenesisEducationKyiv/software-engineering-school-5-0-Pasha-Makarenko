@@ -36,6 +36,7 @@ import { UrlGeneratorModule } from "./url-generator/url-generator.module"
     SearchModule,
     SchedulerModule,
     UrlGeneratorModule
-  ]
+  ],
+  exports: [ConfigModule]
 })
 export class AppModule {}

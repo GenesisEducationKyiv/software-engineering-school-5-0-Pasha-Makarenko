@@ -1,4 +1,4 @@
-import { Component, signal } from "@angular/core"
+import { Component, inject, signal } from "@angular/core"
 import { ModalAdapter } from "../../store/modal/modal.adapter"
 import { ModalComponent } from "../modal/modal.component"
 import { faCloudBolt } from "@fortawesome/free-solid-svg-icons"
@@ -27,6 +27,9 @@ import { SearchComponent } from "../search/search.component"
   styleUrl: "./header.component.scss"
 })
 export class HeaderComponent {
+  protected modalAdapter = inject(ModalAdapter)
+  private subscriptionsService = inject(SubscriptionsService)
+
   icon = faCloudBolt
   modalId = "subscriptions"
   searchId = "subscriptions"
@@ -41,10 +44,7 @@ export class HeaderComponent {
     )
   })
 
-  constructor(
-    protected modalAdapter: ModalAdapter,
-    private subscriptionsService: SubscriptionsService
-  ) {
+  constructor() {
     this.modalAdapter.select().subscribe(state => {
       if (state[this.modalId] && !state[this.modalId].isOpen) {
         this.subscriptionsFormGroup.reset()

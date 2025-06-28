@@ -1,11 +1,18 @@
 import { Module } from "@nestjs/common"
 import { CqrsModule } from "@nestjs/cqrs"
-import { WeatherUrlGeneratorService } from "./services/weather-url-generator.service"
-import { ClientUrlGeneratorService } from "./services/client-url-generator.service"
+import { UrlGeneratorService } from "./services/url-generator.service"
+import { ConfigService } from "@nestjs/config"
 
 @Module({
   imports: [CqrsModule],
-  providers: [WeatherUrlGeneratorService, ClientUrlGeneratorService],
-  exports: [WeatherUrlGeneratorService, ClientUrlGeneratorService]
+  providers: [
+    {
+      provide: UrlGeneratorService,
+      useFactory: (configService: ConfigService) =>
+        new UrlGeneratorService(configService.get<string>("CLIENT_URL")!),
+      inject: [ConfigService]
+    }
+  ],
+  exports: [UrlGeneratorService]
 })
 export class UrlGeneratorModule {}

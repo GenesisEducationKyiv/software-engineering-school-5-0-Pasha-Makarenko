@@ -7,7 +7,7 @@ export enum Frequency {
   HOURLY = "hourly"
 }
 
-interface SubscriptionCreationAttributes extends CreateSubscriptionDto {
+export interface SubscriptionCreationAttributes extends CreateSubscriptionDto {
   readonly confirmationToken: string
   readonly unsubscribeToken: string
 }

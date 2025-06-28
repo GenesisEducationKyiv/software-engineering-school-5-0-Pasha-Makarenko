@@ -1,4 +1,4 @@
-import { Component, computed, effect, signal } from "@angular/core"
+import { Component, computed, effect, inject, signal } from "@angular/core"
 import { WeatherAdapter } from "../../store/weather/weather.adapter"
 import {
   initialWeatherState,
@@ -32,6 +32,9 @@ import { City } from "../../api/search/search.interface"
   styleUrl: "./home.component.scss"
 })
 export class HomeComponent {
+  protected weatherAdapter = inject(WeatherAdapter)
+  protected cityAdapter = inject(CityAdapter)
+
   searchControl = new FormControl<string | null>(null)
   searchIcon = faSearch
   hourStep = 3
@@ -39,19 +42,16 @@ export class HomeComponent {
   city = signal<City | null>(null)
   dayIndex = signal<number>(0)
   currentDay = computed(
-    () =>
-      this.weatherData().data?.forecast.forecastday[this.dayIndex()].day || null
+    () => this.weatherData().data?.forecast[this.dayIndex()] || null
   )
   currentDate = computed(
-    () =>
-      this.weatherData().data?.forecast.forecastday[this.dayIndex()].date ||
-      null
+    () => this.weatherData().data?.forecast[this.dayIndex()].date || null
   )
   hours = computed<WeatherHour[]>(
     () =>
-      this.weatherData().data?.forecast.forecastday[
-        this.dayIndex()
-      ].hour.filter((_, i) => i % this.hourStep === 0) || []
+      this.weatherData().data?.forecast[this.dayIndex()].hours.filter(
+        (_, i) => i % this.hourStep === 0
+      ) || []
   )
   tempUnit = signal<TemperatureUnit>(TemperatureUnit.CELSIUS)
   speedUnit = computed(() =>
@@ -60,10 +60,7 @@ export class HomeComponent {
       : SpeedUnit.MIlES
   )
 
-  constructor(
-    protected weatherAdapter: WeatherAdapter,
-    protected cityAdapter: CityAdapter
-  ) {
+  constructor() {
     this.weatherAdapter.select().subscribe(this.weatherData.set)
     this.cityAdapter.select().subscribe(city => {
       this.city.set(city)
@@ -74,7 +71,7 @@ export class HomeComponent {
       const city = this.city()
 
       if (city) {
-        this.weatherAdapter.weather(city.url)
+        this.weatherAdapter.weather(city.name, city.lat, city.lon)
       }
     })
   }

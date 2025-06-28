@@ -10,14 +10,15 @@ export enum SpeedUnit {
 })
 export class SpeedPipe implements PipeTransform {
   transform(value: number | string, unit: SpeedUnit): string {
-    let result = value.toString()
+    value = parseFloat(value.toString())
+    let result = ""
 
     switch (unit) {
       case SpeedUnit.KILOMETRES:
-        result += " k/h"
+        result = value.toFixed(1) + " k/h"
         break
       case SpeedUnit.MIlES:
-        result += " m/h"
+        result = (value * 0.621371).toFixed(1) + " m/h"
         break
     }
 

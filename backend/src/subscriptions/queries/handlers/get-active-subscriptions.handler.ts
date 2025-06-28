@@ -1,25 +1,21 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs"
 import { GetActiveSubscriptionsQuery } from "../impl/get-active-subscriptions.query"
-import { InjectModel } from "@nestjs/sequelize"
-import { Subscription } from "../../models/subscription.model"
+import { Inject } from "@nestjs/common"
+import { SUBSCRIPTIONS_QUERY_REPOSITORY } from "../../repositories/subscriptions-query.repository"
+import { ISubscriptionsQueryRepository } from "../../interfaces/subscriptions-query.repository.interface"
 
 @QueryHandler(GetActiveSubscriptionsQuery)
 export class GetActiveSubscriptionsHandler
   implements IQueryHandler<GetActiveSubscriptionsQuery>
 {
   constructor(
-    @InjectModel(Subscription)
-    private subscriptionsRepository: typeof Subscription
+    @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
+    private subscriptionsQueryRepository: ISubscriptionsQueryRepository
   ) {}
 
   async execute(query: GetActiveSubscriptionsQuery) {
-    const { where } = query
+    const { frequency } = query
 
-    return this.subscriptionsRepository.findAll({
-      where: {
-        ...where,
-        isConfirmed: true
-      }
-    })
+    return this.subscriptionsQueryRepository.findAllActiveByFrequency(frequency)
   }
 }

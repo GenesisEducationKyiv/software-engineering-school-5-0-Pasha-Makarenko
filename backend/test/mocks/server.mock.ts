@@ -1,37 +1,48 @@
 import { setupServer } from "msw/node"
 import { http, HttpResponse } from "msw"
-import { WeatherApiConst } from "../../src/url-generator/consts/weather-api.const"
 import { weatherDataMock } from "./data/weather.mock"
 import { citiesMock } from "./data/search.mock"
+import { HttpStatus } from "@nestjs/common"
 
 const weatherHandler = http.get(
-  process.env["WEATHER_API_URL"] + WeatherApiConst.weather,
+  process.env["WEATHER_API_WEATHER_URL"]!,
   async ({ request }) => {
     const url = new URL(request.url)
-    const city = url.searchParams.get("q")
-    const days = url.searchParams.get("days")
+    const city =
+      url.searchParams.get("q") ||
+      url.searchParams.get("latitude") + "," + url.searchParams.get("longitude")
+    const days =
+      url.searchParams.get("days") || url.searchParams.get("forecast_days")
 
-    if (!city || !days || city === "invalid_city_query") {
+    if (!city || !days || city === "1,1") {
       return new HttpResponse(
         { message: "No matching location found." },
-        { status: 400 }
+        { status: HttpStatus.BAD_REQUEST }
       )
     }
 
-    return HttpResponse.json(weatherDataMock)
+    const dynamicWeatherData = {
+      ...weatherDataMock,
+      location: {
+        ...weatherDataMock.location,
+        name: url.searchParams.get("q") || weatherDataMock.location.name
+      }
+    }
+
+    return HttpResponse.json(dynamicWeatherData)
   }
 )
 
 const searchHandler = http.get(
-  process.env["WEATHER_API_URL"] + WeatherApiConst.search,
+  process.env["WEATHER_API_SEARCH_URL"]!,
   async ({ request }) => {
     const url = new URL(request.url)
-    const city = url.searchParams.get("q")
+    const city = url.searchParams.get("q") || url.searchParams.get("name")
 
-    if (!city?.toString()) {
+    if (!city) {
       return new HttpResponse(
-        { message: "Parameter q is missing." },
-        { status: 400 }
+        { message: "City query parameter is required." },
+        { status: HttpStatus.BAD_REQUEST }
       )
     }
 

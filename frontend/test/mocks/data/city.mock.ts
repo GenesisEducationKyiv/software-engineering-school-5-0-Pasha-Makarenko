@@ -1,12 +1,10 @@
 import { City } from "../../../src/app/api/search/search.interface"
 import { CityState } from "../../../src/app/store/city/city.state"
-import { Action } from "@ngrx/store"
 
 export const citiesMock: City[] = [
   {
     id: 1,
     name: "London",
-    region: "England",
     country: "United Kingdom",
     lat: 51.5074,
     lon: -0.1278,
@@ -15,7 +13,6 @@ export const citiesMock: City[] = [
   {
     id: 2,
     name: "New York",
-    region: "New York",
     country: "United States",
     lat: 40.7128,
     lon: -74.006,
@@ -24,7 +21,6 @@ export const citiesMock: City[] = [
   {
     id: 3,
     name: "Tokyo",
-    region: "Tokyo",
     country: "Japan",
     lat: 35.6762,
     lon: 139.6503,
@@ -33,7 +29,6 @@ export const citiesMock: City[] = [
   {
     id: 4,
     name: "Sydney",
-    region: "New South Wales",
     country: "Australia",
     lat: -33.8688,
     lon: 151.2093,

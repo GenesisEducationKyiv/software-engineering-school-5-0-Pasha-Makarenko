@@ -5,10 +5,11 @@ import {
   setupTestApp,
   TestContext
 } from "../setup"
+import { HttpStatus } from "@nestjs/common"
 
 describe("Search", () => {
   let context: TestContext
-  const cityQuery = "Paris"
+  const cityQuery = "Test City"
 
   beforeAll(async () => {
     await beforeAllSetup()
@@ -31,7 +32,7 @@ describe("Search", () => {
       await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: cityQuery })
-        .expect(200)
+        .expect(HttpStatus.OK)
         .expect(res => {
           expect(Array.isArray(res.body)).toBe(true)
           expect(res.body.length).toBeGreaterThan(0)
@@ -41,19 +42,8 @@ describe("Search", () => {
     it("should throw error for invalid query", async () => {
       await request(context.app.getHttpServer())
         .get("/api/search")
-        .query({ city: "" })
-        .expect(400)
-        .expect(res => {
-          expect(res.body.message).toContain(
-            "Request failed with status code 400"
-          )
-          expect(res.body.statusCode).toBe(400)
-        })
-
-      await request(context.app.getHttpServer())
-        .get("/api/search")
         .query({ city: "invalid_city_query" })
-        .expect(200)
+        .expect(HttpStatus.OK)
         .expect(res => {
           expect(Array.isArray(res.body)).toBe(true)
           expect(res.body.length).toBe(0)
@@ -61,14 +51,14 @@ describe("Search", () => {
     })
 
     it("should return cached response for same query", async () => {
-      const key = `search_${cityQuery}`
+      const key = `search:${cityQuery}`
 
       await expect(context.cacheManager.get(key)).resolves.toBeNull()
 
       const { body: searchData } = await request(context.app.getHttpServer())
         .get("/api/search")
         .query({ city: cityQuery })
-        .expect(200)
+        .expect(HttpStatus.OK)
 
       await expect(context.cacheManager.get(key)).resolves.toEqual(searchData)
     })

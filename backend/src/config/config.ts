@@ -1,5 +1,6 @@
-import { ConfigModuleOptions } from "@nestjs/config"
 import * as process from "node:process"
+import { ConfigModuleOptions } from "@nestjs/config"
+import { configValidationSchema } from "./config.schema"
 
 const getEnvFilePath = (env: string | undefined) => {
   if (env === "test") {
@@ -13,5 +14,10 @@ const getEnvFilePath = (env: string | undefined) => {
 
 export const config: ConfigModuleOptions = {
   envFilePath: getEnvFilePath(process.env.NODE_ENV),
-  isGlobal: true
+  isGlobal: true,
+  validationSchema: configValidationSchema,
+  validationOptions: {
+    abortEarly: true,
+    allowUnknown: true
+  }
 }

@@ -26,17 +26,21 @@ describe("WeatherService", () => {
   })
 
   it("should handle weather API errors", () => {
-    const city = "London"
-    const days = 3
+    const dto = {
+      city: "London",
+      lat: 51.5074,
+      lon: -0.1278,
+      days: 3
+    }
     const errorResponse = { status: 404, statusText: "Not Found" }
 
-    service.getWeather({ city, days }).subscribe({
+    service.getWeather(dto).subscribe({
       error: err => {
         expect(err.status).toBe(404)
       }
     })
 
-    const req = httpMock.expectOne(ENDPOINTS.weather(city, days))
+    const req = httpMock.expectOne(ENDPOINTS.weather(dto))
     req.flush(null, errorResponse)
   })
 })

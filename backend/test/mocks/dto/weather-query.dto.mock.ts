@@ -2,5 +2,7 @@ import { WeatherQueryDto } from "../../../src/weather/dto/weather-query.dto"
 
 export const weatherQueryDtoMock: WeatherQueryDto = {
   city: "Test City",
-  days: "3"
+  lat: 0,
+  lon: 0,
+  days: 3
 }

@@ -5,11 +5,7 @@ import {
 } from "@angular/common/http/testing"
 import { SubscriptionsService } from "../../../../src/app/api/subscriptions/subscriptions.service"
 import { ENDPOINTS } from "../../../../src/app/consts/endpoints"
-import {
-  confirmTokenMock,
-  subscribeDtoMock,
-  unsubscribeTokenMock
-} from "../../../mocks/data/subscriptions.mock"
+import { subscribeDtoMock } from "../../../mocks/data/subscriptions.mock"
 
 describe("SubscriptionsService", () => {
   let service: SubscriptionsService

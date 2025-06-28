@@ -10,9 +10,6 @@ export class CityPipe implements PipeTransform {
       return ""
     }
 
-    return format
-      .replace("$n", city.name)
-      .replace("$r", city.region)
-      .replace("$c", city.country)
+    return format.replace("$n", city.name).replace("$c", city.country)
   }
 }

@@ -3,8 +3,11 @@ import { provideRouter } from "@angular/router"
 import { routes } from "./app.routes"
 import { provideHttpClient } from "@angular/common/http"
 import { provideStore } from "@ngrx/store"
-import { modalReducer } from "./components/modal/state/modal.reducer"
-import { homeReducer } from "./pages/home/state/home.reducer"
+import { modalReducer } from "./store/modal/modal.reducer"
+import { weatherReducer } from "./store/weather/weather.reducer"
+import { cityReducer } from "./store/city/city.reducer"
+import { provideEffects } from "@ngrx/effects"
+import { CityEffects } from "./store/city/city.effects"
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +16,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideStore({
       modals: modalReducer,
-      home: homeReducer
-    })
+      weather: weatherReducer,
+      city: cityReducer
+    }),
+    provideEffects(CityEffects)
   ]
 }

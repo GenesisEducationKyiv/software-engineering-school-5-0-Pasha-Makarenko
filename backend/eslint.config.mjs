@@ -35,7 +35,8 @@ export default tseslint.config(
   },
   {
     rules: {
-      "prettier/prettier": "warn"
+      "prettier/prettier": "warn",
+      "@typescript-eslint/no-unused-vars": "off"
     }
   }
 )

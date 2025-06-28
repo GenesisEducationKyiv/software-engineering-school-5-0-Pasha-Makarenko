@@ -1,7 +1,9 @@
-import { Component, computed, inject, signal } from "@angular/core"
-import { WeatherService } from "../../api/weather/weather.service"
-import { HomeAdapter } from "./state/home.adapter"
-import { HomeState, initialHomeState } from "./state/home.state"
+import { Component, computed, effect, inject, signal } from "@angular/core"
+import { WeatherAdapter } from "../../store/weather/weather.adapter"
+import {
+  initialWeatherState,
+  WeatherState
+} from "../../store/weather/weather.state"
 import { SearchComponent } from "../../components/search/search.component"
 import { FormControl } from "@angular/forms"
 import { FaIconComponent } from "@fortawesome/angular-fontawesome"
@@ -12,6 +14,8 @@ import { TemperaturePipe, TemperatureUnit } from "../../pipes/temperature.pipe"
 import { CityPipe } from "../../pipes/city.pipe"
 import { WeatherHour } from "../../api/weather/weather.interface"
 import { SpeedPipe, SpeedUnit } from "../../pipes/speed.pipe"
+import { CityAdapter } from "../../store/city/city.adapter"
+import { City } from "../../api/search/search.interface"
 
 @Component({
   selector: "app-home",
@@ -28,23 +32,24 @@ import { SpeedPipe, SpeedUnit } from "../../pipes/speed.pipe"
   styleUrl: "./home.component.scss"
 })
 export class HomeComponent {
-  weatherService = inject(WeatherService)
-  searchControl = new FormControl<string | null>(
-    this.weatherService.city?.name || null
-  )
-  data = signal<HomeState["home"]>(initialHomeState.home)
+  protected weatherAdapter = inject(WeatherAdapter)
+  protected cityAdapter = inject(CityAdapter)
+
+  searchControl = new FormControl<string | null>(null)
   searchIcon = faSearch
+  hourStep = 3
+  weatherData = signal<WeatherState["weather"]>(initialWeatherState.weather)
+  city = signal<City | null>(null)
   dayIndex = signal<number>(0)
   currentDay = computed(
-    () => this.data().result?.forecast.forecastday[this.dayIndex()].day || null
+    () => this.weatherData().data?.forecast[this.dayIndex()] || null
   )
   currentDate = computed(
-    () => this.data().result?.forecast.forecastday[this.dayIndex()].date || null
+    () => this.weatherData().data?.forecast[this.dayIndex()].date || null
   )
-  hourStep = 3
   hours = computed<WeatherHour[]>(
     () =>
-      this.data().result?.forecast.forecastday[this.dayIndex()].hour.filter(
+      this.weatherData().data?.forecast[this.dayIndex()].hours.filter(
         (_, i) => i % this.hourStep === 0
       ) || []
   )
@@ -55,12 +60,22 @@ export class HomeComponent {
       : SpeedUnit.MIlES
   )
 
-  constructor(protected homeAdapter: HomeAdapter) {
-    this.homeAdapter.select().subscribe(this.data.set)
-    this.homeAdapter.weather()
+  constructor() {
+    this.weatherAdapter.select().subscribe(this.weatherData.set)
+    this.cityAdapter.select().subscribe(city => {
+      this.city.set(city)
+      this.searchControl.setValue(city ? city.name : null)
+    })
+
+    effect(() => {
+      const city = this.city()
+
+      if (city) {
+        this.weatherAdapter.weather(city.name, city.lat, city.lon)
+      }
+    })
   }
 
-  protected readonly console = console
   protected readonly TemperatureUnit = TemperatureUnit
   protected readonly SpeedUnit = SpeedUnit
 }

@@ -1,4 +1,4 @@
-import { inject, Injectable } from "@angular/core"
+import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
 import { City } from "./search.interface"
 import { ENDPOINTS } from "../../consts/endpoints"
@@ -7,7 +7,7 @@ import { ENDPOINTS } from "../../consts/endpoints"
   providedIn: "root"
 })
 export class SearchService {
-  http = inject(HttpClient)
+  constructor(private http: HttpClient) {}
 
   search(city: string) {
     return this.http.get<City[]>(ENDPOINTS.search(city))

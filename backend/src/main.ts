@@ -2,12 +2,16 @@ import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { ValidationPipe } from "@nestjs/common"
-import * as process from "node:process"
+import { ConfigService } from "@nestjs/config"
+import { GlobalExceptionFilter } from "./shared/filters/global-exception.filter"
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger: ["error", "warn", "log"]
+  })
+  const configService = app.get(ConfigService)
   app.enableCors({
-    origin: process.env.CLIENT_URL
+    origin: configService.get<string>("CLIENT_URL")
   })
   app.setGlobalPrefix("api")
 
@@ -26,7 +30,9 @@ async function bootstrap() {
     })
   )
 
-  await app.listen(process.env.API_PORT ?? 3000)
+  app.useGlobalFilters(new GlobalExceptionFilter())
+
+  await app.listen(configService.get<string>("API_PORT")!)
 }
 
 bootstrap()

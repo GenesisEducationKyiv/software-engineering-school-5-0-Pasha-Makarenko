@@ -1,12 +1,47 @@
 import { Module } from "@nestjs/common"
-import { SearchController } from "./search.controller"
-import { SearchService } from "./search.service"
-import { HttpModule } from "@nestjs/axios"
+import { SearchController } from "./controllers/search.controller"
+import { HttpModule, HttpService } from "@nestjs/axios"
+import { GetCitiesHandler } from "./queries/handlers/get-cities.handler"
+import { CqrsModule } from "@nestjs/cqrs"
+import {
+  openMeteoSearchProviderFactory,
+  SEARCH_PROVIDER,
+  searchProviderFactory,
+  weatherApiSearchProviderFactory
+} from "./providers/search.provider.factory"
+import { ConfigService } from "@nestjs/config"
+import { CACHE_MANAGER } from "@nestjs/cache-manager"
+import { WeatherApiSearchProvider } from "./providers/weather-api-search.provider"
+import { OpenMeteoSearchProvider } from "./providers/open-meteo-search.provider"
+
+const queryHandlers = [GetCitiesHandler]
 
 @Module({
   controllers: [SearchController],
-  imports: [HttpModule],
-  providers: [SearchService],
-  exports: [SearchService]
+  imports: [CqrsModule, HttpModule],
+  providers: [
+    ...queryHandlers,
+    {
+      provide: WeatherApiSearchProvider,
+      useFactory: weatherApiSearchProviderFactory,
+      inject: [ConfigService, HttpService]
+    },
+    {
+      provide: OpenMeteoSearchProvider,
+      useFactory: openMeteoSearchProviderFactory,
+      inject: [ConfigService, HttpService]
+    },
+    {
+      provide: SEARCH_PROVIDER,
+      useFactory: searchProviderFactory,
+      inject: [
+        ConfigService,
+        CACHE_MANAGER,
+        WeatherApiSearchProvider,
+        OpenMeteoSearchProvider
+      ]
+    }
+  ],
+  exports: [...queryHandlers, SEARCH_PROVIDER]
 })
 export class SearchModule {}

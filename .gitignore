@@ -1,6 +1,8 @@
 /.idea
 /data
+/data-test
 /node_modules
 .env.test
 .env.dev
 .env
+.secrets

@@ -1,4 +1,4 @@
-# Weather Application 🌦️
+  # Weather Application 🌦️
 
 A web application for tracking weather in selected cities with email subscription functionality.
 
@@ -57,22 +57,6 @@ npm run install:all && npm run build:all
 
 ```bash
 npm run start:backend
-```
-
-## Testing �
-
-### Backend Tests
-
-```bash
-cd backend
-npm test
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
 ```
 
 ## API Documentation 📚

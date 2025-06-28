@@ -17,7 +17,9 @@ export const dynamicServeStatic = () => {
           "frontend",
           "browser"
         ),
-        useGlobalPrefix: false
+        renderPath: "/",
+        useGlobalPrefix: false,
+        exclude: ["/api/(.*)"]
       })
     ]
   }

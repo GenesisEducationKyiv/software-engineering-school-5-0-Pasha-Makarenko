@@ -57,12 +57,12 @@ graph TD
     B --> D[Subscriptions Module]
     B --> E[Search Module]
     B --> F[Nodemailer]
-    C --> G[External Weather API]
+    C --> G[Weather Provider]
     C --> H[Cache]
     D --> I[PostgreSQL]
-    E --> G
+    E --> J[Search Provider]
     E --> H
-    F --> J[SMTP Server]
+    F --> K[SMTP Server]
     C --> D
     C --> F
 
@@ -77,6 +77,7 @@ graph TD
     subgraph External Services
         G
         J
+        K
     end
 
     subgraph Data Layer
@@ -100,7 +101,7 @@ graph TD
 
 ```
 GET /api/search/?city={city} - Search city by name
-GET /api/weather?city={city}&days={days} - Get weather data for a city
+GET /api/weather?city={city}&=lat={lat}&lon={lon}&&days={days} - Get weather data for a city
 POST /api/subscribe - Subscribe to weather updates
 POST /api/confirm/{token} - Confirm subscription with token
 POST /api/unsubscribe/{token} - Unsubscribe from weather updates
@@ -187,7 +188,7 @@ sequenceDiagram
     participant Scheduler
     participant API
     participant Cache
-    participant ExternalWeatherAPI
+    participant Weather Provider
     participant Database
     participant Notifier
     Scheduler ->> API: Trigger weather update job
@@ -197,8 +198,8 @@ sequenceDiagram
         API ->> Cache: Get cached weather data
         Cache -->> API: Return cached data
     else Fetch new weather data
-        API ->> ExternalWeatherAPI: Fetch weather data by city
-        ExternalWeatherAPI -->> API: Return weather data
+        API ->> Weather Provider: Fetch weather data by city
+        Weather Provider -->> API: Return weather data
         API ->> Cache: Update cached weather data
     end
     API ->> Notifier: Send weather updates to subscribers
@@ -220,5 +221,5 @@ sequenceDiagram
 ## 7. Testing Strategy
 
 - [x] Unit tests for each module.
-- [ ] Integration tests for API endpoints.
+- [x] Integration tests for API endpoints.
 - [ ] E2E tests for the entire flow.

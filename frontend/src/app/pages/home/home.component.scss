@@ -120,11 +120,20 @@
 }
 
 .weather-item {
+  display: block;
   transition: background-color 0.2s ease;
   padding: mixins.rem(10);
+
+  &__day {
+    display: block;
+  }
 
   &_active {
     background-color: var(--second-bg);
     border-radius: mixins.rem(15);
+  }
+
+  .weather-temp {
+    display: block;
   }
 }

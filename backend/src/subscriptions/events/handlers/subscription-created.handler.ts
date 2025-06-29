@@ -1,15 +1,18 @@
 import { CommandBus, EventsHandler, IEventHandler } from "@nestjs/cqrs"
 import { SubscriptionCreatedEvent } from "../impl/subscription-created.event"
-import { UrlGeneratorService } from "../../../url-generator/services/url-generator.service"
+import { URL_GENERATOR_SERVICE } from "../../../url-generator/services/url-generator.service"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
 import { SendConfirmationMailException } from "../../exceptions/send-confirmation-mail.exception"
+import { Inject } from "@nestjs/common"
+import { IUrlGeneratorService } from "../../../url-generator/interfaces/url-generator.interfaces"
 
 @EventsHandler(SubscriptionCreatedEvent)
 export class SubscriptionCreatedHandler
   implements IEventHandler<SubscriptionCreatedEvent>
 {
   constructor(
-    private urlGeneratorService: UrlGeneratorService,
+    @Inject(URL_GENERATOR_SERVICE)
+    private urlGeneratorService: IUrlGeneratorService,
     private commandBus: CommandBus
   ) {}
 

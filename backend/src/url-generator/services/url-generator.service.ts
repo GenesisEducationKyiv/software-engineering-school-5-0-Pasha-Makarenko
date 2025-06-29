@@ -1,9 +1,14 @@
 import { Injectable } from "@nestjs/common"
-import { GeneratedUrl } from "../interfaces/url-generator.interfaces"
+import {
+  GeneratedUrl,
+  IUrlGeneratorService
+} from "../interfaces/url-generator.interfaces"
 import { ClientRoutesConsts } from "../consts/client-routes.consts"
 
+export const URL_GENERATOR_SERVICE = "URL_GENERATOR_SERVICE"
+
 @Injectable()
-export class UrlGeneratorService {
+export class UrlGeneratorService implements IUrlGeneratorService {
   constructor(private readonly clientUrl: string) {}
 
   confirmUrl(token: string): GeneratedUrl {

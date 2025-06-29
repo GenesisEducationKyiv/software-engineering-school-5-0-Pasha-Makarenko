@@ -15,12 +15,14 @@ import { SearchModule } from "../search/search.module"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { WeatherApiWeatherProvider } from "./providers/weather-api-weather.provider"
 import { OpenMeteoWeatherProvider } from "./providers/open-meteo-weather.provider"
+import { CACHE_METRICS_SERVICE } from "../metrics/services/cache-metrics.service"
+import { MetricsModule } from "../metrics/metrics.module"
 
 const queryHandlers = [GetWeatherHandler]
 
 @Module({
   controllers: [WeatherController],
-  imports: [CqrsModule, HttpModule, SearchModule],
+  imports: [CqrsModule, HttpModule, MetricsModule, SearchModule],
   providers: [
     ...queryHandlers,
     {
@@ -39,6 +41,7 @@ const queryHandlers = [GetWeatherHandler]
       inject: [
         ConfigService,
         CACHE_MANAGER,
+        CACHE_METRICS_SERVICE,
         WeatherApiWeatherProvider,
         OpenMeteoWeatherProvider
       ]

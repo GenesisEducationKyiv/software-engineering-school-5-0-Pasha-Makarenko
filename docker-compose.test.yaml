@@ -10,11 +10,6 @@ services:
       - ./data-test/postgres:/var/lib/postgresql/data
     networks:
       - test-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis-test:
     container_name: weather.redis.test
@@ -27,8 +22,6 @@ services:
       - ./data-test/redis:/data
     networks:
       - test-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
 
   test-unit-frontend:
     container_name: weather.frontend.test
@@ -73,10 +66,8 @@ services:
       - ./backend/src/mail/templates:/usr/src/app/mail/templates
       - /usr/src/app/node_modules
     depends_on:
-      database-test:
-        condition: service_healthy
-      redis-test:
-        condition: service_healthy
+      - database-test
+      - redis-test
     networks:
       - test-network
     command: npm run test:integration

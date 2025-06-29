@@ -14,8 +14,6 @@ jobs:
       - name: Create .env.test file
         run: |
           cp .env.test.example .env.test
-          echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env.test
-          echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env.test
 
       - name: Run integration tests for backend
         run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-integration-backend

@@ -1,5 +1,5 @@
-import { UrlGeneratorService } from "../../../src/url-generator/services/url-generator.service"
 import { ClientRoutesConsts } from "../../../src/url-generator/consts/client-routes.consts"
+import { IUrlGeneratorService } from "../../../src/url-generator/interfaces/url-generator.interfaces"
 
 export const confirmUrlMock = (token: string) =>
   process.env["CLIENT_URL"] + ClientRoutesConsts.confirm(token)
@@ -16,4 +16,4 @@ export const urlGeneratorServiceMockFactory = () =>
       url: unsubscribeUrlMock(token),
       params: {}
     }))
-  }) as never as UrlGeneratorService
+  }) as never as IUrlGeneratorService

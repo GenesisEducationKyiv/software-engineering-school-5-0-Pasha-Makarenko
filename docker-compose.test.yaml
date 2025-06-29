@@ -1,6 +1,5 @@
 services:
-
-  test-database:
+  database-test:
     container_name: weather.postgres.test
     image: postgres:16.4-alpine
     env_file:
@@ -11,8 +10,13 @@ services:
       - ./data-test/postgres:/var/lib/postgresql/data
     networks:
       - test-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  test-redis:
+  redis-test:
     container_name: weather.redis.test
     image: redis:latest
     env_file:
@@ -23,6 +27,8 @@ services:
       - ./data-test/redis:/data
     networks:
       - test-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
 
   test-unit-frontend:
     container_name: weather.frontend.test
@@ -49,8 +55,8 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - test-database
-      - test-redis
+      - database-test
+      - redis-test
     networks:
       - test-network
     command: npm run test:unit
@@ -67,8 +73,10 @@ services:
       - ./backend/src/mail/templates:/usr/src/app/mail/templates
       - /usr/src/app/node_modules
     depends_on:
-      - test-database
-      - test-redis
+      database-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
     networks:
       - test-network
     command: npm run test:integration

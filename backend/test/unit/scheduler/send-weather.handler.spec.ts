@@ -1,6 +1,6 @@
 import { Test } from "@nestjs/testing"
 import { CommandBus, QueryBus } from "@nestjs/cqrs"
-import { UrlGeneratorService } from "../../../src/url-generator/services/url-generator.service"
+import { URL_GENERATOR_SERVICE } from "../../../src/url-generator/services/url-generator.service"
 import { urlGeneratorServiceMockFactory } from "../../mocks/services/url-generator.service.mock"
 import {
   commandBusMockFactory,
@@ -10,7 +10,6 @@ import { SendWeatherHandler } from "../../../src/scheduler/commands/handlers/sen
 import { Frequency } from "../../../src/subscriptions/models/subscription.model"
 import { SendWeatherCommand } from "../../../src/scheduler/commands/impl/send-weather.command"
 import { subscriptionModelsMock } from "../../mocks/models/subscription.model.mock"
-import { weatherDataMock } from "../../mocks/data/weather.mock"
 
 describe("SendWeatherHandler", () => {
   let handler: SendWeatherHandler
@@ -30,7 +29,7 @@ describe("SendWeatherHandler", () => {
           useValue: commandBusMockFactory()
         },
         {
-          provide: UrlGeneratorService,
+          provide: URL_GENERATOR_SERVICE,
           useValue: urlGeneratorServiceMockFactory()
         }
       ]

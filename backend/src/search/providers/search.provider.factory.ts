@@ -7,12 +7,14 @@ import { Cache } from "cache-manager"
 import { SearchLoggerDecorator } from "./search-logger.decorator"
 import { SearchProviderHandler } from "./search.provider.handler"
 import { setupChain } from "../../shared/utils/setup-chain.util"
+import { ICacheMetricsService } from "../../metrics/interfaces/cache-metrics.interface"
 
 export const SEARCH_PROVIDER = "SEARCH_PROVIDER"
 
 export const searchProviderFactory = (
   configService: ConfigService,
   cacheManager: Cache,
+  cacheMetricsService: ICacheMetricsService,
   ...providers: SearchProviderHandler[]
 ) => {
   const chain = setupChain<SearchProviderHandler>(providers)
@@ -21,6 +23,7 @@ export const searchProviderFactory = (
     new SearchCacheProxy(
       chain,
       cacheManager,
+      cacheMetricsService,
       configService.get<number>("SEARCH_CACHE_TTL")!
     )
   )

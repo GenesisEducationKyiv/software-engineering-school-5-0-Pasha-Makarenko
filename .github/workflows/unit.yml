@@ -13,11 +13,7 @@ jobs:
 
       - name: Create .env.test file
         run: |
-          cp .env.test.example .env.test
-          echo "WEATHER_API_WEATHER_KEY=${{ secrets.WEATHER_API_WEATHER_KEY }}" >> .env.test
-          echo "WEATHER_API_SEARCH_KEY=${{ secrets.WEATHER_API_SEARCH_KEY }}" >> .env.test
-          echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env.test
-          echo "SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}" >> .env.test      
+          cp .env.test.example .env.test 
 
       - name: Run unit tests for backend
         run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-unit-backend

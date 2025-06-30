@@ -216,6 +216,9 @@ sequenceDiagram
 - PostgreSQL for the database.
 - Redis for caching.
 - Nodemailer for email notifications.
+- Prometheus for monitoring.
+- Loki for logging.
+- Grafana for metrics and logs visualization.
 
 ---
 

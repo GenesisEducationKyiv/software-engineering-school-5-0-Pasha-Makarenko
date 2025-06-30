@@ -97,6 +97,17 @@ services:
     networks:
       - metrics
 
+  loki-dev:
+    container_name: weather.loki.dev
+    image: grafana/loki:latest
+    ports:
+      - ${LOKI_PORT}:3100
+    volumes:
+      - ./data-dev/loki:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - metrics
+
   grafana-dev:
     container_name: weather.grafana.dev
     image: grafana/grafana:latest
@@ -108,8 +119,15 @@ services:
     volumes:
       - ./data-dev/grafana:/var/lib/grafana
       - ./config/grafana/provisioning:/etc/grafana/provisioning
+    command:
+      - sh
+      - -c
+      - |
+        cp /etc/grafana/provisioning/datasources/datasource.dev.yaml /etc/grafana/provisioning/datasources/datasources.yaml
+        /run.sh
     depends_on:
       - prometheus-dev
+      - loki-dev
     networks:
       - metrics
 

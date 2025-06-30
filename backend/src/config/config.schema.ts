@@ -41,6 +41,7 @@ export const clientSchema = Joi.object({
 export const metricsSchema = Joi.object({
   PROMETHEUS_PORT: Joi.number().port().required(),
   LOKI_PORT: Joi.number().port().required(),
+  LOKI_HOST: Joi.string().uri().required(),
   GRAFANA_PORT: Joi.number().port().required(),
   GRAFANA_USER: Joi.string().required(),
   GRAFANA_PASSWORD: Joi.string().required()

@@ -20,6 +20,8 @@ import { SchedulerModule } from "./scheduler/scheduler.module"
 import { UrlGeneratorModule } from "./url-generator/url-generator.module"
 import { MetricsMiddleware } from "./metrics/middlewares/metrics.middleware"
 import { MetricsModule } from "./metrics/metrics.module"
+import { LoggerModule } from "nestjs-pino"
+import { getPinoConfig } from "./config/logger.config"
 
 @Module({
   imports: [
@@ -38,6 +40,11 @@ import { MetricsModule } from "./metrics/metrics.module"
     ScheduleModule.forRoot(),
     ...dynamicServeStatic(),
     MetricsModule,
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: getPinoConfig,
+      inject: [ConfigService]
+    }),
     MailModule,
     SubscriptionsModule,
     WeatherModule,

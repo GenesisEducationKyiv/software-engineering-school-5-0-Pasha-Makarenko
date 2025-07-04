@@ -1,4 +1,9 @@
-import { Module } from "@nestjs/common"
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod
+} from "@nestjs/common"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { SequelizeModule } from "@nestjs/sequelize"
 import { getSequelizeConfig } from "./config/database.config"
@@ -13,6 +18,10 @@ import { SearchModule } from "./search/search.module"
 import { dynamicServeStatic } from "./config/serve-static.config"
 import { SchedulerModule } from "./scheduler/scheduler.module"
 import { UrlGeneratorModule } from "./url-generator/url-generator.module"
+import { MetricsMiddleware } from "./metrics/middlewares/metrics.middleware"
+import { MetricsModule } from "./metrics/metrics.module"
+import { LoggerModule } from "nestjs-pino"
+import { getPinoConfig } from "./config/logger.config"
 
 @Module({
   imports: [
@@ -30,6 +39,12 @@ import { UrlGeneratorModule } from "./url-generator/url-generator.module"
     }),
     ScheduleModule.forRoot(),
     ...dynamicServeStatic(),
+    MetricsModule,
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: getPinoConfig,
+      inject: [ConfigService]
+    }),
     MailModule,
     SubscriptionsModule,
     WeatherModule,
@@ -39,4 +54,10 @@ import { UrlGeneratorModule } from "./url-generator/url-generator.module"
   ],
   exports: [ConfigModule]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MetricsMiddleware)
+      .forRoutes({ path: "*", method: RequestMethod.ALL })
+  }
+}

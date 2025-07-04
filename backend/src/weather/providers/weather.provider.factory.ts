@@ -8,12 +8,14 @@ import { WeatherCacheProxy } from "./weather-cache.proxy"
 import { WeatherLoggerDecorator } from "./weather-logger.decorator"
 import { WeatherProviderHandler } from "./weather.provider.handler"
 import { setupChain } from "../../shared/utils/setup-chain.util"
+import { ICacheMetricsService } from "../../metrics/interfaces/cache-metrics.interface"
 
 export const WEATHER_PROVIDER = "WEATHER_PROVIDER"
 
 export const weatherProviderFactory = (
   configService: ConfigService,
   cacheManager: Cache,
+  cacheMetricsService: ICacheMetricsService,
   ...providers: WeatherProviderHandler[]
 ) => {
   const chain = setupChain<WeatherProviderHandler>(providers)
@@ -22,6 +24,7 @@ export const weatherProviderFactory = (
     new WeatherCacheProxy(
       chain,
       cacheManager,
+      cacheMetricsService,
       configService.get<number>("WEATHER_CACHE_TTL")!
     )
   )

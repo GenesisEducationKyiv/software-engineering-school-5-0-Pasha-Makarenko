@@ -1,6 +1,5 @@
 services:
-
-  test-database:
+  database-test:
     container_name: weather.postgres.test
     image: postgres:16.4-alpine
     env_file:
@@ -12,7 +11,7 @@ services:
     networks:
       - test-network
 
-  test-redis:
+  redis-test:
     container_name: weather.redis.test
     image: redis:latest
     env_file:
@@ -49,8 +48,8 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
-      - test-database
-      - test-redis
+      - database-test
+      - redis-test
     networks:
       - test-network
     command: npm run test:unit
@@ -67,8 +66,8 @@ services:
       - ./backend/src/mail/templates:/usr/src/app/mail/templates
       - /usr/src/app/node_modules
     depends_on:
-      - test-database
-      - test-redis
+      - database-test
+      - redis-test
     networks:
       - test-network
     command: npm run test:integration

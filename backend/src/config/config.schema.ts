@@ -38,6 +38,15 @@ export const clientSchema = Joi.object({
   CLIENT_URL: Joi.string().uri().required()
 })
 
+export const metricsSchema = Joi.object({
+  PROMETHEUS_PORT: Joi.number().port().required(),
+  LOKI_PORT: Joi.number().port().required(),
+  LOKI_HOST: Joi.string().uri().required(),
+  GRAFANA_PORT: Joi.number().port().required(),
+  GRAFANA_USER: Joi.string().required(),
+  GRAFANA_PASSWORD: Joi.string().required()
+})
+
 export const searchSchema = Joi.object({
   WEATHER_API_SEARCH_URL: Joi.string().uri().required(),
   WEATHER_API_SEARCH_KEY: Joi.string().required(),
@@ -65,6 +74,7 @@ export const configValidationSchema = Joi.object()
   .concat(smtpSchema)
   .concat(apiSchema)
   .concat(clientSchema)
+  .concat(metricsSchema)
   .concat(searchSchema)
   .concat(weatherSchema)
   .concat(nodeEnvSchema)

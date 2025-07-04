@@ -106,6 +106,7 @@ POST /api/subscribe - Subscribe to weather updates
 POST /api/confirm/{token} - Confirm subscription with token
 POST /api/unsubscribe/{token} - Unsubscribe from weather updates
 GET /api/docs - API documentation
+GET /api/metrics - Application metrics
 ```
 
 ### 4.2 Scheduler
@@ -215,6 +216,9 @@ sequenceDiagram
 - PostgreSQL for the database.
 - Redis for caching.
 - Nodemailer for email notifications.
+- Prometheus for monitoring.
+- Loki for logging.
+- Grafana for metrics and logs visualization.
 
 ---
 

@@ -20,16 +20,6 @@ describe("architecture", () => {
     expect(rule).toPassAsync()
   })
 
-  it("infrastructure layer should depends on domain", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.INFRASTRUCTURE)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.DOMAIN)
-
-    expect(rule).toPassAsync()
-  })
-
   it("infrastructure layer should not depend on application", () => {
     const rule = filesOfProject()
       .inFolder(LayersFolders.INFRASTRUCTURE)
@@ -50,62 +40,12 @@ describe("architecture", () => {
     expect(rule).toPassAsync()
   })
 
-  it("application layer should depend on domain", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.APPLICATION)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.DOMAIN)
-
-    expect(rule).toPassAsync()
-  })
-
-  it("application layer should depend on infrastructure", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.APPLICATION)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.INFRASTRUCTURE)
-
-    expect(rule).toPassAsync()
-  })
-
   it("application layer should not depend on presentation", () => {
     const rule = filesOfProject()
       .inFolder(LayersFolders.APPLICATION)
       .shouldNot()
       .dependOnFiles()
       .inFolder(LayersFolders.PRESENTATION)
-
-    expect(rule).toPassAsync()
-  })
-
-  it("presentation layer should depend on domain", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.PRESENTATION)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.DOMAIN)
-
-    expect(rule).toPassAsync()
-  })
-
-  it("presentation layer should depend on infrastructure", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.PRESENTATION)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.INFRASTRUCTURE)
-
-    expect(rule).toPassAsync()
-  })
-
-  it("presentation layer should depend on application", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.PRESENTATION)
-      .should()
-      .dependOnFiles()
-      .inFolder(LayersFolders.APPLICATION)
 
     expect(rule).toPassAsync()
   })

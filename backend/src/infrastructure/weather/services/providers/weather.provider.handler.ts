@@ -1,5 +1,4 @@
 import { IWeatherProvider } from "../../../../domain/weather/providers/weather.provider.interface"
-import { WeatherQueryDto } from "../../../../application/weather/dto/weather-query.dto"
 import { WeatherProviderException } from "../../exceptions/weather-provider.exception"
 import { IHandler } from "../../../common/interfaces/handler.interface"
 import { WeatherData } from "../../../../domain/weather/value-objects/weather-data.value-object"
@@ -39,5 +38,5 @@ export abstract class WeatherProviderHandler
     }
   }
 
-  protected abstract handle(dto: WeatherQueryDto): Promise<WeatherData>
+  protected abstract handle(dto: WeatherGetting): Promise<WeatherData>
 }

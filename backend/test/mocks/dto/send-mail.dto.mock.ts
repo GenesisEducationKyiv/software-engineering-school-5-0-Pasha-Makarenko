@@ -1,4 +1,7 @@
-import { MailTemplate, SendMailDto } from "../../../src/mail/dto/send-mail.dto"
+import {
+  MailTemplate,
+  SendMailDto
+} from "../../../src/application/mail/dto/send-mail.dto"
 import { weatherDataMock } from "../data/weather.mock"
 
 export const sendMailDtoWithOneRecipientMock: SendMailDto = {

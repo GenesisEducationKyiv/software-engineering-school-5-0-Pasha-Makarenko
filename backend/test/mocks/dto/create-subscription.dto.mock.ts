@@ -1,5 +1,5 @@
-import { CreateSubscriptionDto } from "../../../src/subscriptions/dto/create-subscription.dto"
-import { Frequency } from "../../../src/subscriptions/models/subscription.model"
+import { CreateSubscriptionDto } from "../../../src/application/subsciptions/dto/create-subscription.dto"
+import { Frequency } from "../../../src/domain/subscriptions/enums/frequency.enum"
 
 export const createSubscriptionDtoMock: CreateSubscriptionDto = {
   email: "email3@example.com",

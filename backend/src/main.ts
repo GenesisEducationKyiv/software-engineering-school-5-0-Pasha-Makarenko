@@ -1,9 +1,9 @@
 import { NestFactory } from "@nestjs/core"
-import { AppModule } from "./app.module"
+import { AppModule } from "./main/app.module"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { ValidationPipe } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import { GlobalExceptionFilter } from "./shared/filters/global-exception.filter"
+import { GlobalExceptionFilter } from "./presentation/common/filters/global-exception.filter"
 import { Logger } from "nestjs-pino"
 
 async function bootstrap() {

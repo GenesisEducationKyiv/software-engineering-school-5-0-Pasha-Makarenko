@@ -1,15 +1,15 @@
 import { Test } from "@nestjs/testing"
 import { MailerService } from "@nestjs-modules/mailer"
 import { ConfigService } from "@nestjs/config"
-import { SendMailHandler } from "../../../src/mail/commands/handlers/send.mail.handler"
+import { SendMailHandler } from "../../../src/application/mail/commands/handlers/send.mail.handler"
 import { configServiceMockFactory } from "../../mocks/services/config.service.mock"
 import { mailerServiceMockFactory } from "../../mocks/services/mailer.service.mock"
 import {
   sendMailDtoWithManyRecipientsMock,
   sendMailDtoWithOneRecipientMock
 } from "../../mocks/dto/send-mail.dto.mock"
-import { SendMailCommand } from "../../../src/mail/commands/impl/send-mail.command"
-import { MailSendingFailedException } from "../../../src/mail/exceptions/mail-sending-failed.exception"
+import { SendMailCommand } from "../../../src/application/mail/commands/impl/send-mail.command"
+import { MailSendingFailedException } from "../../../src/application/mail/exceptions/mail-sending-failed.exception"
 
 describe("SendMailHandler", () => {
   let handler: SendMailHandler

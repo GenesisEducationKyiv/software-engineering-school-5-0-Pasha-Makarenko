@@ -1,5 +1,5 @@
-import { ClientRoutesConsts } from "../../../src/url-generator/consts/client-routes.consts"
-import { IUrlGeneratorService } from "../../../src/url-generator/interfaces/url-generator.interfaces"
+import { ClientRoutesConsts } from "../../../src/infrastructure/url-generator/consts/client-routes.consts"
+import { IUrlGeneratorService } from "../../../src/infrastructure/url-generator/interfaces/url-generator.interfaces"
 
 export const confirmUrlMock = (token: string) =>
   process.env["CLIENT_URL"] + ClientRoutesConsts.confirm(token)

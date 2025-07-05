@@ -1,8 +1,8 @@
-import { setupServer } from "msw/node"
+import { HttpStatus } from "@nestjs/common"
 import { http, HttpResponse } from "msw"
+import { setupServer } from "msw/node"
 import { weatherDataMock } from "./data/weather.mock"
 import { citiesMock } from "./data/search.mock"
-import { HttpStatus } from "@nestjs/common"
 
 const weatherHandler = http.get(
   process.env["WEATHER_API_WEATHER_URL"]!,

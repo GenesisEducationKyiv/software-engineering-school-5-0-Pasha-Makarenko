@@ -1,12 +1,5 @@
-import { City } from "../../../src/search/interfaces/search.interface"
+import { City } from "../../../src/domain/search/value-objects/city.value-object"
 
 export const citiesMock: City[] = [
-  {
-    id: 1,
-    name: "Test City",
-    country: "Test Country",
-    lat: 0,
-    lon: 0,
-    url: "test-city-url"
-  }
+  City.create(1, "Test City", "Test Country", 0, 0, "test-city-url")
 ]

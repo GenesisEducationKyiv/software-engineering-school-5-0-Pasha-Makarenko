@@ -18,7 +18,8 @@
     "format": "npx prettier . --check",
     "format:fix": "npx prettier . --write",
     "test:unit": "jest",
-    "test:integration": "jest --config ./test/jest-integration.json"
+    "test:integration": "jest --config ./test/jest-integration.json",
+    "test:architecture": "jest --config ./test/jest-architecture.json"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",

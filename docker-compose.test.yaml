@@ -54,6 +54,23 @@ services:
       - test-network
     command: npm run test:unit
 
+  test-architecture-backend:
+    container_name: weather.backend.test-architecture
+    build:
+      context: backend
+      dockerfile: Dockerfile.test
+    env_file:
+      - .env.test
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - database-test
+      - redis-test
+    networks:
+      - test-network
+    command: npm run test:architecture
+
   test-integration-backend:
     container_name: weather.backend.test-integration
     build:

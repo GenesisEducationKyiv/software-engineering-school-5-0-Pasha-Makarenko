@@ -1,7 +1,7 @@
-import { citiesMock } from "../data/search.mock"
-import { GetCitiesQuery } from "../../../src/search/queries/impl/get-cities.query"
 import { QueryHandler } from "../services/cqrs.mock"
-import { City } from "../../../src/search/interfaces/search.interface"
+import { GetCitiesQuery } from "../../../src/application/search/queries/impl/get-cities.query"
+import { City } from "../../../src/domain/search/value-objects/city.value-object"
+import { citiesMock } from "../data/search.mock"
 
 export class GetCitiesQueryHandler
   implements QueryHandler<GetCitiesQuery, City[]>

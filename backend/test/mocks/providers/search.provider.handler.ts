@@ -1,5 +1,5 @@
-import { SearchProviderHandler } from "../../../src/search/providers/search.provider.handler"
-import { City } from "../../../src/search/interfaces/search.interface"
+import { SearchProviderHandler } from "../../../src/infrastructure/search/services/providers/search.provider.handler"
+import { City } from "../../../src/domain/search/value-objects/city.value-object"
 import { citiesMock } from "../data/search.mock"
 
 export class MockSuccessSearchProvider extends SearchProviderHandler {

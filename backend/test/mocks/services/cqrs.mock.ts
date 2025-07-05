@@ -1,9 +1,9 @@
 import { CommandBus, EventBus, QueryBus } from "@nestjs/cqrs"
-import { GetActiveSubscriptionsQuery } from "../../../src/subscriptions/queries/impl/get-active-subscriptions.query"
-import { GetWeatherQuery } from "../../../src/weather/queries/impl/get-weather.query"
+import { GetActiveSubscriptionsQuery } from "../../../src/application/subsciptions/queries/impl/get-active-subscriptions.query"
+import { GetWeatherQuery } from "../../../src/application/weather/queries/impl/get-weather.query"
 import { GetWeatherQueryHandler } from "../handlers/get-weather-handler.mock"
 import { GetActiveSubscriptionsHandler } from "../handlers/get-active-subscriptions-handler.mock"
-import { GetCitiesQuery } from "../../../src/search/queries/impl/get-cities.query"
+import { GetCitiesQuery } from "../../../src/application/search/queries/impl/get-cities.query"
 import { GetCitiesQueryHandler } from "../handlers/get-cities-handler.mock"
 
 export interface QueryHandler<TQuery, TResult> {

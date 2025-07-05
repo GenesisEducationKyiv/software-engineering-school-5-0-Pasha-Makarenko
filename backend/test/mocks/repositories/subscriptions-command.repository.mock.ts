@@ -1,8 +1,8 @@
-import { ISubscriptionsCommandRepository } from "../../../src/subscriptions/interfaces/subscriptions-command.repository.interface"
+import { ISubscriptionsCommandRepository } from "../../../src/domain/subscriptions/repositories/subscriptions-command.repository.interface"
 
 export const subscriptionsCommandRepositoryMockFactory = () =>
   ({
     create: jest.fn(),
-    confirmByToken: jest.fn(),
-    unsubscribeByToken: jest.fn()
+    update: jest.fn(),
+    delete: jest.fn()
   }) as ISubscriptionsCommandRepository

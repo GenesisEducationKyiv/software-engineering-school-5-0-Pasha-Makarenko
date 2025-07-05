@@ -1,45 +1,17 @@
-import { WeatherData } from "../../../src/weather/interfaces/weather.interface"
+import {
+  WeatherData,
+  WeatherDay,
+  WeatherHour,
+  WeatherLocation
+} from "../../../src/domain/weather/value-objects/weather-data.value-object"
 
-export const weatherDataMock: WeatherData = {
-  location: {
-    name: "Test City",
-    country: "Test Country",
-    lat: 0,
-    lon: 0
-  },
-  forecast: [
-    {
-      date: "2023-01-01",
-      mintemp: 10,
-      maxtemp: 20,
-      avgtemp: 15,
-      text: "Sunny",
-      icon: "test-icon.png",
-      hours: [
-        {
-          time: "2023-01-01 00:00",
-          temp: 10,
-          wind: 5,
-          humidity: 60,
-          icon: "test-icon.png"
-        },
-        {
-          time: "2023-01-01 01:00",
-          temp: 11,
-          wind: 6,
-          humidity: 61,
-          icon: "test-icon.png"
-        }
-      ]
-    },
-    {
-      date: "2023-01-02",
-      mintemp: 12,
-      maxtemp: 22,
-      avgtemp: 17,
-      text: "Cloudy",
-      icon: "cloudy-icon.png",
-      hours: []
-    }
+export const weatherDataMock = WeatherData.create(
+  WeatherLocation.create("Test City", "Test Country", 0, 0),
+  [
+    WeatherDay.create("2023-01-01", 10, 20, 15, "Sunny", "test-icon.png", [
+      WeatherHour.create("2023-01-01 00:00", 10, 5, 60, "test-icon.png"),
+      WeatherHour.create("2023-01-01 01:00", 11, 6, 61, "test-icon.png")
+    ]),
+    WeatherDay.create("2023-01-02", 12, 22, 17, "Cloudy", "cloudy-icon.png", [])
   ]
-}
+)

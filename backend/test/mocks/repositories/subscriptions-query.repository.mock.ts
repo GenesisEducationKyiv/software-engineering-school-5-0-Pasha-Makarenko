@@ -1,4 +1,4 @@
-import { ISubscriptionsQueryRepository } from "../../../src/subscriptions/interfaces/subscriptions-query.repository.interface"
+import { ISubscriptionsQueryRepository } from "../../../src/domain/subscriptions/repositories/subscriptions-query.repository.interface"
 
 export const subscriptionsQueryRepositoryMockFactory = () =>
   ({

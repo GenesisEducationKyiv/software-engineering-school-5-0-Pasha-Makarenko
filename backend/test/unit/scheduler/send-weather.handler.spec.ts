@@ -1,15 +1,15 @@
 import { Test } from "@nestjs/testing"
 import { CommandBus, QueryBus } from "@nestjs/cqrs"
-import { URL_GENERATOR_SERVICE } from "../../../src/url-generator/services/url-generator.service"
 import { urlGeneratorServiceMockFactory } from "../../mocks/services/url-generator.service.mock"
 import {
   commandBusMockFactory,
   queryBusMockFactory
 } from "../../mocks/services/cqrs.mock"
-import { SendWeatherHandler } from "../../../src/scheduler/commands/handlers/send-weather.handler"
-import { Frequency } from "../../../src/subscriptions/models/subscription.model"
-import { SendWeatherCommand } from "../../../src/scheduler/commands/impl/send-weather.command"
-import { subscriptionModelsMock } from "../../mocks/models/subscription.model.mock"
+import { SendWeatherHandler } from "../../../src/application/scheduler/commands/handlers/send-weather.handler"
+import { SendWeatherCommand } from "../../../src/application/scheduler/commands/impl/send-weather.command"
+import { URL_GENERATOR_SERVICE } from "../../../src/infrastructure/url-generator/interfaces/url-generator.interfaces"
+import { Frequency } from "../../../src/domain/subscriptions/enums/frequency.enum"
+import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock"
 
 describe("SendWeatherHandler", () => {
   let handler: SendWeatherHandler
@@ -47,11 +47,9 @@ describe("SendWeatherHandler", () => {
     await handler.execute(command)
 
     expect(queryBus.execute).toHaveBeenCalledTimes(
-      2 * subscriptionModelsMock.length + 1
+      2 * subscriptionsMock.length + 1
     )
-    expect(commandBus.execute).toHaveBeenCalledTimes(
-      subscriptionModelsMock.length
-    )
+    expect(commandBus.execute).toHaveBeenCalledTimes(subscriptionsMock.length)
   })
 
   it("should handle empty subscriptions", async () => {

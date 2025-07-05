@@ -1,16 +1,20 @@
 import { Test } from "@nestjs/testing"
 import { EventBus } from "@nestjs/cqrs"
-import { SUBSCRIPTIONS_QUERY_REPOSITORY } from "../../../src/subscriptions/repositories/subscriptions-query.repository"
 import { subscriptionsQueryRepositoryMockFactory } from "../../mocks/repositories/subscriptions-query.repository.mock"
-import { SUBSCRIPTIONS_COMMAND_REPOSITORY } from "../../../src/subscriptions/repositories/subscriptions-command.repository"
 import { subscriptionsCommandRepositoryMockFactory } from "../../mocks/repositories/subscriptions-command.repository.mock"
-import { CreateSubscriptionHandler } from "../../../src/subscriptions/commands/handlers/create-subscription.handler"
-import { ISubscriptionsQueryRepository } from "../../../src/subscriptions/interfaces/subscriptions-query.repository.interface"
-import { ISubscriptionsCommandRepository } from "../../../src/subscriptions/interfaces/subscriptions-command.repository.interface"
+import { CreateSubscriptionHandler } from "../../../src/application/subsciptions/commands/handlers/create-subscription.handler"
+import {
+  ISubscriptionsQueryRepository,
+  SUBSCRIPTIONS_QUERY_REPOSITORY
+} from "../../../src/domain/subscriptions/repositories/subscriptions-query.repository.interface"
+import {
+  ISubscriptionsCommandRepository,
+  SUBSCRIPTIONS_COMMAND_REPOSITORY
+} from "../../../src/domain/subscriptions/repositories/subscriptions-command.repository.interface"
 import { eventBusMockFactory } from "../../mocks/services/cqrs.mock"
-import { CreateSubscriptionCommand } from "../../../src/subscriptions/commands/impl/create-subscription.command"
+import { CreateSubscriptionCommand } from "../../../src/application/subsciptions/commands/impl/create-subscription.command"
 import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.dto.mock"
-import { subscriptionModelsMock } from "../../mocks/models/subscription.model.mock"
+import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock"
 
 describe("CreateSubscriptionHandler", () => {
   let handler: CreateSubscriptionHandler
@@ -56,7 +60,7 @@ describe("CreateSubscriptionHandler", () => {
       .mockResolvedValue(null)
     jest
       .spyOn(subscriptionsCommandRepository, "create")
-      .mockResolvedValue(subscriptionModelsMock[2])
+      .mockResolvedValue(subscriptionsMock[2])
 
     const result = await handler.execute(command)
 
@@ -69,7 +73,7 @@ describe("CreateSubscriptionHandler", () => {
 
     jest
       .spyOn(subscriptionsQueryRepository, "findByEmailAndCity")
-      .mockResolvedValue(subscriptionModelsMock[0])
+      .mockResolvedValue(subscriptionsMock[0])
 
     await expect(handler.execute(command)).rejects.toThrow(
       "Subscription already exists"

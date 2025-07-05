@@ -1,4 +1,4 @@
-import { City } from "../../../src/search/interfaces/search.interface"
+import { City } from "../../../src/domain/search/value-objects/city.value-object"
 
 export const openMeteoDataMock = {
   latitude: 48.8566,
@@ -60,11 +60,11 @@ export const openMeteoDataMock = {
   }
 }
 
-export const cityMock: City = {
-  name: "Paris",
-  country: "France",
-  lat: 48.8566,
-  lon: 2.3522,
-  id: 1,
-  url: "paris-france"
-}
+export const cityMock = City.create(
+  1,
+  "Paris",
+  "France",
+  48.8566,
+  2.3522,
+  "paris-france"
+)

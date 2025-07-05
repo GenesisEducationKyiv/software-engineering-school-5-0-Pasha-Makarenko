@@ -5,8 +5,8 @@ import { getModelToken } from "@nestjs/sequelize"
 import { Cache } from "cache-manager"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { QueryBus } from "@nestjs/cqrs"
-import { AppModule } from "../../src/app.module"
-import { Subscription } from "../../src/subscriptions/models/subscription.model"
+import { AppModule } from "../../src/main/app.module"
+import { Subscription } from "../../src/infrastructure/subsciptions/persistence/models/subscription.model"
 import { server } from "../mocks/server.mock"
 
 export interface ClearOptions {

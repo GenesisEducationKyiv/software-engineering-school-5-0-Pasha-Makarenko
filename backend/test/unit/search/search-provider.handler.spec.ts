@@ -3,7 +3,7 @@ import {
   MockSuccessSearchProvider
 } from "../../mocks/providers/search.provider.handler"
 import { citiesMock } from "../../mocks/data/search.mock"
-import { SearchProviderException } from "../../../src/search/exceptions/search-provider.exception"
+import { SearchProviderException } from "../../../src/infrastructure/search/exceptions/search-provider.exception"
 
 describe("SearchProviderHandler", () => {
   it("should return data from first provider if all providers succeed", async () => {

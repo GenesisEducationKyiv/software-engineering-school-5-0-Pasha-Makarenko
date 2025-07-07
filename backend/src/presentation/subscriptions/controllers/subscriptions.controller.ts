@@ -7,11 +7,11 @@ import {
   Post
 } from "@nestjs/common"
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
-import { CreateSubscriptionDto } from "../../../application/subsciptions/dto/create-subscription.dto"
+import { CreateSubscriptionDto } from "../../../application/subscriptions/dto/create-subscription.dto"
 import { CommandBus } from "@nestjs/cqrs"
-import { CreateSubscriptionCommand } from "../../../application/subsciptions/commands/impl/create-subscription.command"
-import { ConfirmSubscriptionCommand } from "../../../application/subsciptions/commands/impl/confirm-subscription.command"
-import { UnsubscribeCommand } from "../../../application/subsciptions/commands/impl/unsubscribe.command"
+import { CreateSubscriptionCommand } from "../../../application/subscriptions/commands/impl/create-subscription.command"
+import { ConfirmSubscriptionCommand } from "../../../application/subscriptions/commands/impl/confirm-subscription.command"
+import { UnsubscribeCommand } from "../../../application/subscriptions/commands/impl/unsubscribe.command"
 
 @ApiTags("Subscriptions")
 @Controller("")

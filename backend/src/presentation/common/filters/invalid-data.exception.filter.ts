@@ -1,5 +1,5 @@
 import { HttpStatus, Logger } from "@nestjs/common"
-import { InvalidDataException } from "../../../application/common/exceptions/invalid-data.exception"
+import { InvalidDataException } from "../../../domain/common/exceptions/invalid-data.exception"
 import { ExceptionHandler } from "../../../infrastructure/common/interfaces/exception.handler.interface"
 
 export class InvalidDataExceptionFilter

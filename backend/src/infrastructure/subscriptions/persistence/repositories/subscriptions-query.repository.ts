@@ -17,8 +17,8 @@ export class SubscriptionsQueryRepository
   ) {
     const em = transactionEm || this.em
     return await em.findOne(Subscription, {
-      email,
-      city
+      ["_email" as "email"]: email,
+      ["_city" as "city"]: city
     })
   }
 
@@ -28,7 +28,7 @@ export class SubscriptionsQueryRepository
   ) {
     const em = transactionEm || this.em
     return await em.findOne(Subscription, {
-      confirmationToken
+      ["_confirmationToken" as "confirmationToken"]: confirmationToken
     })
   }
 
@@ -38,7 +38,7 @@ export class SubscriptionsQueryRepository
   ) {
     const em = transactionEm || this.em
     return await em.findOne(Subscription, {
-      unsubscribeToken
+      ["_unsubscribeToken" as "unsubscribeToken"]: unsubscribeToken
     })
   }
 
@@ -48,8 +48,8 @@ export class SubscriptionsQueryRepository
   ) {
     const em = transactionEm || this.em
     return await em.find(Subscription, {
-      frequency,
-      isConfirmed: true
+      ["_frequency" as "frequency"]: frequency,
+      ["_isConfirmed" as "isConfirmed"]: true
     })
   }
 }

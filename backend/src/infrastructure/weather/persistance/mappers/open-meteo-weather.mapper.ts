@@ -7,12 +7,20 @@ import {
   WeatherHour,
   WeatherLocation
 } from "../../../../domain/weather/value-objects/weather-data.value-object"
+import { openMeteoWeatherSchema } from "../validation/open-meteo-weather.schema"
+import { ValidationUtil } from "../../../common/utils/validation.util"
 
 export const openMeteoWeatherMapper: (
   data: OpenMeteoData,
   city: City
 ) => WeatherData = (data, city) => {
-  const dayCount = data.hourly.time.length / 24
+  const validatedData = ValidationUtil.validateWithCustomError<OpenMeteoData>(
+    openMeteoWeatherSchema,
+    data,
+    "OpenMeteo weather data validation failed"
+  )
+
+  const dayCount = validatedData.hourly.time.length / 24
 
   const forecast: WeatherDay[] = []
 
@@ -20,26 +28,29 @@ export const openMeteoWeatherMapper: (
     const startIndex = i * 24
     const endIndex = startIndex + 24
 
-    const dailyData = data.hourly.time
+    const dailyData = validatedData.hourly.time
       .slice(startIndex, endIndex)
       .map((time, index) => {
-        const weatherCode = data.hourly.weather_code[startIndex + index]
-        const type = data.hourly.is_day[startIndex + index] ? "day" : "night"
+        const weatherCode =
+          validatedData.hourly.weather_code[startIndex + index]
+        const type = validatedData.hourly.is_day[startIndex + index]
+          ? "day"
+          : "night"
 
         return WeatherHour.create(
           time.split("T")[1],
-          data.hourly.temperature_2m[startIndex + index],
-          data.hourly.wind_speed_10m[startIndex + index],
-          data.hourly.relative_humidity_2m[startIndex + index],
+          validatedData.hourly.temperature_2m[startIndex + index],
+          validatedData.hourly.wind_speed_10m[startIndex + index],
+          validatedData.hourly.relative_humidity_2m[startIndex + index],
           openMeteoWeatherCodeConst[weatherCode][type].image
         )
       })
 
-    const weatherCode = data.daily.weather_code[i]
+    const weatherCode = validatedData.daily.weather_code[i]
 
     forecast.push(
       WeatherDay.create(
-        data.daily.time[i],
+        validatedData.daily.time[i],
         Math.min(...dailyData.map(d => d.temp)),
         Math.max(...dailyData.map(d => d.temp)),
         dailyData.reduce((sum, d) => sum + d.temp, 0) / dailyData.length,
@@ -54,8 +65,8 @@ export const openMeteoWeatherMapper: (
     WeatherLocation.create(
       city.name,
       city.country,
-      data.latitude,
-      data.longitude
+      validatedData.latitude,
+      validatedData.longitude
     ),
     forecast
   )

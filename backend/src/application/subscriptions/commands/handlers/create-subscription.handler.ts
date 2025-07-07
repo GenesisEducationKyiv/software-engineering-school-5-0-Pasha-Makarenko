@@ -6,7 +6,7 @@ import {
   ISubscriptionsCommandRepository,
   SUBSCRIPTIONS_COMMAND_REPOSITORY
 } from "../../../../domain/subscriptions/repositories/subscriptions-command.repository.interface"
-import { generateToken } from "../../../../infrastructure/subsciptions/utils/token.util"
+import { generateToken } from "../../../../infrastructure/subscriptions/utils/token.util"
 import { SubscriptionFactory } from "../../../../domain/subscriptions/factories/subscription.factory"
 import {
   ITransactionsManager,

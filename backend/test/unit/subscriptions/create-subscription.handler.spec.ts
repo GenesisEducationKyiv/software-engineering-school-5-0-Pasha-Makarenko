@@ -2,7 +2,7 @@ import { Test } from "@nestjs/testing"
 import { EventBus } from "@nestjs/cqrs"
 import { subscriptionsQueryRepositoryMockFactory } from "../../mocks/repositories/subscriptions-query.repository.mock"
 import { subscriptionsCommandRepositoryMockFactory } from "../../mocks/repositories/subscriptions-command.repository.mock"
-import { CreateSubscriptionHandler } from "../../../src/application/subsciptions/commands/handlers/create-subscription.handler"
+import { CreateSubscriptionHandler } from "../../../src/application/subscriptions/commands/handlers/create-subscription.handler"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
@@ -12,7 +12,7 @@ import {
   SUBSCRIPTIONS_COMMAND_REPOSITORY
 } from "../../../src/domain/subscriptions/repositories/subscriptions-command.repository.interface"
 import { eventBusMockFactory } from "../../mocks/services/cqrs.mock"
-import { CreateSubscriptionCommand } from "../../../src/application/subsciptions/commands/impl/create-subscription.command"
+import { CreateSubscriptionCommand } from "../../../src/application/subscriptions/commands/impl/create-subscription.command"
 import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.dto.mock"
 import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock"
 import { TRANSACTIONS_MANAGER } from "../../../src/application/common/interfaces/transaction.manager"

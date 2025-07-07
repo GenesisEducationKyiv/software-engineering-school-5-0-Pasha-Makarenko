@@ -9,41 +9,53 @@ export const SubscriptionSchema = new EntitySchema<Subscription, BaseEntity>({
   extends: BaseSchema,
   tableName: "subscriptions",
   properties: {
-    email: {
+    ["_email" as "email"]: {
       type: "string",
       length: 255,
       index: true,
-      nullable: false
+      nullable: false,
+      fieldName: "email",
+      getterName: "email"
     },
-    city: {
+    ["_city" as "city"]: {
       type: "string",
       length: 255,
       index: true,
-      nullable: false
+      nullable: false,
+      fieldName: "city",
+      getterName: "city"
     },
-    frequency: {
+    ["_frequency" as "frequency"]: {
       type: "string",
       enum: true,
       items: Object.values(Frequency),
       default: Frequency.DAILY,
+      getterName: "frequency",
+      fieldName: "frequency",
       onCreate: () => Frequency.DAILY
     },
-    isConfirmed: {
+    ["_isConfirmed" as "isConfirmed"]: {
       type: "boolean",
       default: false,
+      getterName: "isConfirmed",
+      fieldName: "is_confirmed",
       onCreate: () => false
     },
-    confirmationToken: {
+    ["_confirmationToken" as "confirmationToken"]: {
       type: "string",
       length: 64,
       unique: true,
-      nullable: false
+      nullable: false,
+      getterName: "confirmationToken",
+      fieldName: "confirmation_token"
     },
-    unsubscribeToken: {
+    ["_unsubscribeToken" as "unsubscribeToken"]: {
       type: "string",
       length: 64,
       unique: true,
-      nullable: false
+      nullable: false,
+      getterName: "unsubscribeToken",
+      fieldName: "unsubscribe_token"
     }
   }
 })

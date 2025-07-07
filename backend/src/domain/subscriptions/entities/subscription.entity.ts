@@ -3,15 +3,15 @@ import { ConflictException } from "../../common/exceptions/conflict.exception"
 import { BaseEntity } from "../../common/entities/base.entity"
 
 export class Subscription extends BaseEntity {
-  public isConfirmed = false
+  private _isConfirmed = false
 
   constructor(
     id: string | null,
-    public email: string,
-    public city: string,
-    public frequency: Frequency,
-    public confirmationToken: string,
-    public unsubscribeToken: string
+    private _email: string,
+    private _city: string,
+    private _frequency: Frequency,
+    private _confirmationToken: string,
+    private _unsubscribeToken: string
   ) {
     super(id)
   }
@@ -34,13 +34,37 @@ export class Subscription extends BaseEntity {
     )
   }
 
+  get email() {
+    return this._email
+  }
+
+  get city() {
+    return this._city
+  }
+
+  get frequency() {
+    return this._frequency
+  }
+
+  get confirmationToken() {
+    return this._confirmationToken
+  }
+
+  get unsubscribeToken() {
+    return this._unsubscribeToken
+  }
+
+  get isConfirmed() {
+    return this._isConfirmed
+  }
+
   confirm() {
-    if (this.isConfirmed) {
+    if (this._isConfirmed) {
       throw new ConflictException(
         `Subscription with id ${this.id} already confirmed`
       )
     }
 
-    this.isConfirmed = true
+    this._isConfirmed = true
   }
 }

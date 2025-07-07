@@ -1,4 +1,4 @@
-import { CreateSubscriptionDto } from "../../../src/application/subsciptions/dto/create-subscription.dto"
+import { CreateSubscriptionDto } from "../../../src/application/subscriptions/dto/create-subscription.dto"
 import { Frequency } from "../../../src/domain/subscriptions/enums/frequency.enum"
 
 export const createSubscriptionDtoMock: CreateSubscriptionDto = {

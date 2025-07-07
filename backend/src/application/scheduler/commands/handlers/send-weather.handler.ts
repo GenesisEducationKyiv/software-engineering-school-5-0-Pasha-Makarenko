@@ -7,7 +7,7 @@ import {
 import { SendWeatherCommand } from "../impl/send-weather.command"
 import { Inject, Logger } from "@nestjs/common"
 import { SchedulerService } from "../../../../infrastructure/scheduler/services/scheduler.service"
-import { GetActiveSubscriptionsQuery } from "../../../subsciptions/queries/impl/get-active-subscriptions.query"
+import { GetActiveSubscriptionsQuery } from "../../../subscriptions/queries/impl/get-active-subscriptions.query"
 import { GetWeatherQuery } from "../../../weather/queries/impl/get-weather.query"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
 import { GetCitiesQuery } from "../../../search/queries/impl/get-cities.query"

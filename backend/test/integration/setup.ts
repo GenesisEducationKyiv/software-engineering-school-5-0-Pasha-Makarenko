@@ -6,7 +6,7 @@ import { QueryBus } from "@nestjs/cqrs"
 import { AppModule } from "../../src/main/app.module"
 import { server } from "../mocks/server.mock"
 import { MikroORM } from "@mikro-orm/core"
-import { InvalidDataException } from "../../src/application/common/exceptions/invalid-data.exception"
+import { InvalidDataException } from "../../src/domain/common/exceptions/invalid-data.exception"
 import { GlobalExceptionFilter } from "../../src/presentation/common/filters/global.exception.filter"
 import { exceptionFilters } from "../../src/presentation/common/filters/exception.filters"
 

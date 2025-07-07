@@ -1,5 +1,5 @@
 import { CommandBus, EventBus, QueryBus } from "@nestjs/cqrs"
-import { GetActiveSubscriptionsQuery } from "../../../src/application/subsciptions/queries/impl/get-active-subscriptions.query"
+import { GetActiveSubscriptionsQuery } from "../../../src/application/subscriptions/queries/impl/get-active-subscriptions.query"
 import { GetWeatherQuery } from "../../../src/application/weather/queries/impl/get-weather.query"
 import { GetWeatherQueryHandler } from "../handlers/get-weather-handler.mock"
 import { GetActiveSubscriptionsHandler } from "../handlers/get-active-subscriptions-handler.mock"

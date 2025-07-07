@@ -1,5 +1,5 @@
 import { QueryHandler } from "../services/cqrs.mock"
-import { GetActiveSubscriptionsQuery } from "../../../src/application/subsciptions/queries/impl/get-active-subscriptions.query"
+import { GetActiveSubscriptionsQuery } from "../../../src/application/subscriptions/queries/impl/get-active-subscriptions.query"
 import { Subscription } from "../../../src/domain/subscriptions/entities/subscription.entity"
 import { subscriptionsMock } from "../entities/subscription.entity.mock"
 

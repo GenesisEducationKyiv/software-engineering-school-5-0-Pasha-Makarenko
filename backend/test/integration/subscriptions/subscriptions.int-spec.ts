@@ -1,7 +1,7 @@
 import * as request from "supertest"
 import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.dto.mock"
-import { CreateSubscriptionDto } from "../../../src/application/subsciptions/dto/create-subscription.dto"
-import { GetActiveSubscriptionsQuery } from "../../../src/application/subsciptions/queries/impl/get-active-subscriptions.query"
+import { CreateSubscriptionDto } from "../../../src/application/subscriptions/dto/create-subscription.dto"
+import { GetActiveSubscriptionsQuery } from "../../../src/application/subscriptions/queries/impl/get-active-subscriptions.query"
 import {
   beforeAllSetup,
   cleanupTestApp,
@@ -42,7 +42,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -80,7 +80,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -107,7 +107,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -130,7 +130,7 @@ describe("Subscriptions", () => {
     //
     //     const subscription = await context.orm.em.transactional(async em => {
     //       return await em.findOne(Subscription, {
-    //         email: dto.email
+    //         ["_email" as "email"]: dto.email
     //       })
     //     })
     //
@@ -156,7 +156,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -171,7 +171,7 @@ describe("Subscriptions", () => {
       const deletedSubscription = await context.orm.em.transactional(
         async em => {
           return await em.findOne(Subscription, {
-            email: dto.email
+            ["_email" as "email"]: dto.email
           })
         }
       )
@@ -187,7 +187,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -198,7 +198,7 @@ describe("Subscriptions", () => {
       const deletedSubscription = await context.orm.em.transactional(
         async em => {
           return await em.findOne(Subscription, {
-            email: dto.email
+            ["_email" as "email"]: dto.email
           })
         }
       )
@@ -213,7 +213,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -237,7 +237,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -265,7 +265,7 @@ describe("Subscriptions", () => {
 
       const subscription = await context.orm.em.transactional(async em => {
         return await em.findOne(Subscription, {
-          email: dto.email
+          ["_email" as "email"]: dto.email
         })
       })
 
@@ -276,8 +276,8 @@ describe("Subscriptions", () => {
       const activeSubscriptionsFromDB = await context.orm.em.transactional(
         async em => {
           return await em.find(Subscription, {
-            isConfirmed: true,
-            frequency: dto.frequency
+            ["_isConfirmed" as "isConfirmed"]: true,
+            ["_frequency" as "frequency"]: dto.frequency
           })
         }
       )

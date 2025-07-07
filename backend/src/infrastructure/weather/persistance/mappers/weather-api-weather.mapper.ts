@@ -5,18 +5,26 @@ import {
   WeatherHour,
   WeatherLocation
 } from "../../../../domain/weather/value-objects/weather-data.value-object"
+import { weatherApiWeatherSchema } from "../validation/weather-api-weather.schema"
+import { ValidationUtil } from "../../../common/utils/validation.util"
 
 export const weatherApiWeatherMapper: (
   data: WeatherApiData
-) => WeatherData = data =>
-  WeatherData.create(
+) => WeatherData = data => {
+  const validatedData = ValidationUtil.validateWithCustomError<WeatherApiData>(
+    weatherApiWeatherSchema,
+    data,
+    "WeatherAPI weather data validation failed"
+  )
+
+  return WeatherData.create(
     WeatherLocation.create(
-      data.location.name,
-      data.location.country,
-      data.location.lat,
-      data.location.lon
+      validatedData.location.name,
+      validatedData.location.country,
+      validatedData.location.lat,
+      validatedData.location.lon
     ),
-    data.forecast.forecastday.map(day =>
+    validatedData.forecast.forecastday.map(day =>
       WeatherDay.create(
         day.date,
         day.day.mintemp_c,
@@ -36,3 +44,4 @@ export const weatherApiWeatherMapper: (
       )
     )
   )
+}

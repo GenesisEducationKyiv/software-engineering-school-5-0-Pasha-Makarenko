@@ -1,3 +1,7 @@
 export class BaseEntity {
-  constructor(public id: string | null) {}
+  constructor(protected _id: string | null) {}
+
+  get id() {
+    return this._id
+  }
 }

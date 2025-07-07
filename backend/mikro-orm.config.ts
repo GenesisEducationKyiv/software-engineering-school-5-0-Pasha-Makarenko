@@ -5,7 +5,7 @@ import { Migrator } from "@mikro-orm/migrations"
 import { EntityGenerator } from "@mikro-orm/entity-generator"
 import { SeedManager } from "@mikro-orm/seeder"
 import { PostgreSqlDriver } from "@mikro-orm/postgresql"
-import { SubscriptionSchema } from "./src/infrastructure/subsciptions/persistence/schemas/subscription.schema"
+import { SubscriptionSchema } from "./src/infrastructure/subscriptions/persistence/schemas/subscription.schema"
 import { BaseSchema } from "./src/infrastructure/common/persistance/schemas/base.schema"
 import * as process from "node:process"
 

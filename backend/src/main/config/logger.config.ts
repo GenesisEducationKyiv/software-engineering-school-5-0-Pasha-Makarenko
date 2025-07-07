@@ -40,14 +40,17 @@ export const getPinoConfig = (configService: ConfigService): Params => ({
         }
       }
     },
-    transport: {
-      target: "pino-loki",
-      options: {
-        host: configService.get<string>("LOKI_HOST"),
-        json: true,
-        batch: true,
-        labels: { app: "weather-app" }
-      }
-    }
+    transport:
+      configService.get<string>("NODE_ENV") === "test"
+        ? undefined
+        : {
+            target: "pino-loki",
+            options: {
+              host: configService.get<string>("LOKI_HOST"),
+              json: true,
+              batch: true,
+              labels: { app: "weather-app" }
+            }
+          }
   }
 })

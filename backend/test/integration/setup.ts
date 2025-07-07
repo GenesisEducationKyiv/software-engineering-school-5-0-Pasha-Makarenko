@@ -84,9 +84,13 @@ export async function closeTestApp(
   context: TestContext,
   options: CloseOptions = {}
 ) {
-  server.close()
-  await context.app.close()
-  if (options?.closeDB) {
-    await context.orm.close(true)
+  try {
+    server.close()
+    await context.app.close()
+    if (options?.closeDB) {
+      await context.orm.close(true)
+    }
+  } catch (error) {
+    console.error("Error during test app cleanup:", error)
   }
 }

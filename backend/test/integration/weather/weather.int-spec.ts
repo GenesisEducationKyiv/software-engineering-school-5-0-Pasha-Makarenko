@@ -3,6 +3,7 @@ import { weatherQueryDtoMock } from "../../mocks/dto/weather-query.dto.mock"
 import {
   beforeAllSetup,
   cleanupTestApp,
+  closeTestApp,
   setupTestApp,
   TestContext
 } from "../setup"
@@ -24,7 +25,7 @@ describe("Weather", () => {
   })
 
   afterAll(async () => {
-    await cleanupTestApp(context)
+    await closeTestApp(context, { closeDB: true })
   })
 
   describe("weather", () => {

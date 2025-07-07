@@ -2,6 +2,7 @@ import * as request from "supertest"
 import {
   beforeAllSetup,
   cleanupTestApp,
+  closeTestApp,
   setupTestApp,
   TestContext
 } from "../setup"
@@ -24,7 +25,7 @@ describe("Search", () => {
   })
 
   afterAll(async () => {
-    await cleanupTestApp(context)
+    await closeTestApp(context, { closeDB: true })
   })
 
   describe("search", () => {

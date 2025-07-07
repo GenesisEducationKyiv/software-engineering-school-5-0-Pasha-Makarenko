@@ -3,7 +3,7 @@ import {
   MockSuccessSearchProvider
 } from "../../mocks/providers/search.provider.handler"
 import { citiesMock } from "../../mocks/data/search.mock"
-import { SearchProviderException } from "../../../src/infrastructure/search/exceptions/search-provider.exception"
+import { ProviderException } from "../../../src/infrastructure/common/exceptions/provider.exception"
 
 describe("SearchProviderHandler", () => {
   it("should return data from first provider if all providers succeed", async () => {
@@ -18,7 +18,7 @@ describe("SearchProviderHandler", () => {
   it("should return data from first provider if it succeeds", async () => {
     const first = new MockSuccessSearchProvider()
     const second = new MockErrorSearchProviderProvider(
-      new SearchProviderException("Second provider failed")
+      new ProviderException("Second provider failed")
     )
     first.setNext(second)
 
@@ -28,7 +28,7 @@ describe("SearchProviderHandler", () => {
 
   it("should proceed to next provider when first fails", async () => {
     const first = new MockErrorSearchProviderProvider(
-      new SearchProviderException("First provider failed")
+      new ProviderException("First provider failed")
     )
     const second = new MockSuccessSearchProvider(citiesMock)
     first.setNext(second)
@@ -39,9 +39,9 @@ describe("SearchProviderHandler", () => {
 
   it("should throw SearchProviderException when all providers fail", async () => {
     const first = new MockErrorSearchProviderProvider(
-      new SearchProviderException("First provider failed")
+      new ProviderException("First provider failed")
     )
-    const secondError = new SearchProviderException("Second provider failed")
+    const secondError = new ProviderException("Second provider failed")
     const second = new MockErrorSearchProviderProvider(secondError)
     first.setNext(second)
 

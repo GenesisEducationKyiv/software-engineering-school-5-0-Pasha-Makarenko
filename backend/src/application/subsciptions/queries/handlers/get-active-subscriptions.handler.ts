@@ -5,6 +5,10 @@ import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
 } from "../../../../domain/subscriptions/repositories/subscriptions-query.repository.interface"
+import {
+  ITransactionsManager,
+  TRANSACTIONS_MANAGER
+} from "../../../common/interfaces/transaction.manager"
 
 @QueryHandler(GetActiveSubscriptionsQuery)
 export class GetActiveSubscriptionsHandler
@@ -12,12 +16,19 @@ export class GetActiveSubscriptionsHandler
 {
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
-    private subscriptionsQueryRepository: ISubscriptionsQueryRepository
+    private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
+    @Inject(TRANSACTIONS_MANAGER)
+    private transactionManager: ITransactionsManager
   ) {}
 
   async execute(query: GetActiveSubscriptionsQuery) {
     const { frequency } = query
 
-    return this.subscriptionsQueryRepository.findAllActiveByFrequency(frequency)
+    return await this.transactionManager.transaction(async em => {
+      return await this.subscriptionsQueryRepository.findAllActiveByFrequency(
+        frequency,
+        em
+      )
+    })
   }
 }

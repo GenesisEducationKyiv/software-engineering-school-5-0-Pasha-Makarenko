@@ -1,8 +1,8 @@
 import { IWeatherProvider } from "../../../../domain/weather/providers/weather.provider.interface"
-import { WeatherProviderException } from "../../exceptions/weather-provider.exception"
 import { IHandler } from "../../../common/interfaces/handler.interface"
 import { WeatherData } from "../../../../domain/weather/value-objects/weather-data.value-object"
 import { WeatherGetting } from "../../../../domain/weather/value-objects/weather-getting.value-object"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
 
 export abstract class WeatherProviderHandler
   implements IWeatherProvider, IHandler
@@ -26,9 +26,7 @@ export abstract class WeatherProviderHandler
         return this.next.getWeather(dto)
       }
 
-      throw new WeatherProviderException(
-        "All weather providers failed to return data"
-      )
+      throw new ProviderException("All weather providers failed to return data")
     } catch (error) {
       if (this.next) {
         return this.next.getWeather(dto)

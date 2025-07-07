@@ -1,4 +1,4 @@
-import { City } from "../../../domain/search/value-objects/city.value-object"
+import { City } from "../../../domain/search/entities/city.entity"
 
 export const findClosedCity = (
   cities: City[],

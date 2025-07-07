@@ -1,4 +1,4 @@
-import { City } from "../../../src/domain/search/value-objects/city.value-object"
+import { City } from "../../../src/domain/search/entities/city.entity"
 
 export const openMeteoDataMock = {
   latitude: 48.8566,

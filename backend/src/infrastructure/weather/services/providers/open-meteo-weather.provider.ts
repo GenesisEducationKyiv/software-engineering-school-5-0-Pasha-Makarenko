@@ -8,12 +8,12 @@ import {
 } from "../../../../domain/search/providers/search.provider.interface"
 import { OpenMeteoData } from "../../interfaces/open-meteo.interface"
 import { openMeteoWeatherMapper } from "../../persistance/mappers/open-meteo-weather.mapper"
-import { CityNotFoundException } from "../../../../domain/search/exceptions/city-not-found.exception"
-import { WeatherProviderException } from "../../exceptions/weather-provider.exception"
 import { WeatherProviderHandler } from "./weather.provider.handler"
 import { findClosedCity } from "../../../search/utils/find-closed-city.util"
-import { InvalidWeatherProviderKeyException } from "../../exceptions/invalid-weather-provider-key.exception"
 import { WeatherGetting } from "../../../../domain/weather/value-objects/weather-getting.value-object"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import { UnauthorizedException } from "../../../common/exceptions/unauthorized.exception"
 
 @Injectable()
 export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
@@ -33,13 +33,17 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
     const cities = await this.searchProvider.search(city)
 
     if (!cities || cities.length === 0) {
-      throw new CityNotFoundException(city)
+      throw new NotFoundException(
+        `No cities found for the provided city name: ${city}`
+      )
     }
 
     const currentCity = findClosedCity(cities, lat, lon)
 
     if (!currentCity) {
-      throw new CityNotFoundException(city)
+      throw new NotFoundException(
+        `No city found close to the provided coordinates: lat=${lat}, lon=${lon}`
+      )
     }
 
     const params = {
@@ -64,14 +68,17 @@ export class OpenMeteoWeatherProvider extends WeatherProviderHandler {
     } catch (error) {
       switch (error.response?.status) {
         case HttpStatus.UNAUTHORIZED:
-          throw new InvalidWeatherProviderKeyException(
-            OpenMeteoWeatherProvider.name
+          throw new UnauthorizedException(
+            `Invalid API key for OpenMeteo: ${this.attributes.key}`,
+            error
           )
         case HttpStatus.NOT_FOUND:
-          throw new CityNotFoundException(city)
+          throw new NotFoundException(
+            `City not found for coordinates: lat=${lat}, lon=${lon}`
+          )
       }
 
-      throw new WeatherProviderException(
+      throw new ProviderException(
         `Failed to fetch weather data from OpenMeteo: ${error.message}`,
         error
       )

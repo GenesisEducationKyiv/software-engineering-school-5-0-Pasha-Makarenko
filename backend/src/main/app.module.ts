@@ -5,8 +5,8 @@ import {
   RequestMethod
 } from "@nestjs/common"
 import { ConfigModule, ConfigService } from "@nestjs/config"
-import { SequelizeModule } from "@nestjs/sequelize"
-import { getSequelizeConfig } from "./config/database.config"
+import { MikroOrmModule } from "@mikro-orm/nestjs"
+import { getMikroOrmConfig } from "./config/database.config"
 import { config } from "./config/config"
 import { SubscriptionsModule } from "./modules/subscriptions.module"
 import { MailModule } from "./modules/mail.module"
@@ -22,13 +22,16 @@ import { MetricsMiddleware } from "../presentation/common/middlewares/metrics.mi
 import { MetricsModule } from "./modules/metrics.module"
 import { LoggerModule } from "nestjs-pino"
 import { getPinoConfig } from "./config/logger.config"
+import { TransactionsModule } from "./modules/transactions.module"
+import { PostgreSqlDriver } from "@mikro-orm/postgresql"
 
 @Module({
   imports: [
     ConfigModule.forRoot(config),
-    SequelizeModule.forRootAsync({
+    MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: getSequelizeConfig,
+      useFactory: getMikroOrmConfig,
+      driver: PostgreSqlDriver,
       inject: [ConfigService]
     }),
     CacheModule.registerAsync({
@@ -45,6 +48,7 @@ import { getPinoConfig } from "./config/logger.config"
       useFactory: getPinoConfig,
       inject: [ConfigService]
     }),
+    TransactionsModule,
     MailModule,
     SubscriptionsModule,
     WeatherModule,

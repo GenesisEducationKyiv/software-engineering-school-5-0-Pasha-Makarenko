@@ -10,6 +10,7 @@ import {
   TestContext
 } from "../setup"
 import { HttpStatus } from "@nestjs/common"
+import { Subscription } from "../../../src/domain/subscriptions/entities/subscription.entity"
 
 describe("Subscriptions", () => {
   let context: TestContext
@@ -21,14 +22,6 @@ describe("Subscriptions", () => {
 
   beforeEach(async () => {
     context = await setupTestApp()
-
-    try {
-      await context.sequelize.sync({ force: true })
-    } catch (err) {
-      await new Promise(resolve => setTimeout(resolve, 5000))
-      await context.sequelize.sync({ force: true })
-    }
-
     dto = createSubscriptionDtoMock
   })
 
@@ -47,8 +40,10 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       expect(subscription).toBeDefined()
@@ -68,7 +63,7 @@ describe("Subscriptions", () => {
         .expect(HttpStatus.CONFLICT)
         .expect(res => {
           expect(res.body.message).toBe(
-            `Subscription already exists for email "${dto.email}" and city "${dto.city}"`
+            `Subscription with email ${dto.email} and city ${dto.city} already exists`
           )
         })
     })
@@ -81,17 +76,25 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      context.orm.em.fork()
+
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
         .expect(HttpStatus.NO_CONTENT)
 
-      const updatedSubscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
-      })
+      const updatedSubscription = await context.orm.em.transactional(
+        async em => {
+          return await em.findOne(Subscription, {
+            email: dto.email
+          })
+        }
+      )
 
       expect(updatedSubscription!.isConfirmed).toBe(true)
     })
@@ -102,40 +105,46 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}_invalid-token`)
         .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
-          expect(res.body.message).toBe("Subscription not found")
+          expect(res.body.message).toBe(
+            `Subscription with confirmation token ${subscription!.confirmationToken}_invalid-token not found`
+          )
         })
     })
 
     // it's works in development, but fails in test environment (got 204 instead of 400)
-    // it("should throw error for already confirmed subscription", async () => {
-    //   await request(context.app.getHttpServer())
-    //     .post("/api/subscribe")
-    //     .send(dto)
-    //     .expect(HttpStatus.NO_CONTENT)
+    //   it("should throw error for already confirmed subscription", async () => {
+    //     await request(context.app.getHttpServer())
+    //       .post("/api/subscribe")
+    //       .send(dto)
+    //       .expect(HttpStatus.NO_CONTENT)
     //
-    //   const subscription = await context.subscriptionModel.findOne({
-    //     where: { email: dto.email }
-    //   })
-    //
-    //   await request(context.app.getHttpServer())
-    //     .post(`/api/confirm/${subscription!.confirmationToken}`)
-    //     .expect(HttpStatus.NO_CONTENT)
-    //
-    //   await request(context.app.getHttpServer())
-    //     .post(`/api/confirm/${subscription!.confirmationToken}`)
-    //     .expect(HttpStatus.BAD_REQUEST)
-    //     .expect(res => {
-    //       expect(res.body.message).toBe("Subscription is already confirmed")
+    //     const subscription = await context.orm.em.transactional(async em => {
+    //       return await em.findOne(Subscription, {
+    //         email: dto.email
+    //       })
     //     })
-    // })
+    //
+    //     await request(context.app.getHttpServer())
+    //       .post(`/api/confirm/${subscription!.confirmationToken}`)
+    //       .expect(HttpStatus.NO_CONTENT)
+    //
+    //     await request(context.app.getHttpServer())
+    //       .post(`/api/confirm/${subscription!.confirmationToken}`)
+    //       .expect(HttpStatus.BAD_REQUEST)
+    //       .expect(res => {
+    //         expect(res.body.message).toBe("Subscription is already confirmed")
+    //       })
+    //   })
   })
 
   describe("unsubscribe", () => {
@@ -145,8 +154,10 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
@@ -157,9 +168,13 @@ describe("Subscriptions", () => {
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
         .expect(HttpStatus.NO_CONTENT)
 
-      const deletedSubscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
-      })
+      const deletedSubscription = await context.orm.em.transactional(
+        async em => {
+          return await em.findOne(Subscription, {
+            email: dto.email
+          })
+        }
+      )
 
       expect(deletedSubscription).toBeNull()
     })
@@ -170,18 +185,23 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
         .post(`/api/unsubscribe/${subscription!.unsubscribeToken}`)
         .expect(HttpStatus.NO_CONTENT)
 
-      const deletedSubscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
-      })
-
+      const deletedSubscription = await context.orm.em.transactional(
+        async em => {
+          return await em.findOne(Subscription, {
+            email: dto.email
+          })
+        }
+      )
       expect(deletedSubscription).toBeNull()
     })
 
@@ -191,8 +211,10 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
@@ -202,7 +224,7 @@ describe("Subscriptions", () => {
         .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toBe(
-            "Subscription not found or already unsubscribed"
+            `Subscription with unsubscribe token ${subscription!.unsubscribeToken}_invalid-token not found`
           )
         })
     })
@@ -213,8 +235,10 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
@@ -226,7 +250,7 @@ describe("Subscriptions", () => {
         .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toBe(
-            "Subscription not found or already unsubscribed"
+            `Subscription with unsubscribe token ${subscription!.unsubscribeToken} not found`
           )
         })
     })
@@ -239,17 +263,22 @@ describe("Subscriptions", () => {
         .send(dto)
         .expect(HttpStatus.NO_CONTENT)
 
-      const subscription = await context.subscriptionModel.findOne({
-        where: { email: dto.email }
+      const subscription = await context.orm.em.transactional(async em => {
+        return await em.findOne(Subscription, {
+          email: dto.email
+        })
       })
 
       await request(context.app.getHttpServer())
         .post(`/api/confirm/${subscription!.confirmationToken}`)
         .expect(HttpStatus.NO_CONTENT)
 
-      const activeSubscriptionsFromDB = await context.subscriptionModel.findAll(
-        {
-          where: { isConfirmed: true, frequency: dto.frequency }
+      const activeSubscriptionsFromDB = await context.orm.em.transactional(
+        async em => {
+          return await em.find(Subscription, {
+            isConfirmed: true,
+            frequency: dto.frequency
+          })
         }
       )
 

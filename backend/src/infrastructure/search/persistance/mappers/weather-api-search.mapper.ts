@@ -1,5 +1,5 @@
 import { WeatherApiSearchItem } from "../../interfaces/weather-api.interface"
-import { City } from "../../../../domain/search/value-objects/city.value-object"
+import { City } from "../../../../domain/search/entities/city.entity"
 
 export const weatherApiSearchMapper: (
   data: WeatherApiSearchItem

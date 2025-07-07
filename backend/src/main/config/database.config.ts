@@ -1,18 +1,16 @@
-import { SequelizeModuleOptions } from "@nestjs/sequelize"
+import { MikroOrmModuleOptions } from "@mikro-orm/nestjs"
 import { ConfigService } from "@nestjs/config"
-import { Subscription } from "../../infrastructure/subsciptions/persistence/models/subscription.model"
+import { PostgreSqlDriver } from "@mikro-orm/postgresql"
 
-export const getSequelizeConfig = (
+export const getMikroOrmConfig = (
   configService: ConfigService
-): SequelizeModuleOptions => ({
-  dialect: "postgres",
+): MikroOrmModuleOptions => ({
+  driver: PostgreSqlDriver,
   host: configService.get<string>("POSTGRES_HOST"),
   port: Number(configService.get<number>("POSTGRES_PORT")),
-  username: configService.get<string>("POSTGRES_USER"),
+  user: configService.get<string>("POSTGRES_USER"),
   password: configService.get<string>("POSTGRES_PASSWORD"),
-  database: configService.get<string>("POSTGRES_DB"),
-  autoLoadModels: true,
-  synchronize: configService.get<string>("NODE_ENV") !== "production",
-  models: [Subscription],
-  logging: configService.get<string>("NODE_ENV") === "production"
+  dbName: configService.get<string>("POSTGRES_DB"),
+  debug: configService.get<string>("NODE_ENV") !== "production",
+  autoLoadEntities: true
 })

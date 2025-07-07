@@ -1,6 +1,6 @@
 import { OpenMeteoData } from "../../interfaces/open-meteo.interface"
 import { openMeteoWeatherCodeConst } from "../../consts/open-meteo-weather-code.const"
-import { City } from "../../../../domain/search/value-objects/city.value-object"
+import { City } from "../../../../domain/search/entities/city.entity"
 import {
   WeatherData,
   WeatherDay,

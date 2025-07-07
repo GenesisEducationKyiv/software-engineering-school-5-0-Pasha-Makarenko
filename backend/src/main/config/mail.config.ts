@@ -1,9 +1,14 @@
 import { ConfigService } from "@nestjs/config"
 import { MailerOptions } from "@nestjs-modules/mailer"
 import { PugAdapter } from "@nestjs-modules/mailer/dist/adapters/pug.adapter"
+import * as path from "node:path"
 
-export const TEMPLATES_DIR =
-  __dirname + "../../../../infrastructure/mail/templates"
+const getTemplatesDir = (env: string) => {
+  if (env === "test") {
+    return path.join(__dirname, "../../infrastructure/mail/templates")
+  }
+  return path.join(__dirname, "../../../infrastructure/mail/templates")
+}
 
 export const getMailConfig = (configService: ConfigService): MailerOptions => ({
   transport: {
@@ -19,7 +24,7 @@ export const getMailConfig = (configService: ConfigService): MailerOptions => ({
     from: configService.get<string>("SMTP_USER")
   },
   template: {
-    dir: TEMPLATES_DIR,
+    dir: getTemplatesDir(configService.get<string>("NODE_ENV")!),
     adapter: new PugAdapter(),
     options: {
       strict: true

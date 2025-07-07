@@ -1,4 +1,4 @@
-import { City } from "../value-objects/city.value-object"
+import { City } from "../entities/city.entity"
 
 export const SEARCH_PROVIDER = "SEARCH_PROVIDER"
 

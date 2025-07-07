@@ -15,6 +15,9 @@ import { eventBusMockFactory } from "../../mocks/services/cqrs.mock"
 import { CreateSubscriptionCommand } from "../../../src/application/subsciptions/commands/impl/create-subscription.command"
 import { createSubscriptionDtoMock } from "../../mocks/dto/create-subscription.dto.mock"
 import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock"
+import { TRANSACTIONS_MANAGER } from "../../../src/application/common/interfaces/transaction.manager"
+import { transactionsManagerMockFactory } from "../../mocks/managers/transactions.manager.mock"
+import { SubscriptionFactory } from "../../../src/domain/subscriptions/factories/subscription.factory"
 
 describe("CreateSubscriptionHandler", () => {
   let handler: CreateSubscriptionHandler
@@ -25,6 +28,7 @@ describe("CreateSubscriptionHandler", () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         CreateSubscriptionHandler,
+        SubscriptionFactory,
         {
           provide: SUBSCRIPTIONS_QUERY_REPOSITORY,
           useValue: subscriptionsQueryRepositoryMockFactory()
@@ -32,6 +36,10 @@ describe("CreateSubscriptionHandler", () => {
         {
           provide: SUBSCRIPTIONS_COMMAND_REPOSITORY,
           useValue: subscriptionsCommandRepositoryMockFactory()
+        },
+        {
+          provide: TRANSACTIONS_MANAGER,
+          useValue: transactionsManagerMockFactory()
         },
         {
           provide: EventBus,
@@ -58,14 +66,11 @@ describe("CreateSubscriptionHandler", () => {
     jest
       .spyOn(subscriptionsQueryRepository, "findByEmailAndCity")
       .mockResolvedValue(null)
-    jest
-      .spyOn(subscriptionsCommandRepository, "create")
-      .mockResolvedValue(subscriptionsMock[2])
+    jest.spyOn(subscriptionsCommandRepository, "add")
 
-    const result = await handler.execute(command)
+    await handler.execute(command)
 
-    expect(result).toBeDefined()
-    expect(subscriptionsCommandRepository.create).toHaveBeenCalled()
+    expect(subscriptionsCommandRepository.add).toHaveBeenCalled()
   })
 
   it("should throw when subscription exists", async () => {
@@ -76,7 +81,7 @@ describe("CreateSubscriptionHandler", () => {
       .mockResolvedValue(subscriptionsMock[0])
 
     await expect(handler.execute(command)).rejects.toThrow(
-      "Subscription already exists"
+      `Subscription with email ${createSubscriptionDtoMock.email} and city ${createSubscriptionDtoMock.city} already exists`
     )
   })
 })

@@ -4,11 +4,11 @@ import { HttpService } from "@nestjs/axios"
 import { lastValueFrom } from "rxjs"
 import { WeatherApiData } from "../../interfaces/weather-api.interface"
 import { weatherApiWeatherMapper } from "../../persistance/mappers/weather-api-weather.mapper"
-import { WeatherProviderException } from "../../exceptions/weather-provider.exception"
 import { WeatherProviderHandler } from "./weather.provider.handler"
-import { InvalidWeatherProviderKeyException } from "../../exceptions/invalid-weather-provider-key.exception"
-import { CityNotFoundException } from "../../../../domain/search/exceptions/city-not-found.exception"
 import { WeatherGetting } from "../../../../domain/weather/value-objects/weather-getting.value-object"
+import { UnauthorizedException } from "../../../common/exceptions/unauthorized.exception"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
 
 @Injectable()
 export class WeatherApiWeatherProvider extends WeatherProviderHandler {
@@ -40,14 +40,17 @@ export class WeatherApiWeatherProvider extends WeatherProviderHandler {
     } catch (error) {
       switch (error.response?.status) {
         case HttpStatus.UNAUTHORIZED:
-          throw new InvalidWeatherProviderKeyException(
-            WeatherApiWeatherProvider.name
+          throw new UnauthorizedException(
+            `Invalid API key for WeatherAPI: ${this.attributes.key}`,
+            error
           )
         case HttpStatus.NOT_FOUND:
-          throw new CityNotFoundException(city)
+          throw new NotFoundException(
+            `City not found for coordinates: lat=${lat}, lon=${lon}`
+          )
       }
 
-      throw new WeatherProviderException(
+      throw new ProviderException(
         `Failed to fetch weather data from WeatherAPI: ${error.message}`,
         error
       )

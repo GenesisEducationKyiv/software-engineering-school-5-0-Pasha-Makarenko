@@ -14,5 +14,6 @@
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/src/$1"
   },
-  "setupFiles": ["<rootDir>/jest.setup.ts"]
+  "setupFiles": ["<rootDir>/jest.setup.ts"],
+  "maxWorkers": 1
 }

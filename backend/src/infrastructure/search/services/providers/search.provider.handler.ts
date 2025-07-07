@@ -1,7 +1,7 @@
 import { ISearchProvider } from "../../../../domain/search/providers/search.provider.interface"
 import { IHandler } from "../../../common/interfaces/handler.interface"
-import { City } from "../../../../domain/search/value-objects/city.value-object"
-import { SearchProviderException } from "../../exceptions/search-provider.exception"
+import { City } from "../../../../domain/search/entities/city.entity"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
 
 export abstract class SearchProviderHandler
   implements ISearchProvider, IHandler
@@ -25,9 +25,7 @@ export abstract class SearchProviderHandler
         return this.next.search(city)
       }
 
-      throw new SearchProviderException(
-        "All weather providers failed to return data"
-      )
+      throw new ProviderException("All weather providers failed to return data")
     } catch (error) {
       if (this.next) {
         return this.next.search(city)

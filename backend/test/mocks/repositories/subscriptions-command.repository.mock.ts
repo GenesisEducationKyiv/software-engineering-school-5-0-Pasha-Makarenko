@@ -2,7 +2,6 @@ import { ISubscriptionsCommandRepository } from "../../../src/domain/subscriptio
 
 export const subscriptionsCommandRepositoryMockFactory = () =>
   ({
-    create: jest.fn(),
-    update: jest.fn(),
+    add: jest.fn(),
     delete: jest.fn()
   }) as ISubscriptionsCommandRepository

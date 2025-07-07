@@ -1,7 +1,6 @@
 import { Command } from "@nestjs/cqrs"
-import { Subscription } from "../../../../domain/subscriptions/entities/subscription.entity"
 
-export class ConfirmSubscriptionCommand extends Command<Subscription> {
+export class ConfirmSubscriptionCommand extends Command<void> {
   constructor(public readonly confirmationToken: string) {
     super()
   }

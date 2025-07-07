@@ -10,13 +10,12 @@ import { SchedulerService } from "../../../../infrastructure/scheduler/services/
 import { GetActiveSubscriptionsQuery } from "../../../subsciptions/queries/impl/get-active-subscriptions.query"
 import { GetWeatherQuery } from "../../../weather/queries/impl/get-weather.query"
 import { SendMailCommand } from "../../../mail/commands/impl/send-mail.command"
-import { WeatherDataUnavailableException } from "../../../weather/exceptions/weather-data-unavailable.exception"
 import { GetCitiesQuery } from "../../../search/queries/impl/get-cities.query"
-import { CityNotFoundException } from "../../../../domain/search/exceptions/city-not-found.exception"
 import {
   IUrlGeneratorService,
   URL_GENERATOR_SERVICE
 } from "../../../../infrastructure/url-generator/interfaces/url-generator.interfaces"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
 
 @CommandHandler(SendWeatherCommand)
 export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
@@ -41,7 +40,9 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
         const cities = await this.queryBus.execute(new GetCitiesQuery(sub.city))
 
         if (!cities || cities.length === 0) {
-          throw new CityNotFoundException(sub.city)
+          throw new NotFoundException(
+            `No cities found for subscription city: ${sub.city}`
+          )
         }
 
         const weather = await this.queryBus.execute(
@@ -54,7 +55,9 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
         )
 
         if (!weather) {
-          throw new WeatherDataUnavailableException()
+          throw new NotFoundException(
+            `Weather data not found for city: ${cities[0].name}`
+          )
         }
 
         const unsubscribeUrl = this.urlGeneratorService.unsubscribeUrl(

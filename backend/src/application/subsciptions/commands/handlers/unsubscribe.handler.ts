@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { UnsubscribeCommand } from "../impl/unsubscribe.command"
 import { Inject } from "@nestjs/common"
-import { SubscriptionNotFoundException } from "../../exceptions/subscription-not-found.exception"
 import {
   ISubscriptionsCommandRepository,
   SUBSCRIPTIONS_COMMAND_REPOSITORY
@@ -10,6 +9,11 @@ import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
 } from "../../../../domain/subscriptions/repositories/subscriptions-query.repository.interface"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import {
+  ITransactionsManager,
+  TRANSACTIONS_MANAGER
+} from "../../../common/interfaces/transaction.manager"
 
 @CommandHandler(UnsubscribeCommand)
 export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
@@ -17,7 +21,9 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
     @Inject(SUBSCRIPTIONS_COMMAND_REPOSITORY)
-    private subscriptionsCommandRepository: ISubscriptionsCommandRepository
+    private subscriptionsCommandRepository: ISubscriptionsCommandRepository,
+    @Inject(TRANSACTIONS_MANAGER)
+    private transactionManager: ITransactionsManager
   ) {}
 
   async execute(command: UnsubscribeCommand) {
@@ -29,11 +35,13 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
       )
 
     if (!subscription) {
-      throw new SubscriptionNotFoundException(
-        "Subscription not found or already unsubscribed"
+      throw new NotFoundException(
+        `Subscription with unsubscribe token ${unsubscribeToken} not found`
       )
     }
 
-    return await this.subscriptionsCommandRepository.delete(subscription.id)
+    await this.transactionManager.transaction(async em => {
+      await this.subscriptionsCommandRepository.delete(subscription, em)
+    })
   }
 }

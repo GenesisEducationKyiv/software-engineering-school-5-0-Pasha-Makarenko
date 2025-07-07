@@ -5,9 +5,9 @@ import { SearchProviderHandler } from "./search.provider.handler"
 import { SearchProviderAttributesDto } from "../../dto/search-provider-attributes.dto"
 import { WeatherApiSearch } from "../../interfaces/weather-api.interface"
 import { weatherApiSearchMapper } from "../../persistance/mappers/weather-api-search.mapper"
-import { InvalidSearchProviderKeyException } from "../../exceptions/invalid-search-provider-key.exception"
-import { CityNotFoundException } from "../../../../domain/search/exceptions/city-not-found.exception"
-import { SearchProviderException } from "../../exceptions/search-provider.exception"
+import { UnauthorizedException } from "../../../common/exceptions/unauthorized.exception"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
 
 export class WeatherApiSearchProvider extends SearchProviderHandler {
   constructor(
@@ -33,14 +33,15 @@ export class WeatherApiSearchProvider extends SearchProviderHandler {
     } catch (error) {
       switch (error.response?.status) {
         case HttpStatus.UNAUTHORIZED:
-          throw new InvalidSearchProviderKeyException(
-            WeatherApiSearchProvider.name
+          throw new UnauthorizedException(
+            `Unauthorized access to WeatherAPI. Please check your API key: ${error.message}`,
+            error
           )
         case HttpStatus.NOT_FOUND:
-          throw new CityNotFoundException(city)
+          throw new NotFoundException(`City not found in WeatherAPI: ${city}`)
       }
 
-      throw new SearchProviderException(
+      throw new ProviderException(
         `Failed to search cities from WeatherAPI: ${error.message}`,
         error
       )

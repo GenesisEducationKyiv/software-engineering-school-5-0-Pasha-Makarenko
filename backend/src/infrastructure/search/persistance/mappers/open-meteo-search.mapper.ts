@@ -1,5 +1,5 @@
 import { OpenMeteoSearchItem } from "../../interfaces/open-meteo.interface"
-import { City } from "../../../../domain/search/value-objects/city.value-object"
+import { City } from "../../../../domain/search/entities/city.entity"
 
 export const openMeteoSearchMapper: (
   data: OpenMeteoSearchItem

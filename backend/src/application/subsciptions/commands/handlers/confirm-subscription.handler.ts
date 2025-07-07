@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { ConfirmSubscriptionCommand } from "../impl/confirm-subscription.command"
 import { Inject } from "@nestjs/common"
-import { SubscriptionNotFoundException } from "../../exceptions/subscription-not-found.exception"
-import {
-  ISubscriptionsCommandRepository,
-  SUBSCRIPTIONS_COMMAND_REPOSITORY
-} from "../../../../domain/subscriptions/repositories/subscriptions-command.repository.interface"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
 } from "../../../../domain/subscriptions/repositories/subscriptions-query.repository.interface"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import {
+  ITransactionsManager,
+  TRANSACTIONS_MANAGER
+} from "../../../common/interfaces/transaction.manager"
 
 @CommandHandler(ConfirmSubscriptionCommand)
 export class ConfirmSubscriptionHandler
@@ -18,8 +18,8 @@ export class ConfirmSubscriptionHandler
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
-    @Inject(SUBSCRIPTIONS_COMMAND_REPOSITORY)
-    private subscriptionsCommandRepository: ISubscriptionsCommandRepository
+    @Inject(TRANSACTIONS_MANAGER)
+    private transactionManager: ITransactionsManager
   ) {}
 
   async execute(command: ConfirmSubscriptionCommand) {
@@ -31,13 +31,13 @@ export class ConfirmSubscriptionHandler
       )
 
     if (!subscription) {
-      throw new SubscriptionNotFoundException("Subscription not found")
+      throw new NotFoundException(
+        `Subscription with confirmation token ${confirmationToken} not found`
+      )
     }
 
-    subscription.confirm()
-
-    await this.subscriptionsCommandRepository.update(subscription)
-
-    return subscription
+    await this.transactionManager.transaction(async () => {
+      subscription.confirm()
+    })
   }
 }

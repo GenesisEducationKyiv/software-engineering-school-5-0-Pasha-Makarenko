@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger"
 import { Type } from "class-transformer"
 import { ConfirmContextDto } from "../../subsciptions/dto/confirm-context.dto"
 import { WeatherContextDto } from "../../weather/dto/weather-context.dto"
-import { InvalidMailTemplateException } from "../exceptions/invalid-mail-template.exception"
+import { InvalidDataException } from "../../common/exceptions/invalid-data.exception"
 
 export enum MailTemplate {
   CONFIRM = "confirm",
@@ -29,8 +29,9 @@ export class SendMailDto {
   @ApiProperty({ example: ConfirmContextDto, description: "Mail context" })
   @Type(dto => {
     if (!dto?.object.template) {
-      throw new InvalidMailTemplateException(
-        dto?.object.template || "undefined"
+      throw new InvalidDataException(
+        "Template type is required in the context: " +
+          JSON.stringify(dto?.object || {})
       )
     }
 

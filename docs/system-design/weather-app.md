@@ -51,39 +51,46 @@
 ## 3. High-Level Architecture
 
 ```mermaid
-graph TD
-    A[Client] -->|HTTP| B[API Gateway]
-    B --> C[Weather Module]
-    B --> D[Subscriptions Module]
-    B --> E[Search Module]
-    B --> F[Nodemailer]
-    C --> G[Weather Provider]
-    C --> H[Cache]
-    D --> I[PostgreSQL]
-    E --> J[Search Provider]
-    E --> H
-    F --> K[SMTP Server]
-    C --> D
-    C --> F
-
-    subgraph NestJS Application
-        B
-        C
-        D
-        E
-        F
+flowchart TB
+    Client["Client"]
+    subgraph Presentation Layer
+        A1["Controllers"]
+        A2["Filters & Middlewares"]
     end
-
-    subgraph External Services
-        G
-        J
-        K
+    subgraph Application Layer
+        B1["CQRS Handlers"]
+        B2["DTOs"]
     end
-
-    subgraph Data Layer
-        H
-        I
+    subgraph Domain Layer
+        C1["Entities"]
+        C2["Factories"]
+        C3["Value Objects"]
+        C4["Repositories (Interfaces)"]
     end
+    subgraph Infrastructure Layer
+        D1["ORM/Database Implementations"]
+        D2["External APIs"]
+        D3["Repository Implementations"]
+        D4["Mail/Scheduler"]
+        D5["Search & Weather Providers"]
+    end
+    Client --> A1
+    A1 --> B1
+    A1 --> B2
+    A1 --> A2
+    B1 --> B2
+    B1 --> C1
+    B1 --> C2
+    B1 --> C3
+    B1 --> C4
+    B1 --> D4
+    B1 --> D5
+    C2 --> C1
+    D3 --> C4
+    D3 --> D1
+    D5 --> D2
+    D1 -.-> C1
+    D1 -.-> C3
 ```
 
 ---

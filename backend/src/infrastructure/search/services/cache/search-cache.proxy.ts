@@ -1,7 +1,7 @@
 import { Cache } from "cache-manager"
 import { ISearchProvider } from "../../../../domain/search/providers/search.provider.interface"
 import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
-import { City } from "../../../../domain/search/value-objects/city.value-object"
+import { City } from "../../../../domain/search/entities/city.entity"
 
 export class SearchCacheProxy implements ISearchProvider {
   constructor(

@@ -50,7 +50,7 @@ describe("Weather", () => {
         .expect(HttpStatus.NOT_FOUND)
         .expect(res => {
           expect(res.body.message).toContain(
-            `No cities found for "invalid_city_query"`
+            "No cities found for the provided city name: invalid_city_query"
           )
           expect(res.body.statusCode).toBe(HttpStatus.NOT_FOUND)
         })

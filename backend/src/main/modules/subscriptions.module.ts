@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common"
-import { SequelizeModule } from "@nestjs/sequelize"
-import { Subscription } from "../../infrastructure/subsciptions/persistence/models/subscription.model"
+import { MikroOrmModule } from "@mikro-orm/nestjs"
 import { SubscriptionsController } from "../../presentation/subscriptions/controllers/subscriptions.controller"
 import { MailModule } from "./mail.module"
 import { ConfigModule } from "@nestjs/config"
@@ -15,6 +14,9 @@ import { SubscriptionsQueryRepository } from "../../infrastructure/subsciptions/
 import { SubscriptionsCommandRepository } from "../../infrastructure/subsciptions/persistence/repositories/subscriptions-command.repository"
 import { SUBSCRIPTIONS_QUERY_REPOSITORY } from "../../domain/subscriptions/repositories/subscriptions-query.repository.interface"
 import { SUBSCRIPTIONS_COMMAND_REPOSITORY } from "../../domain/subscriptions/repositories/subscriptions-command.repository.interface"
+import { SubscriptionSchema } from "../../infrastructure/subsciptions/persistence/schemas/subscription.schema"
+import { SubscriptionFactory } from "../../domain/subscriptions/factories/subscription.factory"
+import { TransactionsModule } from "./transactions.module"
 
 const commandHandlers = [
   CreateSubscriptionHandler,
@@ -25,6 +27,8 @@ const commandHandlers = [
 const queryHandlers = [GetActiveSubscriptionsHandler]
 
 const eventHandlers = [SubscriptionCreatedHandler]
+
+const factories = [SubscriptionFactory]
 
 const repositories = [
   {
@@ -43,12 +47,14 @@ const repositories = [
     ...commandHandlers,
     ...queryHandlers,
     ...eventHandlers,
-    ...repositories
+    ...repositories,
+    ...factories
   ],
   imports: [
     CqrsModule,
     ConfigModule,
-    SequelizeModule.forFeature([Subscription]),
+    MikroOrmModule.forFeature([SubscriptionSchema]),
+    TransactionsModule,
     MailModule,
     UrlGeneratorModule
   ],
@@ -56,7 +62,8 @@ const repositories = [
     ...commandHandlers,
     ...queryHandlers,
     ...eventHandlers,
-    ...repositories
+    ...repositories,
+    ...factories
   ]
 })
 export class SubscriptionsModule {}

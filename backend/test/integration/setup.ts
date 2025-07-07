@@ -1,13 +1,14 @@
 import { Test } from "@nestjs/testing"
 import { INestApplication, ValidationPipe } from "@nestjs/common"
-import { Sequelize } from "sequelize-typescript"
-import { getModelToken } from "@nestjs/sequelize"
 import { Cache } from "cache-manager"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { QueryBus } from "@nestjs/cqrs"
 import { AppModule } from "../../src/main/app.module"
-import { Subscription } from "../../src/infrastructure/subsciptions/persistence/models/subscription.model"
 import { server } from "../mocks/server.mock"
+import { MikroORM } from "@mikro-orm/core"
+import { InvalidDataException } from "../../src/application/common/exceptions/invalid-data.exception"
+import { GlobalExceptionFilter } from "../../src/presentation/common/filters/global.exception.filter"
+import { exceptionFilters } from "../../src/presentation/common/filters/exception.filters"
 
 export interface ClearOptions {
   clearCache?: boolean
@@ -20,8 +21,7 @@ export interface CloseOptions {
 
 export interface TestContext {
   app: INestApplication
-  sequelize: Sequelize
-  subscriptionModel: typeof Subscription
+  orm: MikroORM
   cacheManager: Cache
   queryBus: QueryBus
 }
@@ -41,19 +41,30 @@ export async function setupTestApp(): Promise<TestContext> {
   app.setGlobalPrefix("api")
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true
+      transform: true,
+      exceptionFactory: errors => {
+        return new InvalidDataException(
+          JSON.stringify(
+            errors.map(error => ({
+              property: error.property,
+              constraints: error.constraints
+            }))
+          )
+        )
+      }
     })
   )
+  app.useGlobalFilters(new GlobalExceptionFilter(exceptionFilters))
   await app.init()
 
-  const sequelize = moduleFixture.get<Sequelize>(Sequelize)
-  const subscriptionModel = moduleFixture.get<typeof Subscription>(
-    getModelToken(Subscription)
-  )
   const cacheManager = moduleFixture.get<Cache>(CACHE_MANAGER)
   const queryBus = moduleFixture.get<QueryBus>(QueryBus)
+  const orm = moduleFixture.get<MikroORM>(MikroORM)
 
-  return { app, sequelize, subscriptionModel, cacheManager, queryBus }
+  await orm.schema.dropSchema()
+  await orm.schema.createSchema()
+
+  return { app, orm, cacheManager, queryBus }
 }
 
 export async function cleanupTestApp(
@@ -65,7 +76,7 @@ export async function cleanupTestApp(
     await context.cacheManager.clear()
   }
   if (options?.clearDB) {
-    await context.subscriptionModel.destroy({ where: {} })
+    await context.orm.schema.clearDatabase()
   }
 }
 
@@ -76,6 +87,6 @@ export async function closeTestApp(
   server.close()
   await context.app.close()
   if (options?.closeDB) {
-    await context.sequelize.close()
+    await context.orm.close(true)
   }
 }

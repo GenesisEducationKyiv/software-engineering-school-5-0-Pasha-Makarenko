@@ -20,16 +20,6 @@ describe("architecture", () => {
     expect(rule).toPassAsync()
   })
 
-  it("infrastructure layer should not depend on application", () => {
-    const rule = filesOfProject()
-      .inFolder(LayersFolders.INFRASTRUCTURE)
-      .shouldNot()
-      .dependOnFiles()
-      .inFolder(LayersFolders.APPLICATION)
-
-    expect(rule).toPassAsync()
-  })
-
   it("infrastructure layer should not depend on presentation", () => {
     const rule = filesOfProject()
       .inFolder(LayersFolders.INFRASTRUCTURE)

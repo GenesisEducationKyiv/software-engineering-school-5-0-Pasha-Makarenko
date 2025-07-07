@@ -5,9 +5,9 @@ import { SearchProviderAttributesDto } from "../../dto/search-provider-attribute
 import { SearchProviderHandler } from "./search.provider.handler"
 import { OpenMeteoSearch } from "../../interfaces/open-meteo.interface"
 import { openMeteoSearchMapper } from "../../persistance/mappers/open-meteo-search.mapper"
-import { InvalidSearchProviderKeyException } from "../../exceptions/invalid-search-provider-key.exception"
-import { CityNotFoundException } from "../../../../domain/search/exceptions/city-not-found.exception"
-import { SearchProviderException } from "../../exceptions/search-provider.exception"
+import { UnauthorizedException } from "../../../common/exceptions/unauthorized.exception"
+import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
+import { ProviderException } from "../../../common/exceptions/provider.exception"
 
 export class OpenMeteoSearchProvider extends SearchProviderHandler {
   constructor(
@@ -44,14 +44,15 @@ export class OpenMeteoSearchProvider extends SearchProviderHandler {
     } catch (error) {
       switch (error.response?.status) {
         case HttpStatus.UNAUTHORIZED:
-          throw new InvalidSearchProviderKeyException(
-            OpenMeteoSearchProvider.name
+          throw new UnauthorizedException(
+            `Unauthorized access to OpenMeteo API. Please check your API key: ${error.message}`,
+            error
           )
         case HttpStatus.NOT_FOUND:
-          throw new CityNotFoundException(city)
+          throw new NotFoundException(`City not found in OpenMeteo: ${city}`)
       }
 
-      throw new SearchProviderException(
+      throw new ProviderException(
         `Failed to search cities from OpenMeteo: ${error.message}`,
         error
       )

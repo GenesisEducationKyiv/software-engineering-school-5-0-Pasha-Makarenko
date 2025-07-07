@@ -1,20 +1,23 @@
 import { Frequency } from "../enums/frequency.enum"
-import { SubscriptionAlreadyConfirmedException } from "../exceptions/subscription-already-confirmed.exception"
+import { ConflictException } from "../../common/exceptions/conflict.exception"
+import { BaseEntity } from "../../common/entities/base.entity"
 
-export class Subscription {
-  private _isConfirmed = false
+export class Subscription extends BaseEntity {
+  public isConfirmed = false
 
   constructor(
-    private _id: string,
-    private _email: string,
-    private _city: string,
-    private _frequency: Frequency,
-    private _confirmationToken: string,
-    private _unsubscribeToken: string
-  ) {}
+    id: string | null,
+    public email: string,
+    public city: string,
+    public frequency: Frequency,
+    public confirmationToken: string,
+    public unsubscribeToken: string
+  ) {
+    super(id)
+  }
 
   static create(
-    id: string,
+    id: string | null,
     email: string,
     city: string,
     frequency: Frequency,
@@ -31,39 +34,13 @@ export class Subscription {
     )
   }
 
-  get id(): string {
-    return this._id
-  }
-
-  get email(): string {
-    return this._email
-  }
-
-  get city(): string {
-    return this._city
-  }
-
-  get frequency(): Frequency {
-    return this._frequency
-  }
-
-  get confirmationToken(): string {
-    return this._confirmationToken
-  }
-
-  get unsubscribeToken(): string {
-    return this._unsubscribeToken
-  }
-
-  get isConfirmed(): boolean {
-    return this._isConfirmed
-  }
-
   confirm() {
-    if (this._isConfirmed) {
-      throw new SubscriptionAlreadyConfirmedException()
+    if (this.isConfirmed) {
+      throw new ConflictException(
+        `Subscription with id ${this.id} already confirmed`
+      )
     }
 
-    this._isConfirmed = true
+    this.isConfirmed = true
   }
 }

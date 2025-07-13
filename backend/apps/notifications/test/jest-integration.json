@@ -3,7 +3,7 @@
     "js",
     "json",
     "ts"
-  ],s
+  ],
   "rootDir": "../",
   "testEnvironment": "node",
   "testMatch": [

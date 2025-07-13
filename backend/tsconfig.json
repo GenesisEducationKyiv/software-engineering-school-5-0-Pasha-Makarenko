@@ -18,12 +18,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/exceptions-filters": [
-        "libs/exceptions-filters/src"
-      ],
-      "@app/exceptions-filters/*": [
-        "libs/exceptions-filters/src/*"
-      ]
+      "@app/exceptions-filters": ["libs/exceptions-filters/src"],
+      "@app/exceptions-filters/*": ["libs/exceptions-filters/src/*"]
     }
   }
 }

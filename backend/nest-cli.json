@@ -4,9 +4,7 @@
   "sourceRoot": "apps/weather-app/src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [
-      "**/*.pug"
-    ],
+    "assets": ["**/*.pug"],
     "webpack": true,
     "tsConfigPath": "apps/weather-app/tsconfig.app.json"
   },

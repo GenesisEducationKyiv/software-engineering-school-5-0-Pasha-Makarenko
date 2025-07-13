@@ -13,10 +13,13 @@
     "start:all": "npm run start:backend & npm run start:frontend",
     "start:backend": "cd backend && npm run start:prod",
     "start:frontend": "cd frontend && npm run start",
-    "test:unit:backend": "docker-compose -f docker-compose.test.yaml up --build test-unit-backend",
     "test:unit:frontend": "docker-compose -f docker-compose.test.yaml up --build test-unit-frontend",
-    "test:architecture:backend": "docker-compose -f docker-compose.test.yaml up --build test-architecture-backend",
-    "test:integration:backend": "docker-compose -f docker-compose.test.yaml up --build test-integration-backend"
+    "test:unit:weather-app": "docker-compose -f docker-compose.test.yaml up --build test-unit-weather-app",
+    "test:architecture:weather-app": "docker-compose -f docker-compose.test.yaml up --build test-architecture-weather-app",
+    "test:integration:weather-app": "docker-compose -f docker-compose.test.yaml up --build test-integration-weather-app",
+    "test:unit:notifications": "docker-compose -f docker-compose.test.yaml up --build test-unit-notifications",
+    "test:architecture:notifications": "docker-compose -f docker-compose.test.yaml up --build test-architecture-notifications",
+    "test:integration:notifications": "docker-compose -f docker-compose.test.yaml up --build test-integration-notifications"
   },
   "keywords": [
     "weather"

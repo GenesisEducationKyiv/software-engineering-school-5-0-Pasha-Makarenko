@@ -2,7 +2,12 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: "backend-dev"
+  - job_name: "weather-app-dev"
     metrics_path: "/api/metrics"
     static_configs:
-      - targets: [ "backend-dev:8000" ]
+      - targets: [ "weather-app-dev:8000" ]
+
+  - job_name: "notifications-dev"
+    metrics_path: "/api/metrics"
+    static_configs:
+      - targets: [ "notifications-dev:8001" ]

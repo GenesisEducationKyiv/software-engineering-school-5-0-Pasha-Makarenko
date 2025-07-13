@@ -15,8 +15,11 @@ jobs:
         run: |
           cp .env.test.example .env.test
 
-      - name: Run integration tests for backend
-        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-integration-backend
+      - name: Run integration tests for weather-app
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-integration-weather-app
+
+      - name: Run integration tests for notifications
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-integration-notifications
 
       - name: Cleanup
         if: always()

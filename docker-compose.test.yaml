@@ -23,6 +23,22 @@ services:
     networks:
       - test-network
 
+  rabbitmq-test:
+    container_name: weather.rabbitmq.test
+    image: rabbitmq:4.0-management
+    env_file:
+      - .env.test
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+    ports:
+      - ${RABBIT_PORT}:5672
+      - "15672:15672"
+    volumes:
+      - ./data-test/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - test-network
+
   test-unit-frontend:
     container_name: weather.frontend.test
     build:
@@ -37,57 +53,107 @@ services:
       - test-network
     command: npm run test:unit
 
-  test-unit-backend:
-    container_name: weather.backend.test-unit
+  test-unit-weather-app:
+    container_name: weather.weather-app.test-unit
     build:
       context: backend
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
+      - rabbitmq-test
       - database-test
       - redis-test
     networks:
       - test-network
-    command: npm run test:unit
+    command: npm run test:unit:weather-app
 
-  test-architecture-backend:
+  test-architecture-weather-app:
     container_name: weather.backend.test-architecture
     build:
       context: backend
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     depends_on:
+      - rabbitmq-test
       - database-test
       - redis-test
     networks:
       - test-network
-    command: npm run test:architecture
+    command: npm run test:architecture:weather-app
 
-  test-integration-backend:
-    container_name: weather.backend.test-integration
+  test-integration-weather-app:
+    container_name: weather.weather-app.test-integration
     build:
       context: backend
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
       - ./backend:/usr/src/app
-      - ./backend/src/mail/templates:/usr/src/app/mail/templates
       - /usr/src/app/node_modules
     depends_on:
+      - rabbitmq-test
       - database-test
       - redis-test
     networks:
       - test-network
-    command: npm run test:integration
+    command: sh -c "npm run migrate:weather-app && npm run test:integration:weather-app"
+
+  test-unit-notifications:
+    container_name: weather.notifications.test-unit
+    build:
+      context: backend
+      dockerfile: Dockerfile.notifications.test
+    env_file:
+      - .env.test
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq-test
+    networks:
+      - test-network
+    command: npm run test:unit:notifications
+
+  test-architecture-notifications:
+    container_name: weather.notifications.test-architecture
+    build:
+      context: backend
+      dockerfile: Dockerfile.notifications.test
+    env_file:
+      - .env.test
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq-test
+    networks:
+      - test-network
+    command: npm run test:architecture:notifications
+
+  test-integration-notifications:
+    container_name: weather.notifications.test-integration
+    build:
+      context: backend
+      dockerfile: Dockerfile.notifications.test
+    env_file:
+      - .env.test
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq-test
+    networks:
+      - test-network
+    command: npm run test:integration:notifications
 
 networks:
   test-network:

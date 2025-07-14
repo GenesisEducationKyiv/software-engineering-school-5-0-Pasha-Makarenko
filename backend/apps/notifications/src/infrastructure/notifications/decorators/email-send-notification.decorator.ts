@@ -1,24 +1,24 @@
 import { SendNotificationStrategy } from "../../../application/notifications/interfaces/send-notification.strategy"
-import { WeatherContextDto } from "../../../application/notifications/dto/weather-notification.dto"
 import { IEmailMetricsService } from "../../metrics/interfaces/email-metrics.interface"
 import { EMAIL_SEND_NOTIFICATION_STRATEGY } from "../factories/email-send-notification.factory"
 import { Logger } from "@nestjs/common"
 import { NotificationTemplate } from "../../../domain/notifications/enums/notification-template.enum"
+import { NotificationContext } from "../../../application/notifications/interfaces/context.interface"
 
-export class EmailSendNotificationDecorator
-  implements SendNotificationStrategy<WeatherContextDto>
+export class EmailSendNotificationDecorator<T extends NotificationContext>
+  implements SendNotificationStrategy<T>
 {
   private readonly logger = new Logger(EMAIL_SEND_NOTIFICATION_STRATEGY)
 
   constructor(
-    private strategy: SendNotificationStrategy<WeatherContextDto>,
+    private strategy: SendNotificationStrategy<T>,
     private emailMetricsService: IEmailMetricsService
   ) {}
 
   async send(
     recipients: string[],
     subject: string,
-    context: WeatherContextDto,
+    context: T,
     template: NotificationTemplate
   ): Promise<void> {
     this.logger.log(`Sending email to: ${recipients.join(", ")}`)

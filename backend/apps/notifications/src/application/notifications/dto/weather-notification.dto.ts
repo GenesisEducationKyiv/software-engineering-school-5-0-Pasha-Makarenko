@@ -2,8 +2,9 @@ import { NotificationDto } from "./notification.dto"
 import { ApiProperty } from "@nestjs/swagger"
 import { IsString } from "class-validator"
 import { WeatherData } from "../../../domain/notifications/value-objects/weather-data.value-object"
+import { NotificationContext } from "../interfaces/context.interface"
 
-export class WeatherContextDto {
+export class WeatherContextDto implements NotificationContext {
   @ApiProperty({
     example: "https://example.com/unsubscribe/123",
     description: "Unsubscription url"

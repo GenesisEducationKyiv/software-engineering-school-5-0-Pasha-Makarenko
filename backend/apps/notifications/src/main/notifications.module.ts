@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { MetricsModule } from "./modules/metrics.module"
 import { LoggerModule } from "nestjs-pino"
-import { config } from "../../../weather-app/src/main/config/config"
+import { config } from "../../src/main/config/config"
 import { getPinoConfig } from "./config/logger.config"
 import {
   NOTIFICATION_STRATEGY,

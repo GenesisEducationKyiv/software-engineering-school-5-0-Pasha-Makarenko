@@ -1,6 +1,7 @@
 import { IsEnum, IsString } from "class-validator"
 import { ApiProperty } from "@nestjs/swagger"
 import { NotificationStrategyType } from "../interfaces/send-notification.strategy"
+import { NotificationContext } from "../interfaces/context.interface"
 
 export abstract class NotificationDto {
   @ApiProperty({
@@ -21,5 +22,5 @@ export abstract class NotificationDto {
   @IsEnum(NotificationStrategyType)
   readonly type: NotificationStrategyType
 
-  abstract readonly context: unknown
+  abstract readonly context: NotificationContext
 }

@@ -1,12 +1,12 @@
 import { SendNotificationStrategy } from "../../../application/notifications/interfaces/send-notification.strategy"
-import { WeatherContextDto } from "../../../application/notifications/dto/weather-notification.dto"
 import { NotificationTemplate } from "../../../domain/notifications/enums/notification-template.enum"
 import { MailerService } from "@nestjs-modules/mailer"
 import { ConfigService } from "@nestjs/config"
 import { MailSendingFailedException } from "../../../application/notifications/exceptions/mail-sending-failed.exception"
+import { NotificationContext } from "../../../application/notifications/interfaces/context.interface"
 
-export class EmailSendNotificationStrategy
-  implements SendNotificationStrategy<WeatherContextDto>
+export class EmailSendNotificationStrategy<T extends NotificationContext>
+  implements SendNotificationStrategy<T>
 {
   private readonly from: string
 
@@ -20,7 +20,7 @@ export class EmailSendNotificationStrategy
   async send(
     recipients: string[],
     subject: string,
-    context: WeatherContextDto,
+    context: T,
     template: NotificationTemplate
   ) {
     try {

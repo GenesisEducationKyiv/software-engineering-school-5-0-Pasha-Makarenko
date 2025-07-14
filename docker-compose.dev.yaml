@@ -42,7 +42,7 @@ services:
       - pg-network
       - metrics
       - rabbitmq-net
-    command: npm run migrate:weather-app
+    command: sh -c "npm run migrate:weather-app && npm run start:dev:weather-app"
 
   notifications-dev:
     container_name: weather.notifications.dev

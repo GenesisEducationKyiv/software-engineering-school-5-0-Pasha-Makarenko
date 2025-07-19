@@ -1,4 +1,6 @@
+import { Inject } from "@nestjs/common"
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
+import * as CircuitBreaker from "opossum"
 import { SendConfirmationNotificationCommand } from "../impl/send-confirmation-notification.command"
 import {
   NOTIFICATION_STRATEGY,
@@ -8,7 +10,6 @@ import {
 import { ConfirmContextDto } from "../../dto/confirmation-notification.dto"
 import { NotFoundNotificationStrategyException } from "../../exceptions/not-found-notification-strategy.exception"
 import { NotificationTemplate } from "../../../../domain/notifications/enums/notification-template.enum"
-import { Inject } from "@nestjs/common"
 
 @CommandHandler(SendConfirmationNotificationCommand)
 export class SendConfirmationNotificationHandler
@@ -30,11 +31,21 @@ export class SendConfirmationNotificationHandler
       throw new NotFoundNotificationStrategyException(dto.type)
     }
 
-    await strategy.send(
-      dto.recipients,
-      dto.subject,
-      dto.context,
-      NotificationTemplate.CONFIRMATION
+    const circuit = new CircuitBreaker(
+      () =>
+        strategy.send(
+          dto.recipients,
+          dto.subject,
+          dto.context,
+          NotificationTemplate.CONFIRMATION
+        ),
+      {
+        timeout: 5000,
+        errorThresholdPercentage: 50,
+        resetTimeout: 30000
+      }
     )
+
+    await circuit.fire()
   }
 }

@@ -18,7 +18,7 @@ services:
     container_name: weather.weather-app.dev
     build:
       context: backend
-      dockerfile: Dockerfile.weather-app.dev
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.dev
     env_file:
       - .env.dev
     environment:
@@ -48,7 +48,7 @@ services:
     container_name: weather.notifications.dev
     build:
       context: backend
-      dockerfile: Dockerfile.notifications.dev
+      dockerfile: ./apps/notifications/Dockerfile.notifications.dev
     env_file:
       - .env.dev
     environment:

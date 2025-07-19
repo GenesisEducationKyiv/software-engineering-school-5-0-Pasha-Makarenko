@@ -93,7 +93,7 @@ services:
     container_name: weather.weather-app.test-integration
     build:
       context: backend
-      dockerfile: backend/apps/weather-app/Dockerfile.weather-app.test
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:

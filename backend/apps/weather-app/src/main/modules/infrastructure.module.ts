@@ -4,6 +4,8 @@ import { TransactionsManager } from "../../infrastructure/common/persistance/man
 import { URL_GENERATOR_SERVICE } from "../../application/common/interfaces/url-generator.interfaces"
 import { ConfigService } from "@nestjs/config"
 import { UrlGeneratorService } from "../../infrastructure/common/services/url-generator.service"
+import { TOKEN_SERVICE } from "../../application/common/interfaces/token-service.interface"
+import { TokenService } from "../../infrastructure/common/services/token.service"
 
 @Module({
   providers: [
@@ -16,6 +18,10 @@ import { UrlGeneratorService } from "../../infrastructure/common/services/url-ge
       useFactory: (configService: ConfigService) =>
         new UrlGeneratorService(configService.get<string>("CLIENT_URL")!),
       inject: [ConfigService]
+    },
+    {
+      provide: TOKEN_SERVICE,
+      useClass: TokenService
     }
   ],
   exports: [TRANSACTIONS_MANAGER, URL_GENERATOR_SERVICE]

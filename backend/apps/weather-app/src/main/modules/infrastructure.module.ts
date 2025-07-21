@@ -24,6 +24,6 @@ import { TokenService } from "../../infrastructure/common/services/token.service
       useClass: TokenService
     }
   ],
-  exports: [TRANSACTIONS_MANAGER, URL_GENERATOR_SERVICE]
+  exports: [TRANSACTIONS_MANAGER, URL_GENERATOR_SERVICE, TOKEN_SERVICE]
 })
 export class InfrastructureModule {}

@@ -18,6 +18,8 @@ import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock
 import { TRANSACTIONS_MANAGER } from "../../../src/application/common/interfaces/transaction.manager"
 import { transactionsManagerMockFactory } from "../../mocks/managers/transactions.manager.mock"
 import { SubscriptionFactory } from "../../../src/domain/subscriptions/factories/subscription.factory"
+import { TOKEN_SERVICE } from "../../../src/application/common/interfaces/token-service.interface"
+import { tokenServiceMockFactory } from "../../mocks/services/token.service.mock"
 
 describe("CreateSubscriptionHandler", () => {
   let handler: CreateSubscriptionHandler
@@ -40,6 +42,10 @@ describe("CreateSubscriptionHandler", () => {
         {
           provide: TRANSACTIONS_MANAGER,
           useValue: transactionsManagerMockFactory()
+        },
+        {
+          provide: TOKEN_SERVICE,
+          useValue: tokenServiceMockFactory()
         },
         {
           provide: EventBus,

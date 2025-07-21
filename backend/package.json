@@ -91,6 +91,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
     "@types/nodemailer": "^6.4.17",
+    "@types/opossum": "^8.1.9",
     "@types/pg": "^8.15.2",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.29.1",

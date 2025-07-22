@@ -2,6 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus, Query } from "@nestjs/common"
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger"
 import { QueryBus } from "@nestjs/cqrs"
 import { GetCitiesQuery } from "../../../application/search/queries/impl/get-cities.query"
+import { SearchQueryDto } from "../../../application/search/dto/search-query.dto"
 
 @ApiTags("Search")
 @Controller("search")
@@ -12,7 +13,7 @@ export class SearchController {
   @ApiResponse({ status: HttpStatus.OK })
   @HttpCode(HttpStatus.OK)
   @Get()
-  async search(@Query("city") city: string) {
-    return await this.queryBus.execute(new GetCitiesQuery(city))
+  async search(@Query() dto: SearchQueryDto) {
+    return await this.queryBus.execute(new GetCitiesQuery(dto))
   }
 }

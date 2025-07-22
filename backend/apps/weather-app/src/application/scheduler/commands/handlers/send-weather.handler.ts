@@ -38,7 +38,9 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
 
     for (const sub of subscriptions) {
       try {
-        const cities = await this.queryBus.execute(new GetCitiesQuery(sub.city))
+        const cities = await this.queryBus.execute(
+          new GetCitiesQuery({ city: sub.city })
+        )
 
         if (!cities || cities.length === 0) {
           throw new NotFoundException(

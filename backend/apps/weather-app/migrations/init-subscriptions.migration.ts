@@ -11,8 +11,8 @@ export class InitSubscriptionsMigration extends Migration {
         "is_confirmed" BOOLEAN NOT NULL DEFAULT false,
         "confirmation_token" VARCHAR(64) NOT NULL UNIQUE,
         "unsubscribe_token" VARCHAR(64) NOT NULL UNIQUE,
-        "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updated_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT "subscriptions_email_city_unique" UNIQUE ("email", "city")
       )`
     )

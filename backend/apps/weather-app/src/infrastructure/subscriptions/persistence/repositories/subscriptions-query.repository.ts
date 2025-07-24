@@ -52,4 +52,14 @@ export class SubscriptionsQueryRepository
       ["_isConfirmed" as "isConfirmed"]: true
     })
   }
+
+  async findAllInactiveByTime(time: number, transactionEm?: EntityManager) {
+    const em = transactionEm || this.em
+    return await em.find(Subscription, {
+      ["_isConfirmed" as "isConfirmed"]: false,
+      ["_createdAt" as "createdAt"]: {
+        $lt: new Date(Date.now() - time)
+      }
+    })
+  }
 }

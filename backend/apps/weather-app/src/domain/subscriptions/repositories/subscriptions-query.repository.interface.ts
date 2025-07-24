@@ -24,4 +24,9 @@ export interface ISubscriptionsQueryRepository {
     frequency: Frequency,
     transactionEm?: unknown
   ): Promise<Subscription[]>
+
+  findAllInactiveByTime(
+    time: number,
+    transactionEm?: unknown
+  ): Promise<Subscription[]>
 }

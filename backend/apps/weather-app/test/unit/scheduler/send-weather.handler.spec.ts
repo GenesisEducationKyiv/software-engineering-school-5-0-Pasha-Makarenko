@@ -10,6 +10,8 @@ import { SendWeatherCommand } from "../../../src/application/scheduler/commands/
 import { URL_GENERATOR_SERVICE } from "../../../src/application/common/interfaces/url-generator.interfaces"
 import { Frequency } from "../../../src/domain/subscriptions/enums/frequency.enum"
 import { subscriptionsMock } from "../../mocks/entities/subscription.entity.mock"
+import { WEATHER_CONTEXT_MAPPER } from "../../../src/application/notifications/interfaces/weather-context.interface"
+import { WeatherContextMapper } from "../../../src/infrastructure/notifications/mapper/weather-context.mapper"
 
 describe("SendWeatherHandler", () => {
   let handler: SendWeatherHandler
@@ -31,6 +33,10 @@ describe("SendWeatherHandler", () => {
         {
           provide: URL_GENERATOR_SERVICE,
           useValue: urlGeneratorServiceMockFactory()
+        },
+        {
+          provide: WEATHER_CONTEXT_MAPPER,
+          useValue: new WeatherContextMapper()
         }
       ]
     }).compile()

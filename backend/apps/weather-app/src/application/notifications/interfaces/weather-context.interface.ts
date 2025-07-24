@@ -1,18 +1,5 @@
 import { WeatherData } from "../../../domain/weather/value-objects/weather-data.value-object"
-
-export interface WeatherContext {
-  city: string
-  country: string
-  date: string
-  description: string
-  temperature: number
-  hours: {
-    time: string
-    temperature: number
-    humidity: number
-    wind: number
-  }[]
-}
+import { WeatherContext } from "../../../domain/notifications/value-objects/weather-context.value-object"
 
 export const WEATHER_CONTEXT_MAPPER = "WEATHER_CONTEXT_MAPPER"
 

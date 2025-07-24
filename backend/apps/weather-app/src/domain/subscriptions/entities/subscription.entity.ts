@@ -66,5 +66,6 @@ export class Subscription extends BaseEntity {
     }
 
     this._isConfirmed = true
+    this.updateTimestamp()
   }
 }

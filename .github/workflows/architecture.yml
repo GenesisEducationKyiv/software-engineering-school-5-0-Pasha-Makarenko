@@ -15,8 +15,11 @@ jobs:
         run: |
           cp .env.test.example .env.test 
 
-      - name: Run architecture tests for backend
-        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-architecture-backend
+      - name: Run architecture tests for weather-app
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-architecture-weather-app
+
+      - name: Run architecture tests for notifications
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-architecture-notifications
 
       - name: Cleanup
         if: always()

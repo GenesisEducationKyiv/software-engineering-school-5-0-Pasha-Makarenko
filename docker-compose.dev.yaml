@@ -14,19 +14,21 @@ services:
     networks:
       - angular-net
 
-  backend-dev:
-    container_name: weather.backend.dev
+  weather-app-dev:
+    container_name: weather.weather-app.dev
     build:
       context: backend
-      dockerfile: Dockerfile.dev
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.dev
     env_file:
       - .env.dev
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
     ports:
-      - ${API_PORT}:8000
+      - ${WEATHER_APP_PORT}:8000
     depends_on:
+      rabbitmq-dev:
+        condition: service_healthy
       database-dev:
         condition: service_healthy
       redis-dev:
@@ -39,6 +41,54 @@ services:
       - angular-net
       - pg-network
       - metrics
+      - rabbitmq-net
+    command: sh -c "npm run migrate:weather-app && npm run start:dev:weather-app"
+
+  notifications-dev:
+    container_name: weather.notifications.dev
+    build:
+      context: backend
+      dockerfile: ./apps/notifications/Dockerfile.notifications.dev
+    env_file:
+      - .env.dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    ports:
+      - ${NOTIFICATIONS_PORT}:8001
+    depends_on:
+      rabbitmq-dev:
+        condition: service_healthy
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    networks:
+      - angular-net
+      - metrics
+      - rabbitmq-net
+
+  rabbitmq-dev:
+    image: rabbitmq:4.0-management
+    container_name: weather.rabbitmq.dev
+    ports:
+      - ${RABBITMQ_PORT}:5672
+      - "15672:15672"
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - ./data-dev/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - rabbitmq-net
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   database-dev:
     container_name: weather.postgres.dev
@@ -93,7 +143,8 @@ services:
     ports:
       - ${PROMETHEUS_PORT}:9090
     depends_on:
-      - backend-dev
+      - weather-app-dev
+      - notifications-dev
     networks:
       - metrics
 
@@ -137,4 +188,6 @@ networks:
   angular-net:
     driver: bridge
   metrics:
+    driver: bridge
+  rabbitmq-net:
     driver: bridge

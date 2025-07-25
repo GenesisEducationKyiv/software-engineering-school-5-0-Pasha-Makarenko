@@ -6,7 +6,7 @@ import {
 } from "@nestjs/cqrs"
 import { SendWeatherCommand } from "../impl/send-weather.command"
 import { Inject, Logger } from "@nestjs/common"
-import { SchedulerService } from "../../../../infrastructure/scheduler/services/scheduler.service"
+import { SendWeatherScheduler } from "../../services/send-weather.scheduler"
 import { GetActiveSubscriptionsQuery } from "../../../subscriptions/queries/impl/get-active-subscriptions.query"
 import { GetWeatherQuery } from "../../../weather/queries/impl/get-weather.query"
 import { GetCitiesQuery } from "../../../search/queries/impl/get-cities.query"
@@ -17,16 +17,22 @@ import {
 import { NotFoundException } from "../../../../domain/common/exceptions/not-found.exception"
 import { SendWeatherNotificationCommand } from "../../../notifications/commands/impl/send-weather-notification.command"
 import { NotificationType } from "../../../notifications/enums/notification-type.enum"
+import {
+  IWeatherContextMapper,
+  WEATHER_CONTEXT_MAPPER
+} from "../../../notifications/interfaces/weather-context.interface"
 
 @CommandHandler(SendWeatherCommand)
 export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
-  private logger = new Logger(SchedulerService.name)
+  private logger = new Logger(SendWeatherScheduler.name)
 
   constructor(
     @Inject(URL_GENERATOR_SERVICE)
     private urlGeneratorService: IUrlGeneratorService,
     private queryBus: QueryBus,
-    private commandBus: CommandBus
+    private commandBus: CommandBus,
+    @Inject(WEATHER_CONTEXT_MAPPER)
+    private mapper: IWeatherContextMapper
   ) {}
 
   async execute(command: SendWeatherCommand) {
@@ -38,7 +44,9 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
 
     for (const sub of subscriptions) {
       try {
-        const cities = await this.queryBus.execute(new GetCitiesQuery(sub.city))
+        const cities = await this.queryBus.execute(
+          new GetCitiesQuery({ city: sub.city })
+        )
 
         if (!cities || cities.length === 0) {
           throw new NotFoundException(
@@ -72,7 +80,7 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
             type: NotificationType.EMAIL,
             context: {
               unsubscribeUrl,
-              weather
+              weather: this.mapper.map(weather)
             }
           })
         )

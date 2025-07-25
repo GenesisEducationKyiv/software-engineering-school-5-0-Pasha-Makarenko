@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common"
 import { CommandBus } from "@nestjs/cqrs"
 import { Cron, CronExpression } from "@nestjs/schedule"
-import { SendWeatherCommand } from "../../../application/scheduler/commands/impl/send-weather.command"
+import { SendWeatherCommand } from "../commands/impl/send-weather.command"
 import { Frequency } from "../../../domain/subscriptions/enums/frequency.enum"
 
 @Injectable()
-export class SchedulerService {
+export class SendWeatherScheduler {
   constructor(private commandBus: CommandBus) {}
 
   @Cron(CronExpression.EVERY_HOUR)

@@ -29,10 +29,10 @@ services:
     env_file:
       - .env.test
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
-      - ${RABBIT_PORT}:5672
+      - ${RABBITMQ_PORT}:5672
       - "15672:15672"
     volumes:
       - ./data-test/rabbitmq:/var/lib/rabbitmq
@@ -57,7 +57,7 @@ services:
     container_name: weather.weather-app.test-unit
     build:
       context: backend
-      dockerfile: Dockerfile.weather-app.test
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
@@ -75,7 +75,7 @@ services:
     container_name: weather.backend.test-architecture
     build:
       context: backend
-      dockerfile: Dockerfile.weather-app.test
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
@@ -93,7 +93,7 @@ services:
     container_name: weather.weather-app.test-integration
     build:
       context: backend
-      dockerfile: Dockerfile.weather-app.test
+      dockerfile: ./apps/weather-app/Dockerfile.weather-app.test
     env_file:
       - .env.test
     volumes:
@@ -111,7 +111,7 @@ services:
     container_name: weather.notifications.test-unit
     build:
       context: backend
-      dockerfile: Dockerfile.notifications.test
+      dockerfile: ./apps/notifications/Dockerfile.notifications.test
     env_file:
       - .env.test
     volumes:
@@ -127,7 +127,7 @@ services:
     container_name: weather.notifications.test-architecture
     build:
       context: backend
-      dockerfile: Dockerfile.notifications.test
+      dockerfile: ./apps/notifications/Dockerfile.notifications.test
     env_file:
       - .env.test
     volumes:
@@ -143,7 +143,7 @@ services:
     container_name: weather.notifications.test-integration
     build:
       context: backend
-      dockerfile: Dockerfile.notifications.test
+      dockerfile: ./apps/notifications/Dockerfile.notifications.test
     env_file:
       - .env.test
     volumes:

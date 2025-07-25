@@ -12,6 +12,20 @@ export const BaseSchema = new EntitySchema<BaseEntity>({
       defaultRaw: "gen_random_uuid()",
       fieldName: "id",
       getterName: "id"
+    },
+    ["_createdAt" as "createdAt"]: {
+      type: "Date",
+      nullable: false,
+      defaultRaw: "CURRENT_TIMESTAMP",
+      fieldName: "created_at",
+      getterName: "createdAt"
+    },
+    ["_updatedAt" as "updatedAt"]: {
+      type: "Date",
+      nullable: false,
+      defaultRaw: "CURRENT_TIMESTAMP",
+      fieldName: "updated_at",
+      getterName: "updatedAt"
     }
   }
 })

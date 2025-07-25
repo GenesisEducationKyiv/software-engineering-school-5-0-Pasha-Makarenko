@@ -20,7 +20,7 @@ export class SendConfirmationNotificationHandler
   async execute(command: SendConfirmationNotificationCommand) {
     const { dto } = command
 
-    this.client.emit("notifications.sendConfirmation", dto).pipe(
+    this.client.sendConfirmation(dto).pipe(
       catchError(error => {
         throw new NotificationSendingFailedException(
           "Failed to emit confirmation notification",

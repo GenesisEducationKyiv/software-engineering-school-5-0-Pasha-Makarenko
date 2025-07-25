@@ -5,5 +5,6 @@ export const subscriptionsQueryRepositoryMockFactory = () =>
     findByEmailAndCity: jest.fn(),
     findByConfirmationToken: jest.fn(),
     findByUnsubscribeToken: jest.fn(),
-    findAllActiveByFrequency: jest.fn()
+    findAllActiveByFrequency: jest.fn(),
+    findAllInactiveByTime: jest.fn()
   }) as ISubscriptionsQueryRepository

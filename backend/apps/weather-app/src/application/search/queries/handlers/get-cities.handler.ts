@@ -14,8 +14,8 @@ export class GetCitiesHandler implements IQueryHandler<GetCitiesQuery> {
   ) {}
 
   async execute(query: GetCitiesQuery) {
-    const { city } = query
+    const { dto } = query
 
-    return await this.searchProvider.search(city)
+    return await this.searchProvider.search(dto.city)
   }
 }

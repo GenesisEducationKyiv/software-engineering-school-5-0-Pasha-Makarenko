@@ -723,7 +723,7 @@
   "schemaVersion": 38,
   "style": "dark",
   "tags": [
-    "weather",
+    "weather-app",
     "backend",
     "metrics"
   ],

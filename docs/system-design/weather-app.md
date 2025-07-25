@@ -11,6 +11,7 @@
 - Getting actual weather data by city.
 - Viewing weather on website.
 - Users can unsubscribe from weather updates.
+- WeatherApp sends notification events to Notifications microservice via MessageBus.
 
 ### Non-Functional Requirements
 
@@ -22,7 +23,7 @@
 ### Constraints
 
 - Minimal architecture complexity.
-- Caching weather and city data.
+- Caching weather and city data
 
 ---
 
@@ -51,39 +52,54 @@
 ## 3. High-Level Architecture
 
 ```mermaid
-graph TD
-    A[Client] -->|HTTP| B[API Gateway]
-    B --> C[Weather Module]
-    B --> D[Subscriptions Module]
-    B --> E[Search Module]
-    B --> F[Nodemailer]
-    C --> G[Weather Provider]
-    C --> H[Cache]
-    D --> I[PostgreSQL]
-    E --> J[Search Provider]
-    E --> H
-    F --> K[SMTP Server]
-    C --> D
-    C --> F
-
-    subgraph NestJS Application
-        B
-        C
-        D
-        E
-        F
+flowchart TB
+    Client["Client"]
+    subgraph Presentation Layer
+        A1["Controllers"]
+        A2["Filters & Middlewares"]
     end
-
-    subgraph External Services
-        G
-        J
-        K
+    subgraph Application Layer
+        B1["CQRS Handlers"]
+        B2["DTOs"]
     end
-
-    subgraph Data Layer
-        H
-        I
+    subgraph Domain Layer
+        C1["Entities"]
+        C2["Factories"]
+        C3["Value Objects"]
+        C4["Repositories (Interfaces)"]
     end
+    subgraph Infrastructure Layer
+        D1["ORM/Database Implementations"]
+        D2["External APIs"]
+        D3["Repository Implementations"]
+        D4["Mail/Scheduler"]
+        D5["Search & Weather Providers"]
+        D6["MessageBus Client"]
+    end
+    subgraph Notifications Microservice
+        N1["Controllers"]
+        N2["CQRS"]
+    end
+    Client --> A1
+    A1 --> B1
+    A1 --> B2
+    A1 --> A2
+    B1 --> B2
+    B1 --> C1
+    B1 --> C2
+    B1 --> C3
+    B1 --> C4
+    B1 --> D4
+    B1 -.-> D5
+    B1 --> D6
+    D6 -.-> N1
+    N1 --> N2
+    C2 --> C1
+    D3 --> C4
+    D3 --> D1
+    D5 --> D2
+    D1 -.-> C1
+    D1 -.-> C3
 ```
 
 ---
@@ -112,10 +128,13 @@ GET /api/metrics - Application metrics
 ### 4.2 Scheduler
 
 - Send weather updates to all subscribers depending on frequency.
+- Publishes weather notification events to MessageBus for Notifications microservice.
 
-### 4.3 Notifier
+### 4.3 Notifier (Notifications Microservice Integration)
 
-- Send emails for subscription confirmation and weather updates.
+- WeatherApp does not send emails directly.
+- Instead, it emits events (e.g., notifications.sendWeather, notifications.sendConfirmation) to RabbitMQ.
+- Notifications microservice listens for these events and handles email delivery.
 
 ### 4.4 Weather API Integration
 
@@ -154,13 +173,14 @@ erDiagram
 sequenceDiagram
     participant Client
     participant API
-    participant Notifier
+    participant MessageBus
+    participant Notifications
     participant Database
     Client ->> API: Subscribe to weather updates
     API ->> Database: Save unconfirmed subscription
-    API ->> Notifier: Send confirmation email with token
+    API ->> MessageBus: Emit notifications.sendConfirmation event
     API -->> Client: 201 Created
-    Notifier -->> Client: Email with confirmation link
+    Notifications -->> Client: Email with confirmation link (via RabbitMQ)
     Client ->> API: Confirm subscription with token
     API ->> Database: Update subscription status
     Database -->> API: Confirmation updated
@@ -188,10 +208,11 @@ sequenceDiagram
 sequenceDiagram
     participant Scheduler
     participant API
+    participant MessageBus
+    participant Notifications
     participant Cache
     participant Weather Provider
     participant Database
-    participant Notifier
     Scheduler ->> API: Trigger weather update job
     API ->> Database: Get all active subscriptions
     Database -->> API: Return subscriptions
@@ -203,7 +224,9 @@ sequenceDiagram
         Weather Provider -->> API: Return weather data
         API ->> Cache: Update cached weather data
     end
-    API ->> Notifier: Send weather updates to subscribers
+    API ->> MessageBus: Emit notifications.sendWeather event
+    MessageBus ->> Notifications: Receive event
+    Notifications ->> Notifications: Send weather emails
 ```
 
 ---
@@ -215,14 +238,23 @@ sequenceDiagram
 - Docker for containerization.
 - PostgreSQL for the database.
 - Redis for caching.
-- Nodemailer for email notifications.
+- RabbitMQ for inter-service communication.
+- Nodemailer for email notifications (in Notifications microservice).
 - Prometheus for monitoring.
 - Loki for logging.
 - Grafana for metrics and logs visualization.
 
 ---
 
-## 7. Testing Strategy
+## 7. Monitoring & Metrics
+
+- Prometheus scrapes metrics from /api/metrics.
+- Grafana dashboards for API, weather, and notification events.
+- Loki collects logs from all services.
+
+---
+
+## 8. Testing Strategy
 
 - [x] Unit tests for each module.
 - [x] Integration tests for API endpoints.

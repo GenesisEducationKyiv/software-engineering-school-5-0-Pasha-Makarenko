@@ -1,0 +1,26 @@
+name: Architecture Tests
+
+on:
+  push:
+
+jobs:
+  architecture-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env.test file
+        run: |
+          cp .env.test.example .env.test 
+
+      - name: Run architecture tests for weather-app
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-architecture-weather-app
+
+      - name: Run architecture tests for notifications
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-architecture-notifications
+
+      - name: Cleanup
+        if: always()
+        run: docker compose -f docker-compose.test.yaml down -v

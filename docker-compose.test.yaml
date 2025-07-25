@@ -29,10 +29,10 @@ services:
     env_file:
       - .env.test
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
-      - ${RABBIT_PORT}:5672
+      - ${RABBITMQ_PORT}:5672
       - "15672:15672"
     volumes:
       - ./data-test/rabbitmq:/var/lib/rabbitmq

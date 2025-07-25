@@ -165,7 +165,7 @@
   "refresh": "5s",
   "schemaVersion": 41,
   "tags": [
-    "weather",
+    "weather-app",
     "backend",
     "logs"
   ],

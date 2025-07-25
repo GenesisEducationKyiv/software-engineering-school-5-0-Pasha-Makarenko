@@ -15,8 +15,11 @@ jobs:
         run: |
           cp .env.test.example .env.test 
 
-      - name: Run unit tests for backend
-        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-unit-backend
+      - name: Run unit tests for weather-app
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-unit-weather-app
+
+      - name: Run unit tests for notifications
+        run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-unit-notifications
 
       - name: Run unit tests for frontend
         run: docker compose -f docker-compose.test.yaml up --build --abort-on-container-exit test-unit-frontend

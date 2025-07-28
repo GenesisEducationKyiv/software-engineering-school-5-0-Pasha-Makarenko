@@ -2,12 +2,10 @@ import { Injectable } from "@nestjs/common"
 import {
   CacheMetricsType,
   ICacheMetricsService
-} from "../interfaces/cache-metrics.interface"
+} from "../../../application/metrics/interfaces/cache-metrics.interface"
 import { Counter } from "prom-client"
 import { InjectMetric } from "@willsoto/nestjs-prometheus"
 import { NotificationTemplate } from "../../../../../notifications/src/domain/notifications/enums/notification-template.enum"
-
-export const CACHE_METRICS_SERVICE = "CACHE_METRICS_SERVICE"
 
 @Injectable()
 export class CacheMetricsService implements ICacheMetricsService {

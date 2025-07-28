@@ -10,6 +10,10 @@ import {
   ITransactionsManager,
   TRANSACTIONS_MANAGER
 } from "../../../common/interfaces/transaction.manager"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(UnsubscribeCommand)
 export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
@@ -19,7 +23,9 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
     @Inject(TRANSACTIONS_MANAGER)
-    private transactionManager: ITransactionsManager
+    private transactionManager: ITransactionsManager,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService
   ) {}
 
   async execute(command: UnsubscribeCommand) {
@@ -46,6 +52,10 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
       subscription.unsubscribe()
     })
 
+    this.subscriptionsMetricsService.recordSubscriptionUnsubscribed(
+      subscription.city,
+      subscription.frequency
+    )
     this.logger.log({
       operation: "unsubscribe",
       params: command,

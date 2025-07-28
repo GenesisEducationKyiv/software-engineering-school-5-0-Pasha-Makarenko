@@ -1,5 +1,7 @@
 import { HttpStatus } from "@nestjs/common"
 
+export const HTTP_METRICS_SERVICE = "HTTP_METRICS_SERVICE"
+
 export enum HttpMetricsType {
   REQUESTS_TOTAL = "http_requests_total",
   REQUEST_DURATION = "http_request_duration_seconds",

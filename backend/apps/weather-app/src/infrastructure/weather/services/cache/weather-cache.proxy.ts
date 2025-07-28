@@ -3,7 +3,7 @@ import {
   IWeatherProvider,
   WEATHER_PROVIDER
 } from "../../../../domain/weather/providers/weather.provider.interface"
-import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
+import { ICacheMetricsService } from "../../../../application/metrics/interfaces/cache-metrics.interface"
 import { WeatherGetting } from "../../../../domain/weather/value-objects/weather-getting.value-object"
 import { WeatherData } from "../../../../domain/weather/value-objects/weather-data.value-object"
 import { Logger } from "@nestjs/common"

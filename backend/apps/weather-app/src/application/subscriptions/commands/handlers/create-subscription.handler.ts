@@ -15,6 +15,10 @@ import {
   ITokenService,
   TOKEN_SERVICE
 } from "../../../common/interfaces/token-service.interface"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(CreateSubscriptionCommand)
 export class CreateSubscriptionHandler
@@ -30,6 +34,8 @@ export class CreateSubscriptionHandler
     private transactionManager: ITransactionsManager,
     @Inject(TOKEN_SERVICE)
     private tokenService: ITokenService,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService,
     private eventBus: EventBus
   ) {}
 
@@ -59,6 +65,7 @@ export class CreateSubscriptionHandler
 
     this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
 
+    this.subscriptionsMetricsService.recordSubscriptionCreated(city, frequency)
     this.logger.log({
       operation: "createSubscription",
       params: command.dto,

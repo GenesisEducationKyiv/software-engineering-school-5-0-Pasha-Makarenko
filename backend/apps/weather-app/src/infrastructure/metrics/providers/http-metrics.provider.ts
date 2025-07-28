@@ -3,7 +3,7 @@ import {
   makeGaugeProvider,
   makeHistogramProvider
 } from "@willsoto/nestjs-prometheus"
-import { HttpMetricsType } from "../interfaces/http-metrics.interface"
+import { HttpMetricsType } from "../../../application/metrics/interfaces/http-metrics.interface"
 
 export const httpMetricsProviders = [
   makeCounterProvider({

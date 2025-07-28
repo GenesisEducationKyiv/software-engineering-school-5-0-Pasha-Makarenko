@@ -2,11 +2,9 @@ import { HttpStatus, Injectable } from "@nestjs/common"
 import {
   HttpMetricsType,
   IHttpMetricsService
-} from "../interfaces/http-metrics.interface"
+} from "../../../application/metrics/interfaces/http-metrics.interface"
 import { Counter, Gauge, Histogram } from "prom-client"
 import { InjectMetric } from "@willsoto/nestjs-prometheus"
-
-export const HTTP_METRICS_SERVICE = "HTTP_METRICS_SERVICE"
 
 @Injectable()
 export class HttpMetricsService implements IHttpMetricsService {

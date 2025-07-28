@@ -3,7 +3,7 @@ import {
   ISearchProvider,
   SEARCH_PROVIDER
 } from "../../../../domain/search/providers/search.provider.interface"
-import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
+import { ICacheMetricsService } from "../../../../application/metrics/interfaces/cache-metrics.interface"
 import { City } from "../../../../domain/search/entities/city.entity"
 import { Logger } from "@nestjs/common"
 

@@ -6,7 +6,7 @@ import { SearchCacheProxy } from "../cache/search-cache.proxy"
 import { Cache } from "cache-manager"
 import { SearchProviderHandler } from "./search.provider.handler"
 import { setupChain } from "../../../common/utils/setup-chain.util"
-import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
+import { ICacheMetricsService } from "../../../../application/metrics/interfaces/cache-metrics.interface"
 
 export const searchProviderFactory = (
   configService: ConfigService,

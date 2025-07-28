@@ -10,6 +10,10 @@ import {
   ITransactionsManager,
   TRANSACTIONS_MANAGER
 } from "../../../common/interfaces/transaction.manager"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(ConfirmSubscriptionCommand)
 export class ConfirmSubscriptionHandler
@@ -21,7 +25,9 @@ export class ConfirmSubscriptionHandler
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
     @Inject(TRANSACTIONS_MANAGER)
-    private transactionManager: ITransactionsManager
+    private transactionManager: ITransactionsManager,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService
   ) {}
 
   async execute(command: ConfirmSubscriptionCommand) {
@@ -48,6 +54,10 @@ export class ConfirmSubscriptionHandler
       subscription.confirm()
     })
 
+    this.subscriptionsMetricsService.recordSubscriptionConfirmed(
+      subscription.city,
+      subscription.frequency
+    )
     this.logger.log({
       operation: "confirmSubscription",
       params: command,

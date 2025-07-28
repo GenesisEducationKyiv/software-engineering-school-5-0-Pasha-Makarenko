@@ -6,7 +6,7 @@ import { WeatherApiWeatherProvider } from "./weather-api-weather.provider"
 import { OpenMeteoWeatherProvider } from "./open-meteo-weather.provider"
 import { WeatherCacheProxy } from "../cache/weather-cache.proxy"
 import { WeatherProviderHandler } from "./weather.provider.handler"
-import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
+import { ICacheMetricsService } from "../../../../application/metrics/interfaces/cache-metrics.interface"
 import { setupChain } from "../../../common/utils/setup-chain.util"
 
 export const weatherProviderFactory = (

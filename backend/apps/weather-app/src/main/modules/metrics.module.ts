@@ -8,6 +8,7 @@ import { HTTP_METRICS_SERVICE } from "../../application/metrics/interfaces/http-
 import { CACHE_METRICS_SERVICE } from "../../application/metrics/interfaces/cache-metrics.interface"
 import { SUBSCRIPTIONS_METRICS_SERVICE } from "../../application/metrics/interfaces/subscriptions-metrics.interface"
 import { SubscriptionsMetricsService } from "../../infrastructure/metrics/services/subscriptions-metrics.service"
+import { subscriptionsMetricsProviders } from "../../infrastructure/metrics/providers/subscriptions-metrics.provider"
 
 const metricsServices = [
   {
@@ -24,7 +25,11 @@ const metricsServices = [
   }
 ]
 
-const metricsProviders = [...httpMetricsProviders, ...cacheMetricsProviders]
+const metricsProviders = [
+  ...httpMetricsProviders,
+  ...cacheMetricsProviders,
+  ...subscriptionsMetricsProviders
+]
 
 @Module({
   imports: [

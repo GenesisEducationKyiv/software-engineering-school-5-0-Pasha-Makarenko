@@ -1,10 +1,17 @@
 import { ConfigService } from "@nestjs/config"
 import { Params } from "nestjs-pino"
+import { REQUEST_ID_HEADER } from "../../presentation/common/middlewares/request-id.middleware"
 
 export enum LogLevel {
   INFO = "info",
   WARN = "warn",
   ERROR = "error"
+}
+
+export enum LogLevelCode {
+  INFO = 30,
+  WARN = 40,
+  ERROR = 50
 }
 
 export const getPinoConfig = (configService: ConfigService): Params => ({
@@ -20,6 +27,7 @@ export const getPinoConfig = (configService: ConfigService): Params => ({
     customErrorMessage: (req, res, err) =>
       `ERROR ${req.method} ${req.url} -> ${res.statusCode}: 
                       ${err?.message}`,
+    genReqId: req => req[REQUEST_ID_HEADER],
     serializers: {
       req(req) {
         return {

@@ -42,6 +42,12 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
       new GetActiveSubscriptionsQuery(frequency)
     )
 
+    this.logger.log({
+      operation: "sendWeather",
+      params: { frequency },
+      message: `Found ${subscriptions.length} active subscriptions for frequency ${frequency}`
+    })
+
     for (const sub of subscriptions) {
       try {
         const cities = await this.queryBus.execute(
@@ -85,10 +91,12 @@ export class SendWeatherHandler implements ICommandHandler<SendWeatherCommand> {
           })
         )
       } catch (error) {
-        this.logger.error(
-          `Failed to process subscription for ${sub.email}:`,
-          error.message
-        )
+        this.logger.error({
+          operation: "sendWeather",
+          params: { subscription_id: sub.id },
+          message: `Error sending weather notification for subscription ${sub.id}`,
+          error
+        })
       }
     }
   }

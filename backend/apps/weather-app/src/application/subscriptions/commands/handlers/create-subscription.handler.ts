@@ -1,6 +1,6 @@
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs"
 import { CreateSubscriptionCommand } from "../impl/create-subscription.command"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import { SubscriptionCreatedEvent } from "../../events/impl/subscription-created.event"
 import {
   ISubscriptionsCommandRepository,
@@ -20,6 +20,8 @@ import {
 export class CreateSubscriptionHandler
   implements ICommandHandler<CreateSubscriptionCommand>
 {
+  private readonly logger = new Logger(CreateSubscriptionHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_COMMAND_REPOSITORY)
     private subscriptionsCommandRepository: ISubscriptionsCommandRepository,
@@ -33,6 +35,12 @@ export class CreateSubscriptionHandler
 
   async execute(command: CreateSubscriptionCommand) {
     const { email, city, frequency } = command.dto
+
+    this.logger.log({
+      operation: "createSubscription",
+      params: command.dto,
+      message: "Creating new subscription"
+    })
 
     const confirmationToken = this.tokenService.generate()
     const unsubscribeToken = this.tokenService.generate()
@@ -50,5 +58,14 @@ export class CreateSubscriptionHandler
     })
 
     this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
+
+    this.logger.log({
+      operation: "createSubscription",
+      params: command.dto,
+      result: {
+        subscription_id: subscription.id
+      },
+      message: "Subscription created successfully"
+    })
   }
 }

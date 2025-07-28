@@ -21,18 +21,22 @@ export class EmailSendNotificationDecorator<T extends NotificationContext>
     context: T,
     template: NotificationTemplate
   ): Promise<void> {
-    this.logger.log(`Sending email to: ${recipients.join(", ")}`)
+    this.logger.log({
+      operation: "sendEmailNotification",
+      params: { recipients, subject, context, template },
+      message: "Sending email notification"
+    })
 
     try {
       await this.strategy.send(recipients, subject, context, template)
       this.emailMetricsService.recordEmailSent(template)
-      this.logger.log(`Email sent successfully to: ${recipients.join(", ")}`)
+      this.logger.log({
+        operation: "sendEmailNotification",
+        params: { recipients, subject, context, template },
+        message: "Email notification sent successfully"
+      })
     } catch (error) {
       this.emailMetricsService.recordEmailFailed(template)
-      this.logger.error(
-        `Failed to send email to: ${recipients.join(", ")}`,
-        error.stack
-      )
       throw error
     }
   }

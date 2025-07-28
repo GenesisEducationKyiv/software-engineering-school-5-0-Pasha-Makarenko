@@ -8,6 +8,7 @@ import { exceptionFilters } from "./presentation/common/filters/exception.filter
 import { AsyncMicroserviceOptions, Transport } from "@nestjs/microservices"
 import { ConfigService } from "@nestjs/config"
 import { getRabbitMqConfig } from "./main/config/rabbitmq.config"
+import { RequestIdMiddleware } from "./presentation/common/middlewares/request-id.middleware"
 
 async function bootstrap() {
   const app = await NestFactory.create(NotificationsModule)
@@ -19,6 +20,7 @@ async function bootstrap() {
   })
   app.setGlobalPrefix("api")
   app.useLogger(logger)
+  app.use(RequestIdMiddleware)
   app.useGlobalFilters(new GlobalExceptionFilter(exceptionFilters))
   app.useGlobalPipes(
     new ValidationPipe({

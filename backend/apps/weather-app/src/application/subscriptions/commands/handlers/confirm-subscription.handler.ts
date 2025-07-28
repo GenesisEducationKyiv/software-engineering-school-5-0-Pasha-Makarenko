@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { ConfirmSubscriptionCommand } from "../impl/confirm-subscription.command"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
@@ -15,6 +15,8 @@ import {
 export class ConfirmSubscriptionHandler
   implements ICommandHandler<ConfirmSubscriptionCommand>
 {
+  private readonly logger = new Logger(ConfirmSubscriptionHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
@@ -24,6 +26,12 @@ export class ConfirmSubscriptionHandler
 
   async execute(command: ConfirmSubscriptionCommand) {
     const { confirmationToken } = command
+
+    this.logger.log({
+      operation: "confirmSubscription",
+      params: command,
+      message: "Confirming subscription"
+    })
 
     const subscription =
       await this.subscriptionsQueryRepository.findByConfirmationToken(
@@ -38,6 +46,15 @@ export class ConfirmSubscriptionHandler
 
     await this.transactionManager.transaction(async () => {
       subscription.confirm()
+    })
+
+    this.logger.log({
+      operation: "confirmSubscription",
+      params: command,
+      result: {
+        subscription_id: subscription.id
+      },
+      message: "Subscription confirmed successfully"
     })
   }
 }

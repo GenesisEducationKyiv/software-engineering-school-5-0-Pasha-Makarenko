@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { SendConfirmationNotificationCommand } from "../impl/send-confimation-notification.command"
 import { catchError } from "rxjs"
 import { NotificationSendingFailedException } from "../../exceptions/notification-sending-failed.exception"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import {
   INotificationsClient,
   NOTIFICATIONS_CLIENT
@@ -12,6 +12,8 @@ import {
 export class SendConfirmationNotificationHandler
   implements ICommandHandler<SendConfirmationNotificationCommand>
 {
+  private readonly logger = new Logger(SendConfirmationNotificationHandler.name)
+
   constructor(
     @Inject(NOTIFICATIONS_CLIENT)
     private client: INotificationsClient
@@ -19,6 +21,12 @@ export class SendConfirmationNotificationHandler
 
   async execute(command: SendConfirmationNotificationCommand) {
     const { dto } = command
+
+    this.logger.log({
+      operation: "sendConfirmationNotification",
+      params: dto,
+      message: "Sending confirmation notification"
+    })
 
     this.client.sendConfirmation(dto).pipe(
       catchError(error => {

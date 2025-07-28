@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs"
 import { GetActiveSubscriptionsQuery } from "../impl/get-active-subscriptions.query"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
@@ -14,6 +14,8 @@ import {
 export class GetActiveSubscriptionsHandler
   implements IQueryHandler<GetActiveSubscriptionsQuery>
 {
+  private readonly logger = new Logger(GetActiveSubscriptionsHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
@@ -24,11 +26,26 @@ export class GetActiveSubscriptionsHandler
   async execute(query: GetActiveSubscriptionsQuery) {
     const { frequency } = query
 
-    return await this.transactionManager.transaction(async em => {
+    this.logger.log({
+      operation: "getActiveSubscriptions",
+      params: query,
+      message: "Fetching active subscriptions"
+    })
+
+    const result = await this.transactionManager.transaction(async em => {
       return await this.subscriptionsQueryRepository.findAllActiveByFrequency(
         frequency,
         em
       )
     })
+
+    this.logger.log({
+      operation: "getActiveSubscriptions",
+      params: query,
+      result: result.map(sub => sub.id),
+      message: "Active subscriptions fetched successfully"
+    })
+
+    return result
   }
 }

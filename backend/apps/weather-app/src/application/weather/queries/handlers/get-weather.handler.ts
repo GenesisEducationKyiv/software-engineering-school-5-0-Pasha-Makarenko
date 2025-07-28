@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import { GetWeatherQuery } from "../impl/get-weather.query"
 import {
   IWeatherProvider,
@@ -9,6 +9,8 @@ import { WeatherGetting } from "../../../../domain/weather/value-objects/weather
 
 @QueryHandler(GetWeatherQuery)
 export class GetWeatherHandler implements IQueryHandler<GetWeatherQuery> {
+  private readonly logger = new Logger(GetWeatherHandler.name)
+
   constructor(
     @Inject(WEATHER_PROVIDER)
     private weatherProvider: IWeatherProvider
@@ -16,9 +18,19 @@ export class GetWeatherHandler implements IQueryHandler<GetWeatherQuery> {
 
   async execute(query: GetWeatherQuery) {
     const { dto } = query
-
-    return await this.weatherProvider.getWeather(
+    this.logger.log({
+      operation: "getWeather",
+      params: dto,
+      message: "Fetching weather data"
+    })
+    const result = await this.weatherProvider.getWeather(
       WeatherGetting.create(dto.city, dto.lat, dto.lon, dto.days)
     )
+    this.logger.log({
+      operation: "getWeather",
+      params: dto,
+      message: "Weather data fetched successfully"
+    })
+    return result
   }
 }

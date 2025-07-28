@@ -7,6 +7,12 @@ export enum LogLevel {
   ERROR = "error"
 }
 
+export enum LogLevelCode {
+  INFO = 30,
+  WARN = 40,
+  ERROR = 50
+}
+
 export const getPinoConfig = (configService: ConfigService): Params => ({
   pinoHttp: {
     level: LogLevel.INFO,
@@ -40,6 +46,7 @@ export const getPinoConfig = (configService: ConfigService): Params => ({
         }
       }
     },
+    genReqId: req => req["x-request-id"],
     transport:
       configService.get<string>("NODE_ENV") === "test"
         ? undefined

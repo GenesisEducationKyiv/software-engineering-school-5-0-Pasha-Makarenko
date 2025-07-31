@@ -121,7 +121,7 @@ export class SubscriptionsQueryRepository
     this.logger.log({
       operation: "findAllActiveByFrequency",
       params: { frequency },
-      result: subscriptions.map(sub => ({ subscription_id: sub.id })),
+      result: { length: subscriptions.length },
       message: "Found all active subscriptions by frequency"
     })
 
@@ -147,7 +147,7 @@ export class SubscriptionsQueryRepository
     this.logger.log({
       operation: "findAllInactiveByTime",
       params: { time },
-      result: subscriptions.map(sub => ({ subscription_id: sub.id })),
+      result: { length: subscriptions.length },
       message: "Found all inactive subscriptions by time"
     })
 

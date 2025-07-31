@@ -36,6 +36,7 @@ export abstract class WeatherProviderHandler
       this.logger.error({
         operation: "getWeather",
         params: dto,
+        context: this.constructor.name,
         message: `Error fetching weather data via provider ${this.constructor.name}`,
         error: error
       })

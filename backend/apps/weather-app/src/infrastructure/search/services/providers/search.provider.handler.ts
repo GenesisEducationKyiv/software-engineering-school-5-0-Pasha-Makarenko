@@ -35,6 +35,7 @@ export abstract class SearchProviderHandler
       this.logger.error({
         operation: "search",
         params: { city },
+        context: this.constructor.name,
         message: `Error searching for cities via provider ${this.constructor.name}`,
         error: error
       })

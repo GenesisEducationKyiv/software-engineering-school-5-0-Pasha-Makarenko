@@ -3,6 +3,9 @@ import { ISubscriptionsMetricsService } from "../../../src/application/metrics/i
 export const subscriptionsMetricsServiceMockFactory = () =>
   ({
     recordSubscriptionCreated: jest.fn(),
+    recordSubscriptionCreatedError: jest.fn(),
     recordSubscriptionConfirmed: jest.fn(),
-    recordSubscriptionUnsubscribed: jest.fn()
+    recordSubscriptionConfirmedError: jest.fn(),
+    recordSubscriptionUnsubscribed: jest.fn(),
+    recordSubscriptionUnsubscribedError: jest.fn()
   }) as never as ISubscriptionsMetricsService

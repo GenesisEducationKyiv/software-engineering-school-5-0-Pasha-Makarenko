@@ -9,6 +9,15 @@ import { CACHE_METRICS_SERVICE } from "../../application/metrics/interfaces/cach
 import { SUBSCRIPTIONS_METRICS_SERVICE } from "../../application/metrics/interfaces/subscriptions-metrics.interface"
 import { SubscriptionsMetricsService } from "../../infrastructure/metrics/services/subscriptions-metrics.service"
 import { subscriptionsMetricsProviders } from "../../infrastructure/metrics/providers/subscriptions-metrics.provider"
+import { SCHEDULER_METRICS_SERVICE } from "../../application/metrics/interfaces/scheduler-metrics.interface"
+import { SchedulerMetricsService } from "../../infrastructure/metrics/services/scheduler-metrics.service"
+import { WEATHER_METRICS_SERVICE } from "../../application/metrics/interfaces/weather-metrics.interface"
+import { WeatherMetricsService } from "../../infrastructure/metrics/services/weather-metrics.service"
+import { SEARCH_METRICS_SERVICE } from "../../application/metrics/interfaces/search-metrics.interface"
+import { SearchMetricsService } from "../../infrastructure/metrics/services/search-service.service"
+import { schedulerMetricsProviders } from "../../infrastructure/metrics/providers/scheduler-metrics.provider"
+import { weatherMetricsProviders } from "../../infrastructure/metrics/providers/weather-metrics.provider"
+import { searchMetricsProviders } from "../../infrastructure/metrics/providers/search-metrics.provider"
 
 const metricsServices = [
   {
@@ -20,15 +29,30 @@ const metricsServices = [
     useClass: CacheMetricsService
   },
   {
+    provide: SCHEDULER_METRICS_SERVICE,
+    useClass: SchedulerMetricsService
+  },
+  {
     provide: SUBSCRIPTIONS_METRICS_SERVICE,
     useClass: SubscriptionsMetricsService
+  },
+  {
+    provide: WEATHER_METRICS_SERVICE,
+    useClass: WeatherMetricsService
+  },
+  {
+    provide: SEARCH_METRICS_SERVICE,
+    useClass: SearchMetricsService
   }
 ]
 
 const metricsProviders = [
   ...httpMetricsProviders,
   ...cacheMetricsProviders,
-  ...subscriptionsMetricsProviders
+  ...schedulerMetricsProviders,
+  ...subscriptionsMetricsProviders,
+  ...weatherMetricsProviders,
+  ...searchMetricsProviders
 ]
 
 @Module({

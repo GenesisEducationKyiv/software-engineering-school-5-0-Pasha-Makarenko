@@ -48,21 +48,29 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
       )
     }
 
-    await this.transactionManager.transaction(async em => {
-      subscription.unsubscribe()
-    })
+    try {
+      await this.transactionManager.transaction(async em => {
+        subscription.unsubscribe()
+      })
 
-    this.subscriptionsMetricsService.recordSubscriptionUnsubscribed(
-      subscription.city,
-      subscription.frequency
-    )
-    this.logger.log({
-      operation: "unsubscribe",
-      params: command,
-      result: {
-        subscription_id: subscription.id
-      },
-      message: "Subscription unsubscribed successfully"
-    })
+      this.subscriptionsMetricsService.recordSubscriptionUnsubscribed(
+        subscription.city,
+        subscription.frequency
+      )
+      this.logger.log({
+        operation: "unsubscribe",
+        params: command,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription unsubscribed successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionUnsubscribedError(
+        subscription.city,
+        subscription.frequency
+      )
+      throw error
+    }
   }
 }

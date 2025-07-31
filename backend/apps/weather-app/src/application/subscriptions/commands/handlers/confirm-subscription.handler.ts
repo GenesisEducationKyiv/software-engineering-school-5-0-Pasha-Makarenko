@@ -50,21 +50,29 @@ export class ConfirmSubscriptionHandler
       )
     }
 
-    await this.transactionManager.transaction(async () => {
-      subscription.confirm()
-    })
+    try {
+      await this.transactionManager.transaction(async () => {
+        subscription.confirm()
+      })
 
-    this.subscriptionsMetricsService.recordSubscriptionConfirmed(
-      subscription.city,
-      subscription.frequency
-    )
-    this.logger.log({
-      operation: "confirmSubscription",
-      params: command,
-      result: {
-        subscription_id: subscription.id
-      },
-      message: "Subscription confirmed successfully"
-    })
+      this.subscriptionsMetricsService.recordSubscriptionConfirmed(
+        subscription.city,
+        subscription.frequency
+      )
+      this.logger.log({
+        operation: "confirmSubscription",
+        params: command,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription confirmed successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionConfirmedError(
+        subscription.city,
+        subscription.frequency
+      )
+      throw error
+    }
   }
 }

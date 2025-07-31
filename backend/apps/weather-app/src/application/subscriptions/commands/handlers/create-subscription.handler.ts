@@ -48,31 +48,42 @@ export class CreateSubscriptionHandler
       message: "Creating new subscription"
     })
 
-    const confirmationToken = this.tokenService.generate()
-    const unsubscribeToken = this.tokenService.generate()
+    try {
+      const confirmationToken = this.tokenService.generate()
+      const unsubscribeToken = this.tokenService.generate()
 
-    const subscription = await this.subscriptionFactory.create(
-      email,
-      city,
-      frequency,
-      confirmationToken,
-      unsubscribeToken
-    )
+      const subscription = await this.subscriptionFactory.create(
+        email,
+        city,
+        frequency,
+        confirmationToken,
+        unsubscribeToken
+      )
 
-    await this.transactionManager.transaction(async em => {
-      await this.subscriptionsCommandRepository.add(subscription, em)
-    })
+      await this.transactionManager.transaction(async em => {
+        await this.subscriptionsCommandRepository.add(subscription, em)
+      })
 
-    this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
+      this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
 
-    this.subscriptionsMetricsService.recordSubscriptionCreated(city, frequency)
-    this.logger.log({
-      operation: "createSubscription",
-      params: command.dto,
-      result: {
-        subscription_id: subscription.id
-      },
-      message: "Subscription created successfully"
-    })
+      this.subscriptionsMetricsService.recordSubscriptionCreated(
+        city,
+        frequency
+      )
+      this.logger.log({
+        operation: "createSubscription",
+        params: command.dto,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription created successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionCreatedError(
+        city,
+        frequency
+      )
+      throw error
+    }
   }
 }

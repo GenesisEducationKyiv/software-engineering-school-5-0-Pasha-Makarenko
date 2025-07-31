@@ -14,9 +14,37 @@ export enum LogLevelCode {
   ERROR = 50
 }
 
+export const samplingLoggerConfig = {
+  development: {
+    [LogLevel.INFO]: 1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  },
+  test: {
+    [LogLevel.INFO]: 1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  },
+  production: {
+    [LogLevel.INFO]: 0.1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  }
+}
+
 export const getPinoConfig = (configService: ConfigService): Params => ({
   pinoHttp: {
     level: LogLevel.INFO,
+    hooks: {
+      logMethod(args, method) {
+        const sampling =
+          samplingLoggerConfig[configService.get<string>("NODE_ENV")!]
+        const level = args[0] as LogLevel
+        if (sampling[level] === 0) return
+        if (sampling[level] && Math.random() > sampling[level]) return
+        return method.apply(this, args)
+      }
+    },
     customLogLevel: (res, err) => {
       if (err.statusCode >= 500 || res.statusCode! >= 500) return LogLevel.ERROR
       if (err.statusCode >= 400 || res.statusCode! >= 400) return LogLevel.WARN

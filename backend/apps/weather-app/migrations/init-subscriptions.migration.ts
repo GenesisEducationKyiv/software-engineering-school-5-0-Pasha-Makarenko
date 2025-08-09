@@ -9,6 +9,7 @@ export class InitSubscriptionsMigration extends Migration {
         "city" VARCHAR(255) NOT NULL,
         "frequency" VARCHAR(20) NOT NULL DEFAULT 'DAILY',
         "is_confirmed" BOOLEAN NOT NULL DEFAULT false,
+        "is_unsubscribed" BOOLEAN NOT NULL DEFAULT false,
         "confirmation_token" VARCHAR(64) NOT NULL UNIQUE,
         "unsubscribe_token" VARCHAR(64) NOT NULL UNIQUE,
         "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

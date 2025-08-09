@@ -176,7 +176,7 @@ describe("Subscriptions", () => {
         }
       )
 
-      expect(deletedSubscription).toBeNull()
+      expect(deletedSubscription?.isUnsubscribed).toBe(true)
     })
 
     it("should unsubscribe a unconfirmed user", async () => {
@@ -202,7 +202,8 @@ describe("Subscriptions", () => {
           })
         }
       )
-      expect(deletedSubscription).toBeNull()
+
+      expect(deletedSubscription?.isUnsubscribed).toBe(true)
     })
 
     it("should throw error for invalid token", async () => {

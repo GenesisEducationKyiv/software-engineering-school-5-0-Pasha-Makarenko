@@ -1,9 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common"
+import { ArgumentsHost, Catch, ExceptionFilter, Logger } from "@nestjs/common"
 import { ExceptionHandler } from "../../../infrastructure/common/interfaces/exception.handler.interface"
 import { BaseException } from "../../../main/exceptions/base.exception"
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionFilter.name)
+
   constructor(private filters: Map<string, ExceptionHandler<unknown>>) {}
 
   catch(exception: Error, host: ArgumentsHost) {
@@ -24,6 +26,22 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         message = result.message
         details = result.details
       }
+    } else {
+      this.logger.error({
+        operation: "unhandledException",
+        message: "Unhandled exception caught by global filter",
+        exception: {
+          name: exception.name,
+          message: exception.message,
+          stack: exception.stack
+        },
+        request: {
+          method: request.method,
+          url: request.url,
+          headers: request.headers,
+          body: request.body
+        }
+      })
     }
 
     const errorResponse = {

@@ -23,6 +23,7 @@ import { LoggerModule } from "nestjs-pino"
 import { getPinoConfig } from "./config/logger.config"
 import { InfrastructureModule } from "./modules/infrastructure.module"
 import { PostgreSqlDriver } from "@mikro-orm/postgresql"
+import { RequestIdMiddleware } from "../presentation/common/middlewares/request-id.middleware"
 
 @Module({
   imports: [
@@ -59,7 +60,7 @@ import { PostgreSqlDriver } from "@mikro-orm/postgresql"
 export class WeatherAppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(MetricsMiddleware)
+      .apply(RequestIdMiddleware, MetricsMiddleware)
       .forRoutes({ path: "*", method: RequestMethod.ALL })
   }
 }

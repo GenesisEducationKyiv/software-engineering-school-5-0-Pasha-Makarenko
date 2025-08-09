@@ -41,6 +41,13 @@ export const SubscriptionSchema = new EntitySchema<Subscription, BaseEntity>({
       fieldName: "is_confirmed",
       onCreate: () => false
     },
+    ["_isUnsubscribed" as "isUnsubscribed"]: {
+      type: "boolean",
+      default: false,
+      getterName: "isUnsubscribed",
+      fieldName: "is_unsubscribed",
+      onCreate: () => false
+    },
     ["_confirmationToken" as "confirmationToken"]: {
       type: "string",
       length: 64,

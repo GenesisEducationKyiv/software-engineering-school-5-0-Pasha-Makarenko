@@ -1,10 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { UnsubscribeCommand } from "../impl/unsubscribe.command"
-import { Inject } from "@nestjs/common"
-import {
-  ISubscriptionsCommandRepository,
-  SUBSCRIPTIONS_COMMAND_REPOSITORY
-} from "../../../../domain/subscriptions/repositories/subscriptions-command.repository.interface"
+import { Inject, Logger } from "@nestjs/common"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
@@ -14,20 +10,32 @@ import {
   ITransactionsManager,
   TRANSACTIONS_MANAGER
 } from "../../../common/interfaces/transaction.manager"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(UnsubscribeCommand)
 export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
+  private readonly logger = new Logger(UnsubscribeHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
-    @Inject(SUBSCRIPTIONS_COMMAND_REPOSITORY)
-    private subscriptionsCommandRepository: ISubscriptionsCommandRepository,
     @Inject(TRANSACTIONS_MANAGER)
-    private transactionManager: ITransactionsManager
+    private transactionManager: ITransactionsManager,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService
   ) {}
 
   async execute(command: UnsubscribeCommand) {
     const { unsubscribeToken } = command
+
+    this.logger.log({
+      operation: "unsubscribe",
+      params: command,
+      message: "Unsubscribing from subscription"
+    })
 
     const subscription =
       await this.subscriptionsQueryRepository.findByUnsubscribeToken(
@@ -40,8 +48,29 @@ export class UnsubscribeHandler implements ICommandHandler<UnsubscribeCommand> {
       )
     }
 
-    await this.transactionManager.transaction(async em => {
-      await this.subscriptionsCommandRepository.delete(subscription, em)
-    })
+    try {
+      await this.transactionManager.transaction(async em => {
+        subscription.unsubscribe()
+      })
+
+      this.subscriptionsMetricsService.recordSubscriptionUnsubscribed(
+        subscription.city,
+        subscription.frequency
+      )
+      this.logger.log({
+        operation: "unsubscribe",
+        params: command,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription unsubscribed successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionUnsubscribedError(
+        subscription.city,
+        subscription.frequency
+      )
+      throw error
+    }
   }
 }

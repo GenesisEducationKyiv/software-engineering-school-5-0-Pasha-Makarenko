@@ -1,5 +1,5 @@
 import { makeCounterProvider } from "@willsoto/nestjs-prometheus"
-import { CacheMetricsType } from "../interfaces/cache-metrics.interface"
+import { CacheMetricsType } from "../../../application/metrics/interfaces/cache-metrics.interface"
 
 export const cacheMetricsProviders = [
   makeCounterProvider({

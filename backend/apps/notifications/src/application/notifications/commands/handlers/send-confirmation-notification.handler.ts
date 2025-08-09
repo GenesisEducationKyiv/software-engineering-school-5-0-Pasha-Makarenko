@@ -1,4 +1,4 @@
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import * as CircuitBreaker from "opossum"
 import { SendConfirmationNotificationCommand } from "../impl/send-confirmation-notification.command"
@@ -15,6 +15,8 @@ import { NotificationTemplate } from "../../../../domain/notifications/enums/not
 export class SendConfirmationNotificationHandler
   implements ICommandHandler<SendConfirmationNotificationCommand>
 {
+  private readonly logger = new Logger(SendConfirmationNotificationHandler.name)
+
   constructor(
     @Inject(NOTIFICATION_STRATEGY)
     private readonly strategies: Record<
@@ -25,6 +27,13 @@ export class SendConfirmationNotificationHandler
 
   async execute(command: SendConfirmationNotificationCommand) {
     const { dto } = command
+
+    this.logger.log({
+      operation: "sendConfirmationNotification",
+      params: dto,
+      message: "Sending confirmation notification"
+    })
+
     const strategy = this.strategies[dto.type]
 
     if (!strategy) {
@@ -47,5 +56,11 @@ export class SendConfirmationNotificationHandler
     )
 
     await circuit.fire()
+
+    this.logger.log({
+      operation: "sendConfirmationNotification",
+      params: dto,
+      message: "Confirmation notification sent successfully"
+    })
   }
 }

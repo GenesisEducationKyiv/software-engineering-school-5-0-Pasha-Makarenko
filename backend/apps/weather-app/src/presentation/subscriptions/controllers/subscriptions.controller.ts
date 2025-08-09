@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Post
 } from "@nestjs/common"
@@ -16,6 +17,8 @@ import { UnsubscribeCommand } from "../../../application/subscriptions/commands/
 @ApiTags("Subscriptions")
 @Controller("")
 export class SubscriptionsController {
+  private readonly logger = new Logger(SubscriptionsController.name)
+
   constructor(private commandBus: CommandBus) {}
 
   @ApiOperation({ summary: "Subscribe" })
@@ -23,7 +26,17 @@ export class SubscriptionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("subscribe")
   async subscribe(@Body() dto: CreateSubscriptionDto) {
-    return await this.commandBus.execute(new CreateSubscriptionCommand(dto))
+    this.logger.log({
+      operation: "subscribe",
+      params: dto,
+      message: "Creating subscription"
+    })
+    await this.commandBus.execute(new CreateSubscriptionCommand(dto))
+    this.logger.log({
+      operation: "subscribe",
+      params: dto,
+      message: "Subscription created successfully"
+    })
   }
 
   @ApiOperation({ summary: "Confirm subscription" })
@@ -31,7 +44,17 @@ export class SubscriptionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("confirm/:token")
   async confirm(@Param("token") token: string) {
-    return await this.commandBus.execute(new ConfirmSubscriptionCommand(token))
+    this.logger.log({
+      operation: "confirmSubscription",
+      params: { token },
+      message: "Confirming subscription"
+    })
+    await this.commandBus.execute(new ConfirmSubscriptionCommand(token))
+    this.logger.log({
+      operation: "confirmSubscription",
+      params: { token },
+      message: "Subscription confirmed successfully"
+    })
   }
 
   @ApiOperation({ summary: "Unsubscribe" })
@@ -39,6 +62,16 @@ export class SubscriptionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post("unsubscribe/:token")
   async unsubscribe(@Param("token") token: string) {
-    return await this.commandBus.execute(new UnsubscribeCommand(token))
+    this.logger.log({
+      operation: "unsubscribe",
+      params: { token },
+      message: "Unsubscribing"
+    })
+    await this.commandBus.execute(new UnsubscribeCommand(token))
+    this.logger.log({
+      operation: "unsubscribe",
+      params: { token },
+      message: "Unsubscribed successfully"
+    })
   }
 }

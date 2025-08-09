@@ -13,10 +13,10 @@ import { SearchModule } from "./search.module"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
 import { WeatherApiWeatherProvider } from "../../infrastructure/weather/services/providers/weather-api-weather.provider"
 import { OpenMeteoWeatherProvider } from "../../infrastructure/weather/services/providers/open-meteo-weather.provider"
-import { CACHE_METRICS_SERVICE } from "../../infrastructure/metrics/services/cache-metrics.service"
 import { MetricsModule } from "./metrics.module"
 import { WEATHER_PROVIDER } from "../../domain/weather/providers/weather.provider.interface"
 import { SEARCH_PROVIDER } from "../../domain/search/providers/search.provider.interface"
+import { CACHE_METRICS_SERVICE } from "../../application/metrics/interfaces/cache-metrics.interface"
 
 const queryHandlers = [GetWeatherHandler]
 

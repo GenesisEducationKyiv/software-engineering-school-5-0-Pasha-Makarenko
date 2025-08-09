@@ -8,12 +8,14 @@ import {
 import { WeatherContextDto } from "../../dto/weather-notification.dto"
 import { NotificationTemplate } from "../../../../domain/notifications/enums/notification-template.enum"
 import { NotFoundNotificationStrategyException } from "../../exceptions/not-found-notification-strategy.exception"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 
 @CommandHandler(SendWeatherNotificationCommand)
 export class SendWeatherNotificationHandler
   implements ICommandHandler<SendWeatherNotificationCommand>
 {
+  private readonly logger = new Logger(SendWeatherNotificationHandler.name)
+
   constructor(
     @Inject(NOTIFICATION_STRATEGY)
     private readonly strategies: Record<
@@ -24,6 +26,13 @@ export class SendWeatherNotificationHandler
 
   async execute(command: SendWeatherNotificationCommand) {
     const { dto } = command
+
+    this.logger.log({
+      operation: "sendWeatherNotification",
+      params: dto,
+      message: "Sending weather notification"
+    })
+
     const strategy = this.strategies[dto.type]
 
     if (!strategy) {
@@ -36,5 +45,11 @@ export class SendWeatherNotificationHandler
       dto.context,
       NotificationTemplate.WEATHER
     )
+
+    this.logger.log({
+      operation: "sendWeatherNotification",
+      params: dto,
+      message: "Weather notification sent successfully"
+    })
   }
 }

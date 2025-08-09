@@ -4,6 +4,7 @@ import { BaseEntity } from "../../common/entities/base.entity"
 
 export class Subscription extends BaseEntity {
   private _isConfirmed = false
+  private _isUnsubscribed = false
 
   constructor(
     id: string | null,
@@ -58,6 +59,10 @@ export class Subscription extends BaseEntity {
     return this._isConfirmed
   }
 
+  get isUnsubscribed() {
+    return this._isUnsubscribed
+  }
+
   confirm() {
     if (this._isConfirmed) {
       throw new ConflictException(
@@ -66,6 +71,17 @@ export class Subscription extends BaseEntity {
     }
 
     this._isConfirmed = true
+    this.updateTimestamp()
+  }
+
+  unsubscribe() {
+    if (this._isUnsubscribed) {
+      throw new ConflictException(
+        `Subscription with id ${this.id} already unsubscribed`
+      )
+    }
+
+    this._isUnsubscribed = true
     this.updateTimestamp()
   }
 }

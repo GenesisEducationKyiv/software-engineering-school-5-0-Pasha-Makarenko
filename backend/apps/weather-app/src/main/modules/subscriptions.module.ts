@@ -16,6 +16,7 @@ import { SUBSCRIPTIONS_COMMAND_REPOSITORY } from "../../domain/subscriptions/rep
 import { SubscriptionSchema } from "../../infrastructure/subscriptions/persistence/schemas/subscription.schema"
 import { SubscriptionFactory } from "../../domain/subscriptions/factories/subscription.factory"
 import { InfrastructureModule } from "./infrastructure.module"
+import { MetricsModule } from "./metrics.module"
 
 const commandHandlers = [
   CreateSubscriptionHandler,
@@ -54,6 +55,7 @@ const repositories = [
     ConfigModule,
     MikroOrmModule.forFeature([SubscriptionSchema]),
     InfrastructureModule,
+    MetricsModule,
     NotificationsModule
   ],
   exports: [

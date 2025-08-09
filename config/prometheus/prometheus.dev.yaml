@@ -1,13 +1,18 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
   - job_name: "weather-app-dev"
     metrics_path: "/api/metrics"
+    scrape_interval: 15s
+    honor_labels: true
     static_configs:
       - targets: [ "weather-app-dev:8000" ]
 
   - job_name: "notifications-dev"
     metrics_path: "/api/metrics"
+    scrape_interval: 15s
+    honor_labels: true
     static_configs:
       - targets: [ "notifications-dev:8001" ]

@@ -8,6 +8,7 @@ import { WeatherModule } from "./weather.module"
 import { InfrastructureModule } from "./infrastructure.module"
 import { CleanUpSubscriptionsHandler } from "../../application/scheduler/commands/handlers/clean-up-subscriptions.handler"
 import { CleanUpSubscriptionsScheduler } from "../../application/scheduler/services/clean-up-subscriptions.scheduler"
+import { MetricsModule } from "./metrics.module"
 
 const commandHandlers = [SendWeatherHandler, CleanUpSubscriptionsHandler]
 
@@ -19,6 +20,7 @@ const schedulers = [SendWeatherScheduler, CleanUpSubscriptionsScheduler]
     NotificationsModule,
     SubscriptionsModule,
     InfrastructureModule,
+    MetricsModule,
     WeatherModule
   ],
   providers: [...commandHandlers, ...schedulers],

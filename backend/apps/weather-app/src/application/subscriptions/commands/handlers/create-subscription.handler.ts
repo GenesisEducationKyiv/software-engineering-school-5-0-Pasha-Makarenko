@@ -1,6 +1,6 @@
 import { CommandHandler, EventBus, ICommandHandler } from "@nestjs/cqrs"
 import { CreateSubscriptionCommand } from "../impl/create-subscription.command"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import { SubscriptionCreatedEvent } from "../../events/impl/subscription-created.event"
 import {
   ISubscriptionsCommandRepository,
@@ -15,11 +15,17 @@ import {
   ITokenService,
   TOKEN_SERVICE
 } from "../../../common/interfaces/token-service.interface"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(CreateSubscriptionCommand)
 export class CreateSubscriptionHandler
   implements ICommandHandler<CreateSubscriptionCommand>
 {
+  private readonly logger = new Logger(CreateSubscriptionHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_COMMAND_REPOSITORY)
     private subscriptionsCommandRepository: ISubscriptionsCommandRepository,
@@ -28,27 +34,56 @@ export class CreateSubscriptionHandler
     private transactionManager: ITransactionsManager,
     @Inject(TOKEN_SERVICE)
     private tokenService: ITokenService,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService,
     private eventBus: EventBus
   ) {}
 
   async execute(command: CreateSubscriptionCommand) {
     const { email, city, frequency } = command.dto
 
-    const confirmationToken = this.tokenService.generate()
-    const unsubscribeToken = this.tokenService.generate()
-
-    const subscription = await this.subscriptionFactory.create(
-      email,
-      city,
-      frequency,
-      confirmationToken,
-      unsubscribeToken
-    )
-
-    await this.transactionManager.transaction(async em => {
-      await this.subscriptionsCommandRepository.add(subscription, em)
+    this.logger.log({
+      operation: "createSubscription",
+      params: command.dto,
+      message: "Creating new subscription"
     })
 
-    this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
+    try {
+      const confirmationToken = this.tokenService.generate()
+      const unsubscribeToken = this.tokenService.generate()
+
+      const subscription = await this.subscriptionFactory.create(
+        email,
+        city,
+        frequency,
+        confirmationToken,
+        unsubscribeToken
+      )
+
+      await this.transactionManager.transaction(async em => {
+        await this.subscriptionsCommandRepository.add(subscription, em)
+      })
+
+      this.eventBus.publish(new SubscriptionCreatedEvent(subscription))
+
+      this.subscriptionsMetricsService.recordSubscriptionCreated(
+        city,
+        frequency
+      )
+      this.logger.log({
+        operation: "createSubscription",
+        params: command.dto,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription created successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionCreatedError(
+        city,
+        frequency
+      )
+      throw error
+    }
   }
 }

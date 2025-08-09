@@ -4,10 +4,9 @@ import { HttpService } from "@nestjs/axios"
 import { OpenMeteoSearchProvider } from "./open-meteo-search.provider"
 import { SearchCacheProxy } from "../cache/search-cache.proxy"
 import { Cache } from "cache-manager"
-import { SearchLoggerDecorator } from "../loggers/search-logger.decorator"
 import { SearchProviderHandler } from "./search.provider.handler"
 import { setupChain } from "../../../common/utils/setup-chain.util"
-import { ICacheMetricsService } from "../../../metrics/interfaces/cache-metrics.interface"
+import { ICacheMetricsService } from "../../../../application/metrics/interfaces/cache-metrics.interface"
 
 export const searchProviderFactory = (
   configService: ConfigService,
@@ -17,13 +16,11 @@ export const searchProviderFactory = (
 ) => {
   const chain = setupChain<SearchProviderHandler>(providers)
 
-  return new SearchLoggerDecorator(
-    new SearchCacheProxy(
-      chain,
-      cacheManager,
-      cacheMetricsService,
-      configService.get<number>("SEARCH_CACHE_TTL")!
-    )
+  return new SearchCacheProxy(
+    chain,
+    cacheManager,
+    cacheMetricsService,
+    configService.get<number>("SEARCH_CACHE_TTL")!
   )
 }
 

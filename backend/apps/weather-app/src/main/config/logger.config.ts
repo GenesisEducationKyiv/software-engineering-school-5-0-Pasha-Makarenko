@@ -1,5 +1,6 @@
 import { ConfigService } from "@nestjs/config"
 import { Params } from "nestjs-pino"
+import { REQUEST_ID_HEADER } from "../../presentation/common/middlewares/request-id.middleware"
 
 export enum LogLevel {
   INFO = "info",
@@ -7,9 +8,43 @@ export enum LogLevel {
   ERROR = "error"
 }
 
+export enum LogLevelCode {
+  INFO = 30,
+  WARN = 40,
+  ERROR = 50
+}
+
+export const samplingLoggerConfig = {
+  development: {
+    [LogLevel.INFO]: 1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  },
+  test: {
+    [LogLevel.INFO]: 1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  },
+  production: {
+    [LogLevel.INFO]: 0.1,
+    [LogLevel.WARN]: 1,
+    [LogLevel.ERROR]: 1
+  }
+}
+
 export const getPinoConfig = (configService: ConfigService): Params => ({
   pinoHttp: {
     level: LogLevel.INFO,
+    hooks: {
+      logMethod(args, method) {
+        const sampling =
+          samplingLoggerConfig[configService.get<string>("NODE_ENV")!]
+        const level = args[0] as LogLevel
+        if (sampling[level] === 0) return
+        if (sampling[level] && Math.random() > sampling[level]) return
+        return method.apply(this, args)
+      }
+    },
     customLogLevel: (res, err) => {
       if (err.statusCode >= 500 || res.statusCode! >= 500) return LogLevel.ERROR
       if (err.statusCode >= 400 || res.statusCode! >= 400) return LogLevel.WARN
@@ -20,6 +55,7 @@ export const getPinoConfig = (configService: ConfigService): Params => ({
     customErrorMessage: (req, res, err) =>
       `ERROR ${req.method} ${req.url} -> ${res.statusCode}: 
                       ${err?.message}`,
+    genReqId: req => req[REQUEST_ID_HEADER],
     serializers: {
       req(req) {
         return {

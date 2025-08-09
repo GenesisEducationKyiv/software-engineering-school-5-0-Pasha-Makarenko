@@ -5,7 +5,7 @@ import { GetCitiesHandler } from "../../application/search/queries/handlers/get-
 import { CqrsModule } from "@nestjs/cqrs"
 import { ConfigService } from "@nestjs/config"
 import { CACHE_MANAGER } from "@nestjs/cache-manager"
-import { CACHE_METRICS_SERVICE } from "../../infrastructure/metrics/services/cache-metrics.service"
+import { CACHE_METRICS_SERVICE } from "../../application/metrics/interfaces/cache-metrics.interface"
 import { MetricsModule } from "./metrics.module"
 import { WeatherApiSearchProvider } from "../../infrastructure/search/services/providers/weather-api-search.provider"
 import {

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { ConfirmSubscriptionCommand } from "../impl/confirm-subscription.command"
-import { Inject } from "@nestjs/common"
+import { Inject, Logger } from "@nestjs/common"
 import {
   ISubscriptionsQueryRepository,
   SUBSCRIPTIONS_QUERY_REPOSITORY
@@ -10,20 +10,34 @@ import {
   ITransactionsManager,
   TRANSACTIONS_MANAGER
 } from "../../../common/interfaces/transaction.manager"
+import {
+  ISubscriptionsMetricsService,
+  SUBSCRIPTIONS_METRICS_SERVICE
+} from "../../../metrics/interfaces/subscriptions-metrics.interface"
 
 @CommandHandler(ConfirmSubscriptionCommand)
 export class ConfirmSubscriptionHandler
   implements ICommandHandler<ConfirmSubscriptionCommand>
 {
+  private readonly logger = new Logger(ConfirmSubscriptionHandler.name)
+
   constructor(
     @Inject(SUBSCRIPTIONS_QUERY_REPOSITORY)
     private subscriptionsQueryRepository: ISubscriptionsQueryRepository,
     @Inject(TRANSACTIONS_MANAGER)
-    private transactionManager: ITransactionsManager
+    private transactionManager: ITransactionsManager,
+    @Inject(SUBSCRIPTIONS_METRICS_SERVICE)
+    private subscriptionsMetricsService: ISubscriptionsMetricsService
   ) {}
 
   async execute(command: ConfirmSubscriptionCommand) {
     const { confirmationToken } = command
+
+    this.logger.log({
+      operation: "confirmSubscription",
+      params: command,
+      message: "Confirming subscription"
+    })
 
     const subscription =
       await this.subscriptionsQueryRepository.findByConfirmationToken(
@@ -36,8 +50,29 @@ export class ConfirmSubscriptionHandler
       )
     }
 
-    await this.transactionManager.transaction(async () => {
-      subscription.confirm()
-    })
+    try {
+      await this.transactionManager.transaction(async () => {
+        subscription.confirm()
+      })
+
+      this.subscriptionsMetricsService.recordSubscriptionConfirmed(
+        subscription.city,
+        subscription.frequency
+      )
+      this.logger.log({
+        operation: "confirmSubscription",
+        params: command,
+        result: {
+          subscription_id: subscription.id
+        },
+        message: "Subscription confirmed successfully"
+      })
+    } catch (error) {
+      this.subscriptionsMetricsService.recordSubscriptionConfirmedError(
+        subscription.city,
+        subscription.frequency
+      )
+      throw error
+    }
   }
 }

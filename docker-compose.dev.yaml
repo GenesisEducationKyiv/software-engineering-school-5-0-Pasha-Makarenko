@@ -12,7 +12,7 @@ services:
       - ./frontend:/usr/src/app
       - /usr/src/app/node_modules
     networks:
-      - angular-net
+      - nginx-net
 
   weather-app-dev:
     container_name: weather.weather-app.dev
@@ -38,7 +38,7 @@ services:
       - /usr/src/app/node_modules
     restart: unless-stopped
     networks:
-      - angular-net
+      - nginx-net
       - pg-network
       - metrics
       - rabbitmq-net
@@ -64,9 +64,21 @@ services:
       - /usr/src/app/node_modules
     restart: unless-stopped
     networks:
-      - angular-net
       - metrics
       - rabbitmq-net
+
+  nginx-dev:
+    container_name: weather.nginx.dev
+    image: nginx:stable-alpine
+    ports:
+      - ${NGINX_PORT}:80
+    volumes:
+      - ./config/nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend-dev
+      - weather-app-dev
+    networks:
+      - nginx-net
 
   rabbitmq-dev:
     image: rabbitmq:4.0-management
@@ -185,7 +197,7 @@ services:
 networks:
   pg-network:
     driver: bridge
-  angular-net:
+  nginx-net:
     driver: bridge
   metrics:
     driver: bridge

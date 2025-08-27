@@ -1,7 +1,7 @@
 import { environment } from "../../environments/environment"
 import { GetWeatherDto } from "../api/weather/dto/get-weather.dto"
 
-export const BASE_API_URL = environment.apiUrl + "/api"
+export const BASE_API_URL = environment.apiUrl
 
 export const ENDPOINTS = {
   subscribe: `${BASE_API_URL}/subscribe`,
